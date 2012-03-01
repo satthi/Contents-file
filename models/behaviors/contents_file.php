@@ -258,7 +258,7 @@ class ContentsFileBehavior extends ModelBehavior {
         if (empty($data[$Model][$field])) {
             return true;
         }
-        if (!$this->_resizeImg($data[$Model][$field]['file_path'], $resize_list)) {
+        if (!$this->resizeImg($model,$data[$Model][$field]['file_path'], $resize_list)) {
             // リサイズに失敗したらログに記録
             return false;
         }
@@ -266,10 +266,10 @@ class ContentsFileBehavior extends ModelBehavior {
     }
 
     /*
-     * _resizeimg
+     * resizeimg
      */
 
-    private function _resizeImg($imagePath, $resizeSet) {
+    public function resizeImg(&$model,$imagePath, $resizeSet) {
         $resize_flag = true;
         if (!empty($resizeSet)) {
             //widthやheightのキーがあるかどうかで1層かそれ以上か判定

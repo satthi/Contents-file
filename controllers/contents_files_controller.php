@@ -3,7 +3,7 @@
 class ContentsFilesController extends ContentsFileAppController {
 
     var $name = 'ContentsFiles';
-    var $uses = array();
+    var $uses = array('ContentsFile.ContentsFileResize');
     var $components = array('Session');
 
     /**
@@ -198,6 +198,13 @@ class ContentsFilesController extends ContentsFileAppController {
             if (!empty($v)) {
                 $renew_path .= '/';
                 $renew_path .= $v;
+            }
+        }
+        //元画像があって、リサイズ画像がない場合、リサイズをする
+        if (!file_exists($renew_path) && file_exists($file_path)){
+            $size_setting = explode('_', $file_size);
+            if (count($size_setting) >= 2){
+                $this->ContentsFileResize->resizeImg($file_path,array('width' => $size_setting[0],'height' => $size_setting[1]));
             }
         }
         return $renew_path;
