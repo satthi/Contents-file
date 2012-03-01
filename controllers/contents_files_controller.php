@@ -28,7 +28,7 @@ class ContentsFilesController extends ContentsFileAppController {
 
         //アクセス制限(セッションキーがあるかどうか)
         $session_info = Configure::read('contents_file_access_limit.' . $model);
-            if (!empty($session_info)) {
+        if (!empty($session_info)) {
             $deny = true;
             foreach ($session_info as $session_key) {
                 if ($this->Session->check($session_key)) {

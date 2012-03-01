@@ -1,7 +1,5 @@
 <?php
 
-App::uses('ContentsFileAttachment', 'ContentsFile.Model');
-
 class ContentsFileBehavior extends ModelBehavior {
 
     var $settings = array();
@@ -21,7 +19,7 @@ class ContentsFileBehavior extends ModelBehavior {
 
         // Default settings
         $this->settings[$model->alias] = Set::merge($defaults, $settings);
-
+        App::import('Model','ContentsFile.ContentsFileAttachment');
         $this->ContentsFileAttachment = new ContentsFileAttachment();
     }
 
@@ -138,7 +136,7 @@ class ContentsFileBehavior extends ModelBehavior {
         if (!empty($model->data[$model->alias][$field['column']]['file_path'])) {
             return;
         }
-
+        
         if (empty($model->data[$model->alias]['id'])){
             $model_id = $model->getLastInsertId();
         }else{
@@ -171,7 +169,7 @@ class ContentsFileBehavior extends ModelBehavior {
         if (!file_exists($saveDir)) {
             mkdir($saveDir, 0755, true);
         }
-        if (!@rename($field['cacheTempDir'] . $model->data[$model_name][$field_name]['cache_tmp_name'], $saveDir . $model->data[$model_name][$field_name]['name'])) {
+        if (!rename($field['cacheTempDir'] . $model->data[$model_name][$field_name]['cache_tmp_name'], $saveDir . $model->data[$model_name][$field_name]['name'])) {
             return false;
         }
         //!ファイルの保存

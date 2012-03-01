@@ -1,7 +1,5 @@
 <?php
 
-App::uses('AppHelper', 'View/Helper');
-
 class ContentsFileHelper extends AppHelper {
 
     var $helpers = array('Html');
