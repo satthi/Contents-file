@@ -122,7 +122,7 @@ class ContentsFileBehavior extends ModelBehavior {
     private function _fileSave(&$model, $field) {
         $model_name = $model->alias;
         $field_name = $field['column'];
-        if (!array_key_exists($field_name,$model->data[$model->alias])){
+        if (!isset($model->data[$model->alias][$field_name])){
             return;
         }
         if (array_key_exists('delete_' . $field_name , $model->data[$model->alias]) && $model->data[$model->alias]['delete_' . $field_name] == true){
