@@ -31,16 +31,16 @@ class ContentsFileComponent extends Component {
     /**
      * tmpSave
      */
-    public function tmpSave($modelName = null) {
+    public function tmpSave($hash = null,$modelName = null) {
         if (!$modelName) {
             $modelName = $this->controller->modelClass;
         }
         if (!empty($this->controller->$modelName->contentsFileField)) {
             if (array_key_exists('column', $this->controller->$modelName->contentsFileField)) {
-                $this->_tmpSave($modelName, $this->controller->$modelName->contentsFileField);
+                $this->_tmpSave($hash,$modelName, $this->controller->$modelName->contentsFileField);
             } else {
                 foreach ($this->controller->$modelName->contentsFileField as $field) {
-                    $this->_tmpSave($modelName, $field);
+                    $this->_tmpSave($hash,$modelName, $field);
                 }
             }
         }
@@ -50,7 +50,7 @@ class ContentsFileComponent extends Component {
      * _tmpSave
      */
 
-    private function _tmpSave($modelName, $field) {
+    private function _tmpSave($hash,$modelName, $field) {
         if (!empty($this->controller->request->data[$modelName][$field['column']]['name'])) {
             $name = $this->controller->request->data[$modelName][$field['column']]['name'];
             $tmp_name = $this->controller->request->data[$modelName][$field['column']]['tmp_name'];
@@ -66,9 +66,9 @@ class ContentsFileComponent extends Component {
             }
         } else {
             if (!empty($this->controller->request->data)) {
-                $this->controller->request->data[$modelName][$field['column']] = $this->Session->read('ContentsFile.' . $modelName . '__' . $field['column']);
+                $this->controller->request->data[$modelName][$field['column']] = $this->Session->read('ContentsFile.' . $modelName . '__' . $field['column'] . '__' . $hash);
             }
-            $this->Session->delete('ContentsFile.' . $modelName . '__' . $field['column']);
+            $this->Session->delete('ContentsFile.' . $modelName . '__' . $field['column'] . '__' . $hash);
         }
     }
 
@@ -76,16 +76,16 @@ class ContentsFileComponent extends Component {
      * tmpSet
      */
 
-    function tmpSet($modelName = null) {
+    function tmpSet($hash = null,$modelName = null) {
         if (!$modelName) {
             $modelName = $this->controller->modelClass;
         }
         if (!empty($this->controller->$modelName->contentsFileField)) {
             if (array_key_exists('column', $this->controller->$modelName->contentsFileField)) {
-                $this->_tmpSet($modelName, $this->controller->$modelName->contentsFileField);
+                $this->_tmpSet($hash,$modelName, $this->controller->$modelName->contentsFileField);
             } else {
                 foreach ($this->controller->$modelName->contentsFileField as $field) {
-                    $this->_tmpSet($modelName, $field);
+                    $this->_tmpSet($hash,$modelName, $field);
                 }
             }
         }
@@ -95,11 +95,11 @@ class ContentsFileComponent extends Component {
      * _tmpSet
      */
 
-    function _tmpSet($modelName, $field) {
+    function _tmpSet($hash,$modelName, $field) {
         //データがあった場合セッションに書き込んでおく。(次に表示するために
         if (!empty($this->controller->request->data[$modelName][$field['column']])) {
             $data = $this->controller->request->data[$modelName][$field['column']];
-            $this->Session->write('ContentsFile.' . $modelName . '__' . $field['column'], $data);
+            $this->Session->write('ContentsFile.' . $modelName . '__' . $field['column'] . '__' . $hash, $data);
         }
     }
 
