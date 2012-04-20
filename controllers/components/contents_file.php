@@ -67,9 +67,9 @@ class ContentsFileComponent extends Object {
             }
         } else {
             if (!empty($this->controller->data)) {
-                $this->controller->data[$modelName][$field['column']] = $this->Session->read('ContentsFile.' . $modelName . '__' . $field['column'] . '.' . $hash);
+                $this->controller->data[$modelName][$field['column']] = $this->Session->read('ContentsFile.' . $modelName . '__' . $field['column'] . '__' . $hash);
             }
-            $this->Session->delete('ContentsFile.' . $modelName . '__' . $field['column'] . '.' . $hash);
+            $this->Session->delete('ContentsFile.' . $modelName . '__' . $field['column'] . '__' . $hash);
         }
     }
 
