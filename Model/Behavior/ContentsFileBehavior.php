@@ -85,6 +85,9 @@ class ContentsFileBehavior extends ModelBehavior {
      */
 
     private function _fileDataSet(&$model, $field, $data) {
+        if (!isset($data[$model->alias]['id'])){
+            return array();
+        }
         $query = array();
         //必要ファイル情報を取得
         $query['conditions'] = array(
