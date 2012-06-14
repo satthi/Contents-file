@@ -50,11 +50,11 @@ class ContentsFileBehavior extends ModelBehavior {
             return $result;
         }
         if (array_key_exists($model->alias, $result)) {
-            $result = $this->_dataset(&$model, $data);
+            $result = $this->_dataset($model, $data);
         } else {
             foreach ($result as $k => $v) {
                 if (array_key_exists($model->alias, $v)) {
-                    $result[$k] = $this->_dataset(&$model, $v);
+                    $result[$k] = $this->_dataset($model, $v);
                 }
             }
         }
