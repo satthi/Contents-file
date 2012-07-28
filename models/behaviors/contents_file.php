@@ -170,7 +170,9 @@ class ContentsFileBehavior extends ModelBehavior {
         //ファイルの保存
         $saveDir = $field['filePath'] . $model_name . '/' . $model_id . '/' . $field_name . '/';
         if (!file_exists($saveDir)) {
-            mkdir($saveDir, 0755, true);
+            $oldumask = umask(0);
+            mkdir($saveDir, 0777, true);
+            umask($oldumask);
         }
         if (!rename($field['cacheTempDir'] . $model->data[$model_name][$field_name]['cache_tmp_name'], $saveDir . $model->data[$model_name][$field_name]['name'])) {
             return false;
