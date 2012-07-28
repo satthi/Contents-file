@@ -114,8 +114,19 @@ class ContentsFileBehavior extends ModelBehavior {
      */
 
     private function _filePathSet($file_data, $file_path) {
-        $path = $file_path . $file_data['model'] . '/' . $file_data['model_id'] . '/' . $file_data['field_name'] . '/' . $file_data['file_name'];
+        //default_value
+        $ext = null;
+        if (preg_match('/\.([^.]*)$/', $file_data['file_name'], $a)) {
+            if (!empty($a[1])) {
+                $ext = strtolower($a[1]);
+            }
+        }
+        $path = $file_path . $file_data['model'] . '/' . $file_data['model_id'] . '/' . $file_data['field_name'] . '/' . 'file.' . $ext;
+        if (file_exists($path)) {
         return $path;
+        } else {
+            return $file_path . $file_data['model'] . '/' . $file_data['model_id'] . '/' . $file_data['field_name'] . '/' . $file_data['file_name'];
+        }
     }
 
     /*
@@ -174,7 +185,14 @@ class ContentsFileBehavior extends ModelBehavior {
             mkdir($saveDir, 0777, true);
             umask($oldumask);
         }
-        if (!rename($field['cacheTempDir'] . $model->data[$model_name][$field_name]['cache_tmp_name'], $saveDir . $model->data[$model_name][$field_name]['name'])) {
+        //default_value
+        $ext = null;
+        if (preg_match('/\.([^.]*)$/', $model->data[$model_name][$field_name]['name'], $a)) {
+            if (!empty($a[1])) {
+                $ext = strtolower($a[1]);
+            }
+        }
+        if (!@rename($field['cacheTempDir'] . $model->data[$model_name][$field_name]['cache_tmp_name'], $saveDir . 'file.' . $ext)) {
             return false;
         }
         //!ファイルの保存
@@ -336,6 +354,10 @@ class ContentsFileBehavior extends ModelBehavior {
         $reSizeX = 0;
         $reSizeY = 0;
         $mag = 1;
+        //デフォルト大きいほうあわせ
+        if (empty($baseSize['type'])) {
+            $baseSize['type'] = 'large';
+        }c
         if (!array_key_exists('height', $baseSize)) {
             $baseSize['height'] = 0;
         }
@@ -343,7 +365,7 @@ class ContentsFileBehavior extends ModelBehavior {
             $baseSize['width'] = 0;
         }
 
-        if (empty($baseSize['width']) || !empty($baseSize['height']) && $sizeX * $baseSize['height'] < $sizeY * $baseSize['width']) {
+        if (empty($baseSize['width']) || !empty($baseSize['height']) && (($baseSize['type'] == 'large' && $sizeX * $baseSize['height'] < $sizeY * $baseSize['width']) || ($baseSize['type'] == 'small' && $sizeX * $baseSize['height'] > $sizeY * $baseSize['width']))) {
             // 縦基準
             $diffSizeY = $sizeY - $baseSize['height'];
             $mag = $baseSize['height'] / $sizeY;
@@ -391,7 +413,7 @@ class ContentsFileBehavior extends ModelBehavior {
         //一度'/'で分解
         $imagePathExplode = explode('/', $imagePath);
         //rename
-        $imagePathExplode[count($imagePathExplode) - 1] = $baseSize['width'] . '_' . $baseSize['height'] . '_' . $imagePathExplode[count($imagePathExplode) - 1];
+        $imagePathExplode[count($imagePathExplode) - 1] = $baseSize['width'] . '_' . $baseSize['height'] . '_' . $baseSize['type'] . '_' . $imagePathExplode[count($imagePathExplode) - 1];
         $renameImagePath = '';
         //分解したものを再結合
         if (!empty($imagePathExplode)) {

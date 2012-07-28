@@ -63,9 +63,14 @@ class ContentsFileHelper extends AppHelper {
                 $size .= '0_';
             }
             if (!empty($sizeset['height'])) {
-                $size .= $sizeset['height'];
+                $size .= $sizeset['height'] . '_';
             } else {
-                $size .= '0';
+                $size .= '0_';
+            }
+            if (!empty($sizeset['type'])) {
+                $size .= $sizeset['type'];
+            } else {
+                $size .= 'large';
             }
         }
         //ダウンロードか直接表示か

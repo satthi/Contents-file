@@ -204,7 +204,7 @@ class ContentsFilesController extends ContentsFileAppController {
         if (!file_exists($renew_path) && file_exists($file_path)){
             $size_setting = explode('_', $file_size);
             if (count($size_setting) >= 2){
-                $this->ContentsFileResize->resizeImg($file_path,array('width' => $size_setting[0],'height' => $size_setting[1]));
+                $this->ContentsFileResize->resizeImg($file_path,array('width' => $size_setting[0],'height' => $size_setting[1],'type' => $size_setting[2]));
             }
         }
         return $renew_path;
