@@ -101,6 +101,7 @@ class ContentsFileHelper extends AppHelper {
             $url_file['model'],
             $url_file['model_id'],
             $url_file['field_name'],
+            Security::hash($url_file['model'] . $url_file['model_id'] . $url_file['field_name'] . $hash),
             $size,
             $url_file['file_name']
         );

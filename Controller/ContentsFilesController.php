@@ -5,6 +5,7 @@ class ContentsFilesController extends ContentsFileAppController {
     var $name = 'ContentsFiles';
     var $uses = array('ContentsFile.ContentsFileResize');
     var $components = array('Session');
+    var $noUpdateHash = true;
 
     /**
      * loader
@@ -16,12 +17,17 @@ class ContentsFilesController extends ContentsFileAppController {
      * @param string $hash
      * @return
      */
-    function loader($isDownload = true, $model = null, $model_id = null, $fieldName = null, $size = null, $fileName = null) {
+    function loader($isDownload = true, $model = null, $model_id = null, $fieldName = null, $hash = null, $size = null, $fileName = null) {
         $this->layout = false;
         $this->autoRender = false;
         Configure::write('debug', 0);
 
         if (!$model || $model_id == null || !$fieldName) {
+            throw new NotFoundException(__('Invalid access'));
+            return;
+        }
+        
+        if (Security::hash($model . $model_id . $fieldName . $this->Session->read('Filebinder.hash')) !== $hash) {
             throw new NotFoundException(__('Invalid access'));
             return;
         }
