@@ -20,6 +20,10 @@ class ContentsFileComponent extends Object {
      */
     public function startup(&$controller) {
         $controller->helpers[] = 'ContentsFile.ContentsFile';
+        
+        if (!isset($controller->noUpdateHash) || !$controller->noUpdateHash) {
+            $this->Session->write('Filebinder.hash', Security::hash(time()));
+        }
     }
 
     /**

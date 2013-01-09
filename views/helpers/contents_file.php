@@ -2,7 +2,7 @@
 
 class ContentsFileHelper extends AppHelper {
 
-    var $helpers = array('Html');
+    var $helpers = array('Html','Session');
 
     /**
      * image
@@ -52,6 +52,7 @@ class ContentsFileHelper extends AppHelper {
      * @return
      */
     function _makePath($file = null, $options = array(), $sizeset = array()) {
+        $hash = $this->Session->read('Filebinder.hash');
         //画像表示に必要な情報の整理
         if (empty($sizeset)) {
             $size = 'default';
@@ -99,6 +100,7 @@ class ContentsFileHelper extends AppHelper {
             $url_file['model'],
             $url_file['model_id'],
             $url_file['field_name'],
+            Security::hash($url_file['model'] . $url_file['model_id'] . $url_file['field_name'] . $hash),
             $size,
             $url_file['file_name']
         );
