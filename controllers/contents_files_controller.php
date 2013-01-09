@@ -16,13 +16,18 @@ class ContentsFilesController extends ContentsFileAppController {
      * @param string $hash
      * @return
      */
-    function loader($isDownload = true, $model = null, $model_id = null, $fieldName = null, $size = null, $fileName = null) {
+    function loader($isDownload = true, $model = null, $model_id = null, $fieldName = null, $hash = null, $size = null, $fileName = null) {
         $this->layout = false;
         $this->autoRender = false;
         Configure::write('debug', 0);
 
         if (!$model || $model_id == null || !$fieldName) {
-            throw new NotFoundException(__('Invalid access'));
+            $this->cakeError('error404');
+            return;
+        }
+        
+        if (Security::hash($model . $model_id . $fieldName . $this->Session->read('Filebinder.hash')) !== $hash) {
+            $this->cakeError('error404');
             return;
         }
 
@@ -36,7 +41,7 @@ class ContentsFilesController extends ContentsFileAppController {
                 }
             }
             if ($deny === true) {
-                throw new NotFoundException(__('Invalid access'));
+                $this->cakeError('error404');
             }
         }
         //!アクセス制限
@@ -88,7 +93,7 @@ class ContentsFilesController extends ContentsFileAppController {
         }
 
         if (!file_exists($filePath)) {
-            throw new NotFoundException(__('Invalid access'));
+            $this->cakeError('error404');
             return;
         }
 
