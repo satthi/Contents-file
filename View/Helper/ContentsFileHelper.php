@@ -31,6 +31,9 @@ class ContentsFileHelper extends AppHelper {
     //sizeを追加
     function link($file = null, $options = array(), $size = array()) {
         $options = Set::merge($options, array('target' => '_blank'));
+        if (isset($file['error']) && $file['error'] != 0){
+            return '';
+        }
         return $this->Html->link($file['file_name'], $this->_makePath($file, $options, $size), $options);
     }
 
@@ -43,6 +46,9 @@ class ContentsFileHelper extends AppHelper {
     // modified by s.hagiwara 2011.11.18
     //sizeを追加
     function url($file = null, $options = array(), $size = array()) {
+        if (isset($file['error']) && $file['error'] != 0){
+            return '';
+        }
         return $this->Html->url($this->_makePath($file, $options, $size));
     }
 
