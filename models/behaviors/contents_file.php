@@ -404,7 +404,19 @@ class ContentsFileBehavior extends ModelBehavior {
                 }
             }
         }
-        ImageJPEG($outImage, $renameImagePath, 100);
+        switch ($imagetype) {
+            case IMAGETYPE_GIF:
+                ImagePNG($outImage, $renameImagePath);
+                break;
+            case IMAGETYPE_JPEG:
+                ImageJPEG($outImage, $renameImagePath, 100);
+                break;
+            case IMAGETYPE_PNG:
+                ImagePNG($outImage, $renameImagePath);
+                break;
+            default :
+                return false;
+        }
         ImageDestroy($outImage);
 
         return true;
