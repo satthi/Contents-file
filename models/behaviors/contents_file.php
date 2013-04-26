@@ -406,7 +406,7 @@ class ContentsFileBehavior extends ModelBehavior {
         }
         switch ($imagetype) {
             case IMAGETYPE_GIF:
-                ImagePNG($outImage, $renameImagePath);
+                ImageGIF($outImage, $renameImagePath);
                 break;
             case IMAGETYPE_JPEG:
                 ImageJPEG($outImage, $renameImagePath, 100);
