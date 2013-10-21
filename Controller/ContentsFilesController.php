@@ -100,9 +100,9 @@ class ContentsFilesController extends ContentsFileAppController {
 
         // modified by s.sugimoto 2011.09.14
         if ($isDownload) {
-            if (strstr(env('HTTP_USER_AGENT'), 'MSIE')) {
+            if (strstr(env('HTTP_USER_AGENT'), 'MSIE') || strstr(env('HTTP_USER_AGENT'), 'Trident')) {
                 $fileName = mb_convert_encoding($fileName, "SJIS", "UTF-8");
-                header('Content-Disposition: inline; filename="' . $fileName . '"');
+                header('Content-Disposition: attachment; filename="' . $fileName . '"');
             } else {
                 header('Content-Disposition: attachment; filename="' . $fileName . '"');
             }
