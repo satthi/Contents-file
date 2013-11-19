@@ -17,7 +17,7 @@ class ContentsFileComponent extends Component {
     /**
      * startup
      */
-    public function startup(&$controller) {
+    public function startup(Controller $controller) {
         $controller->helpers[] = 'ContentsFile.ContentsFile';
         
         if (!isset($controller->noUpdateHash) || !$controller->noUpdateHash) {
@@ -28,7 +28,7 @@ class ContentsFileComponent extends Component {
     /**
      * Before render
      */
-    public function beforeRender(&$controller) {
+    public function beforeRender(Controller $controller) {
         
     }
 
