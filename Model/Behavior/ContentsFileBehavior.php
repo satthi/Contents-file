@@ -13,7 +13,7 @@ class ContentsFileBehavior extends ModelBehavior {
      * @param &$model
      * @param $settings
      */
-    function setup(&$model, $settings = array()) {
+    function setup(Model $model, $settings = array()) {
         $defaults = array(
             'cache_temp_dir' => TMP . 'cache/files/'
         );
@@ -29,7 +29,7 @@ class ContentsFileBehavior extends ModelBehavior {
      * afterSave
      */
 
-    function afterSave(&$model, $created) {
+    function afterSave(Model $model, $created) {
         $modelName = $model->alias;
         if (!empty($model->contentsFileField)) {
             //一つか、配列で複数持っているかで分岐
@@ -47,7 +47,7 @@ class ContentsFileBehavior extends ModelBehavior {
      * afterFind
      */
 
-    function afterFind(&$model, $result) {
+    function afterFind(Model $model, $result) {
         if (empty($result)) {
             return $result;
         }
@@ -67,7 +67,7 @@ class ContentsFileBehavior extends ModelBehavior {
      * _dataset
      */
 
-    private function _dataset(&$model, $data) {
+    private function _dataset(Model $model, $data) {
         if (!empty($model->contentsFileField)) {
             if (array_key_exists('column', $model->contentsFileField)) {
                 $data[$model->alias][$model->contentsFileField['column']] = $this->_fileDataSet($model, $model->contentsFileField, $data);
@@ -84,7 +84,7 @@ class ContentsFileBehavior extends ModelBehavior {
      * _fileDataSet
      */
 
-    private function _fileDataSet(&$model, $field, $data) {
+    private function _fileDataSet(Model $model, $field, $data) {
         if (!isset($data[$model->alias]['id'])){
             return array();
         }
@@ -135,7 +135,7 @@ class ContentsFileBehavior extends ModelBehavior {
      * _fileSave
      */
 
-    private function _fileSave(&$model, $field) {
+    private function _fileSave(Model $model, $field) {
         $model_name = $model->alias;
         $field_name = $field['column'];
         if (!isset($model->data[$model->alias][$field_name])){
@@ -294,7 +294,7 @@ class ContentsFileBehavior extends ModelBehavior {
      * resizeimg
      */
 
-    public function resizeImg(&$model, $imagePath, $resizeSet) {
+    public function resizeImg(Model $model, $imagePath, $resizeSet) {
         $resize_flag = true;
         if (!empty($resizeSet)) {
             //widthやheightのキーがあるかどうかで1層かそれ以上か判定
