@@ -29,7 +29,7 @@ class ContentsFileBehavior extends ModelBehavior {
      * afterSave
      */
 
-    function afterSave(Model $model, $created) {
+    function afterSave(Model $model, $created, $options = array()) {
         $modelName = $model->alias;
         if (!empty($model->contentsFileField)) {
             //一つか、配列で複数持っているかで分岐
@@ -47,7 +47,7 @@ class ContentsFileBehavior extends ModelBehavior {
      * afterFind
      */
 
-    function afterFind(Model $model, $result) {
+    function afterFind(Model $model, $result, $primary = false) {
         if (empty($result)) {
             return $result;
         }
