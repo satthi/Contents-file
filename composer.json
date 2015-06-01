@@ -16,7 +16,7 @@
     },
     "require": {
         "cakephp/cakephp": "~3.0",
-        "ext-gd": ">=5.4.16"
+        "ext-gd": "*"
     },
     "require-dev": {
     },
