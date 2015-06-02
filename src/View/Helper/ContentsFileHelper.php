@@ -6,7 +6,7 @@ use Cake\View\Helper;
 
 class ContentsFileHelper extends Helper {
 
-    public $helpers = array('Html', 'Url');
+    public $helpers = ['Html', 'Url'];
     private $__default_option = [
         'target' => '_blank',
         'escape' => false

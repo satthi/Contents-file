@@ -78,7 +78,7 @@ class ContentsFileController extends AppController
     }
     
     private function getFileType($ext){
-        $aContentTypes = array(
+        $aContentTypes = [
         'txt'=>'text/plain',
         'htm'=>'text/html',
         'html'=>'text/html',
@@ -95,7 +95,7 @@ class ContentsFileController extends AppController
         'lzh'=>'application/x-lha-compressed',
         'zip'=>'application/x-zip-compressed',
         'sit'=>'application/x-stuffit'
-    ); 
+    ]; 
         $sContentType = 'application/octet-stream';
         
         if (!empty($aContentTypes[$ext])){
@@ -105,7 +105,7 @@ class ContentsFileController extends AppController
     }
     
     private function getMimeType($filename) {
-        $aContentTypes = array(
+        $aContentTypes = [
         'txt'=>'text/plain',
         'htm'=>'text/html',
         'html'=>'text/html',
@@ -122,7 +122,7 @@ class ContentsFileController extends AppController
         'lzh'=>'application/x-lha-compressed',
         'zip'=>'application/x-zip-compressed',
         'sit'=>'application/x-stuffit'
-    ); 
+    ]; 
         $sContentType = 'application/octet-stream';
         
         if (($pos = strrpos($filename, ".")) !== false) {

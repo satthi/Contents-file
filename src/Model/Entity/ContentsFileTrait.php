@@ -8,7 +8,7 @@ use Cake\I18n\Time;
 
 trait ContentsFileTrait
 {
-    private $__contentsFileSettings = array();
+    private $__contentsFileSettings = [];
     private $__attachmentModel;
     
     private function __contentsFileSettings()
