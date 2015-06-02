@@ -25,7 +25,7 @@ class ContentsFileValidation extends Validation
      * @return int file size
      */
     private static function __calcFileSizeUnit($size) {
-        $units = array('K', 'M', 'G', 'T');
+        $units = ['K', 'M', 'G', 'T'];
         $byte = 1024;
 
         if (is_numeric($size) || is_int($size)) {
