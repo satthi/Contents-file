@@ -1,0 +1,6 @@
+/composer.phar
+/composer.lock
+/phpunit.xml
+/vendor
+/tests/test_app/App/tmp/*
+/tests/test_app/App/files/*

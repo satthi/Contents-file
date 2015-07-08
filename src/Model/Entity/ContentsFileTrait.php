@@ -59,7 +59,6 @@ trait ContentsFileTrait
         return $value;
     }
     
-    
     public function setContentsFile(){
         $this->__contentsFileSettings();
         foreach ($this->__contentsFileSettings['fields'] as $field => $field_setting){

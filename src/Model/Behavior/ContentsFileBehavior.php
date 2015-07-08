@@ -192,13 +192,13 @@ class ContentsFileBehavior extends Behavior {
         
         switch ($imagetype) {
             case IMAGETYPE_GIF:
-                ImageGIF($outImage, $imagepathinfo['resize_filepath'], 100);
+                ImageGIF($outImage, $imagepathinfo['resize_filepath'], 0);
                 break;
             case IMAGETYPE_JPEG:
-                ImageJPEG($outImage, $imagepathinfo['resize_filepath'], 100);
+                ImageJPEG($outImage, $imagepathinfo['resize_filepath'], 0);
                 break;
             case IMAGETYPE_PNG:
-                ImagePNG($outImage, $imagepathinfo['resize_filepath'], 100);
+                ImagePNG($outImage, $imagepathinfo['resize_filepath'], 0);
                 break;
             default :
                 return false;
