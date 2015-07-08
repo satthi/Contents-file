@@ -19,6 +19,9 @@
         "ext-gd": "*"
     },
     "require-dev": {
+        "cakephp/cakephp-codesniffer": "dev-master",
+        "phpunit/phpunit": "*",
+        "satthi/plugin-test-support": "dev-master"
     },
     "autoload": {
         "psr-4": {
@@ -26,6 +29,10 @@
         }
     },
     "autoload-dev": {
+        "psr-4": {
+            "ContentsFile\\Test\\": "tests",
+            "ContentsFile\\Test\\App\\": "tests/test_app/App"
+        }
     },
     "suggest": {
     },
