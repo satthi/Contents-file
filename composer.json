@@ -1,0 +1,20 @@
+{
+    "name": "satthi/contents-file",
+    "description": "CakePHP ContentsFile",
+    "type": "cakephp-plugin",
+    "keywords": ["cakephp", "file"],
+    "homepage": "https://github.com/satthi/Contents-file",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Satoru Hagiwara",
+            "role": "Author"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/satthi/Contents-file"
+    },
+    "require": {
+        "ext-gd": "*"
+    }
+}
