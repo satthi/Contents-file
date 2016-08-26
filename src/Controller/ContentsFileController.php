@@ -72,12 +72,16 @@ class ContentsFileController extends AppController
             $fileContentType = $this->getMimeType($file);
             header('Content-Type: ' . $fileContentType);
         }
-        if (!empty($filename)) {
-            header('Content-Disposition: filename=' . $filename);
+
+        if (strstr(env('HTTP_USER_AGENT'), 'MSIE') || strstr(env('HTTP_USER_AGENT'), 'Trident')) {
+            $filename = mb_convert_encoding($filename, "SJIS", "UTF-8");
+            header('Content-Disposition: filename="' . $filename . '"');
+        } else {
+            header('Content-Disposition: filename="' . $filename . '"');
         }
         @ob_end_clean(); // clean
         readfile($file);
-        
+
     }
     
     private function getFileType($ext){
