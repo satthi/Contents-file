@@ -72,6 +72,9 @@ class ContentsFileController extends AppController
             $fileContentType = $this->getMimeType($file);
             header('Content-Type: ' . $fileContentType);
         }
+        if (!empty($filename)) {
+            header('Content-Disposition: filename=' . $filename);
+        }
         @ob_end_clean(); // clean
         readfile($file);
         
