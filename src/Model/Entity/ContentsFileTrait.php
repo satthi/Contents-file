@@ -5,6 +5,7 @@ namespace ContentsFile\Model\Entity;
 use Cake\Utility\Security;
 use Cake\ORM\TableRegistry;
 use Cake\I18n\Time;
+use ContentsFile\Aws\S3;
 
 trait ContentsFileTrait
 {
@@ -41,6 +42,8 @@ trait ContentsFileTrait
                     ->where(['field_name' => $match[1]])
                     ->first()
                 ;
+                // debug($attachmentData);
+                // exit;
                 if (!empty($attachmentData)){
                     $value = [
                         'model' => $attachmentData->model,
@@ -88,7 +91,9 @@ trait ContentsFileTrait
                     if ($this->__getExt($file_info['name']) !== null ){
                         $tmp_file_name .= '.' . $this->__getExt($file_info['name']);
                     }
-                    if (!copy($file_info['tmp_name'], $field_setting['cacheTempDir'] . $tmp_file_name)){
+                    // S3そのいち
+
+                    if (!$this->tmpUpload($file_info['tmp_name'], $field_setting, $tmp_file_name)){
                         //エラー
                     }
                     $file_set['tmp_file_name'] = $tmp_file_name;
@@ -110,5 +115,16 @@ trait ContentsFileTrait
             return null;
         }
         return $file_explode[(count($file_explode) - 1)];
+    }
+
+    private function tmpUpload($tmp_name, $field_setting, $tmp_file_name)
+    {
+        if ($field_setting['type'] == 's3') {
+            $upload_file_name = 'tmp/' . $tmp_file_name;
+            $S3 = new S3();
+            return $S3->upload($tmp_name, $upload_file_name);
+        } else {
+            return copy($tmp_name, $field_setting['cacheTempDir'] . $tmp_file_name);
+        }
     }
 }

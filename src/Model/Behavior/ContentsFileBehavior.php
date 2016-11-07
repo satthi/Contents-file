@@ -7,6 +7,11 @@ use Cake\Event\Event;
 use Cake\ORM\Entity;
 use ArrayObject;
 use Cake\ORM\TableRegistry;
+use ContentsFile\Aws\S3;
+use Cake\Utility\Security;
+use Cake\I18n\Time;
+use Cake\Filesystem\Folder;
+
 
 class ContentsFileBehavior extends Behavior {
 
@@ -38,32 +43,20 @@ class ContentsFileBehavior extends Behavior {
                     'file_size' => $file_info['file_size'],
                 ];
                 $attachmentEntity = $this->__attachmentModel->newEntity($attachmentSaveData);
-                //ファイルの移動
-                $new_filedir = $field_settings['filePath'] . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
-                $new_filepath = $new_filedir . $file_info['field_name'];
-                if (
-                    !$this->__mkdir($new_filedir, 0777, true) || 
-                    $this->__fileMove($field_settings['cacheTempDir'] . $file_info['tmp_file_name'] , $new_filepath)
-                    
-                ){
-                    //失敗時はロールバック
-                    $this->__fileRollback($contentsFileConfig, $entity->id);
-                    return false;
-                }
-                
-                //リサイズディレクトリはまず削除する(これは仮に失敗してもアクセス時に復元可能なため
-                $this->__resizeDirRemove($new_filepath);
-                
-                //リサイズ画像作成
-                if (!empty($field_settings['resize'])){
-                    foreach ($field_settings['resize'] as $resize_settings){
-                        if (!$this->imageResize($new_filepath, $resize_settings)){
-                            //失敗時はロールバック
-                            $this->__fileRollback($contentsFileConfig, $entity->id);
-                            return false;
-                        }
+                if ($field_settings['type'] == 's3') {
+                    if (!$this->s3FileSave($file_info, $field_settings, $attachmentSaveData)) {
+                        return false;
+                    }
+                } else {
+                    if (!$this->fileSave($file_info, $field_settings, $attachmentSaveData)) {
+                        return false;
                     }
                 }
+                // ここから
+
+                //ファイルの移動
+
+                // ここまで
                 
                 //元のデータがあるかfind(あれば更新にする)
                 $attachmentDataCheck = $this->__attachmentModel->find('all')
@@ -86,6 +79,71 @@ class ContentsFileBehavior extends Behavior {
         $this->__fileCommit($contentsFileConfig, $entity->id);
         return true;
         
+    }
+
+    private function s3FileSave($file_info, $field_settings, $attachmentSaveData)
+    {
+        $S3 = new S3();
+        $new_filedir = 'file/' . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
+        $new_filepath = $new_filedir . $file_info['field_name'];
+        $old_filepath = 'tmp/' . $file_info['tmp_file_name'];
+
+        if (
+            !$S3->move($old_filepath, $new_filepath . '/'. 'file')
+        ){
+            //失敗時はロールバック
+            // $this->__fileRollback($contentsFileConfig, $entity->id);
+            return false;
+        }
+        
+        //リサイズディレクトリはまず削除する(これは仮に失敗してもアクセス時に復元可能なため
+        $S3->delete($new_filepath . '/' . 'contents_file_resize_file');
+        
+        //リサイズ画像作成
+        if (!empty($field_settings['resize'])){
+            foreach ($field_settings['resize'] as $resize_settings){
+                
+                // debug($new_filepath);
+                // debug($resize_settings);
+                // exit;
+                if (!$this->s3ImageResize($new_filepath, $resize_settings)) {
+                    // $this->imageResize($new_filepath, $resize_settings)){
+                    //失敗時はロールバック
+                    // $this->__fileRollback($contentsFileConfig, $entity->id);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private function fileSave($file_info, $field_settings, $attachmentSaveData)
+    {
+        $new_filedir = $field_settings['filePath'] . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
+        $new_filepath = $new_filedir . $file_info['field_name'];
+        if (
+            !$this->__mkdir($new_filedir, 0777, true) || 
+            $this->__fileMove($field_settings['cacheTempDir'] . $file_info['tmp_file_name'] , $new_filepath)
+            
+        ){
+            //失敗時はロールバック
+            $this->__fileRollback($contentsFileConfig, $entity->id);
+            return false;
+        }
+        
+        //リサイズディレクトリはまず削除する(これは仮に失敗してもアクセス時に復元可能なため
+        $this->__resizeDirRemove($new_filepath);
+        
+        //リサイズ画像作成
+        if (!empty($field_settings['resize'])){
+            foreach ($field_settings['resize'] as $resize_settings){
+                if (!$this->imageResize($new_filepath, $resize_settings)){
+                    //失敗時はロールバック
+                    $this->__fileRollback($contentsFileConfig, $entity->id);
+                    return false;
+                }
+            }
+        }
     }
     
     /*
@@ -207,6 +265,37 @@ class ContentsFileBehavior extends Behavior {
         ImageDestroy($outImage);
 
         return true;
+    }
+
+    public function s3ImageResize($filepath, $resize)
+    {
+        $imagepathinfo = $this->getPathinfo($filepath . '/file', $resize);
+        $S3 = new S3();
+        // Exception = 存在していない場合
+        $tmp_file_name = Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss'));
+        $tmpPath = TMP . $tmp_file_name;
+        // ベースのファイルを取得
+        $baseObject = $S3->download($imagepathinfo['dirname'] . '/file');
+        $fp = fopen($tmpPath, 'w');
+        fwrite($fp, $baseObject['Body']);
+        fclose($fp);
+        //ない場合はリサイズを実行
+        if (!$this->imageResize($tmpPath, $resize)){
+            //失敗時はそのままのパスを返す(画像以外の可能性あり)
+            unlink($tmpPath);
+            return $filepath;
+        }
+        $resizeFileDir = TMP . 'contents_file_resize_' . $tmp_file_name;
+        $resizeFolder = new Folder($resizeFileDir);
+        // 一つのはず
+        $resizeImg = $resizeFolder->findRecursive()[0];
+        
+        // リサイズ画像をアップロード
+        $S3->upload($resizeImg, $imagepathinfo['resize_filepath']);
+
+        $resizeFolder->delete();
+        unlink($tmpPath);
+        return $imagepathinfo['resize_filepath'];
     }
     
     /*
