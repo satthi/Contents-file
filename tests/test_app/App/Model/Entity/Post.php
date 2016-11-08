@@ -18,7 +18,7 @@ use ContentsFileTrait;
     protected $_accessible = [
         'name' => true,
     ];
-    
+
     public $contentsFileConfig = [
         'fields' => [
             'file' => [
@@ -36,23 +36,24 @@ use ContentsFileTrait;
             ],
         ],
     ];
-    
+
     //&getメソッドをoverride
     public function &get($property)
     {
         $value = parent::get($property);
-        
+
         $value = $this->getContentsFile($property, $value);
-        
+
         return $value;
     }
-    
+
     //setメソッドをoverride
-    
-    public function set($property, $value = null, array $options = []){
-        
+
+    public function set($property, $value = null, array $options = [])
+    {
+
         parent::set($property, $value , $options);
-        
+
         $this->setContentsFile();
         return $this;
     }

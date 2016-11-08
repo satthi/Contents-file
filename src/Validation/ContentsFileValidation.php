@@ -6,16 +6,25 @@ use Cake\Validation\Validation;
 
 class ContentsFileValidation extends Validation
 {
-    public static function checkMaxSize ($value, $max, $context){
+    /**
+     * checkMaxSize
+     *
+     */
+    public static function checkMaxSize ($value, $max, $context)
+    {
         $max_value = ContentsFileValidation::__calcFileSizeUnit($max);
         return $max_value >= $value['size'];
     }
-    
-    
-    public static function uploadMaxSizeCheck ($value,$context){
+
+    /**
+     * uploadMaxSizeCheck
+     *
+     */
+    public static function uploadMaxSizeCheck ($value,$context)
+    {
        return $value['error'] != UPLOAD_ERR_INI_SIZE;
     }
-    
+
     /**
      * Calculate file size by unit
      *
@@ -36,5 +45,5 @@ class ContentsFileValidation extends Validation
 
         return false;
     }
-    
+
 }

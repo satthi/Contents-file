@@ -12,12 +12,13 @@ class ContentsFileHelper extends Helper {
         'escape' => false
     ];
 
-    public function link($file_info, $options = [], $title = null) {
+    public function link($file_info, $options = [], $title = null)
+    {
         //一時パス用の設定
-        if ($title === null){
+        if ($title === null) {
             $title = $file_info['file_name'];
         }
-        if (isset($options['resize'])){
+        if (isset($options['resize'])) {
             $file_info['resize'] = $options['resize'];
             unset($options['resize']);
         }
@@ -25,17 +26,18 @@ class ContentsFileHelper extends Helper {
             $this->__default_option,
             $options
         );
-        
+
         return $this->Html->link(
             $title,
             $this->__urlArray($file_info),
             $options
         );
     }
-    
-    public function image($file_info, $options = []) {
-        if (!empty($file_info)){
-            if (isset($options['resize'])){
+
+    public function image($file_info, $options = [])
+    {
+        if (!empty($file_info)) {
+            if (isset($options['resize'])) {
                 $file_info['resize'] = $options['resize'];
                 unset($options['resize']);
             }
@@ -44,15 +46,17 @@ class ContentsFileHelper extends Helper {
         return '';
     }
 
-    public function url($file_info, $full = false){
-        if (!isset($file_info['resize'])){
+    public function url($file_info, $full = false)
+    {
+        if (!isset($file_info['resize'])) {
             $file_info['resize'] = false;
         }
         return $this->Url->build($this->__urlArray($file_info),$full);
     }
-    
-    private function __urlArray($file_info){
-        if (!empty($file_info['tmp_file_name'])){
+
+    private function __urlArray($file_info)
+    {
+        if (!empty($file_info['tmp_file_name'])) {
             return [
                 'controller' => 'contents_file',
                 'action' => 'loader',
@@ -62,7 +66,7 @@ class ContentsFileHelper extends Helper {
                 'tmp_file_name' => $file_info['tmp_file_name'],
             ];
         } else {
-            if (!isset($file_info['resize'])){
+            if (!isset($file_info['resize'])) {
                 $file_info['resize'] = false;
             }
             return [
@@ -76,5 +80,4 @@ class ContentsFileHelper extends Helper {
             ];
         }
     }
-    
 }
