@@ -73,6 +73,8 @@ trait S3ContentsFileControllerTrait
      * s3ResizeSet
      * S3のリサイズ処理
      * @author hagiwara
+     * @param string $filepath
+     * @param array $resize
      */
     private function s3ResizeSet($filepath, $resize)
     {

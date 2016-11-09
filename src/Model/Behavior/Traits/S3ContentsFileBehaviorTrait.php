@@ -7,7 +7,6 @@ use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
 use Cake\I18n\Time;
 use Cake\Network\Exception\InternalErrorException;
-use Cake\ORM\TableRegistry;
 use Cake\Utility\Security;
 
 /**
@@ -18,6 +17,11 @@ use Cake\Utility\Security;
 trait S3ContentsFileBehaviorTrait
 {
 
+    /**
+     * s3ParamCheck
+     * 通常の設定値チェック
+     * @author hagiwara
+     */
     private function s3ParamCheck()
     {
         // S3に必要な設定がそろっているかチェックする
@@ -40,6 +44,9 @@ trait S3ContentsFileBehaviorTrait
      * s3FileSave
      * ファイルをS3に保存
      * @author hagiwara
+     * @param array $fileInfo
+     * @param array $fieldSettings
+     * @param array $attachmentSaveData
      */
     private function s3FileSave($fileInfo, $fieldSettings, $attachmentSaveData)
     {
@@ -72,6 +79,9 @@ trait S3ContentsFileBehaviorTrait
      * s3FileDelete
      * S3のファイル削除
      * @author hagiwara
+     * @param string $modelName
+     * @param integer $modelId
+     * @param string $field
      */
     private function s3FileDelete($modelName, $modelId, $field)
     {
@@ -94,6 +104,8 @@ trait S3ContentsFileBehaviorTrait
      * s3ImageResize
      * 画像のリサイズ処理(S3用)
      * @author hagiwara
+     * @param string $filepath
+     * @param array $resize
      */
     public function s3ImageResize($filepath, $resize)
     {

@@ -33,6 +33,7 @@ class ContentsFileController extends AppController
     /**
      * getFileType
      * @author hagiwara
+     * @param string $ext
      */
     private function getFileType($ext)
     {
@@ -65,6 +66,7 @@ class ContentsFileController extends AppController
     /**
      * getMimeType
      * @author hagiwara
+     * @param string $filename
      */
     private function getMimeType($filename)
     {
@@ -90,9 +92,9 @@ class ContentsFileController extends AppController
 
         if (($pos = strrpos($filename, ".")) !== false) {
             // 拡張子がある場合
-            $ext = strtolower(substr($filename, $pos+1));
+            $ext = strtolower(substr($filename, $pos + 1));
             if (strlen($ext)) {
-                return $aContentTypes[$ext]?$aContentTypes[$ext]:$sContentType;
+                return $aContentTypes[$ext] ? $aContentTypes[$ext] : $sContentType;
             }
         }
         return $sContentType;

@@ -61,7 +61,7 @@ trait NormalContentsFileControllerTrait
         $file = $filepath;
 
         header('Content-Length: ' . filesize($file));
-        if(!empty($fileExt)) {
+        if (!empty($fileExt)) {
             $fileContentType = $this->getFileType($fileExt);
             header('Content-Type: ' . $fileContentType);
         } else {
@@ -76,6 +76,8 @@ trait NormalContentsFileControllerTrait
      * normalResizeSet
      * 通常のリサイズ処理
      * @author hagiwara
+     * @param string $filepath
+     * @param array $resize
      */
     private function normalResizeSet($filepath, $resize)
     {

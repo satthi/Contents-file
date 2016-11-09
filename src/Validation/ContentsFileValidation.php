@@ -22,7 +22,7 @@ class ContentsFileValidation extends Validation
      */
     public static function uploadMaxSizeCheck($value, $context)
     {
-       return $value['error'] != UPLOAD_ERR_INI_SIZE;
+        return $value['error'] != UPLOAD_ERR_INI_SIZE;
     }
 
     /**

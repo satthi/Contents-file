@@ -4,10 +4,7 @@ namespace ContentsFile\Model\Behavior\Traits;
 
 use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
-use Cake\I18n\Time;
 use Cake\Network\Exception\InternalErrorException;
-use Cake\ORM\TableRegistry;
-use Cake\Utility\Security;
 
 /**
  * NormalContentsFileBehaviorTrait
@@ -17,6 +14,11 @@ use Cake\Utility\Security;
 trait NormalContentsFileBehaviorTrait
 {
 
+    /**
+     * normalParamCheck
+     * 通常の設定値チェック
+     * @author hagiwara
+     */
     private function normalParamCheck()
     {
         // S3に必要な設定がそろっているかチェックする
@@ -34,6 +36,9 @@ trait NormalContentsFileBehaviorTrait
      * normalFileSave
      * ファイルを保存
      * @author hagiwara
+     * @param array $fileInfo
+     * @param array $fieldSettings
+     * @param array $attachmentSaveData
      */
     private function normalFileSave($fileInfo, $fieldSettings, $attachmentSaveData)
     {
@@ -41,7 +46,7 @@ trait NormalContentsFileBehaviorTrait
         $newFilepath = $newFiledir . $fileInfo['field_name'];
         if (
             !$this->mkdir($newFiledir, 0777, true) ||
-            !rename(Configure::read('ContentsFile.Setting.Normal.tmpDir') . $fileInfo['tmp_file_name'] , $newFilepath)
+            !rename(Configure::read('ContentsFile.Setting.Normal.tmpDir') . $fileInfo['tmp_file_name'], $newFilepath)
         ) {
             return false;
         }

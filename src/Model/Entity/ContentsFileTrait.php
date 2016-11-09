@@ -24,7 +24,7 @@ trait ContentsFileTrait
         $default = [];
         //設定値はまとめる
         $settings = $this->contentsFileConfig;
-        $this->contentsFileSettings = array_merge($default,$settings);
+        $this->contentsFileSettings = array_merge($default, $settings);
     }
 
     /**
@@ -46,6 +46,8 @@ trait ContentsFileTrait
      * ファイルのgetterのセッティング
      *
      * @author hagiwara
+     * @param string $property
+     * @param array $value
      */
     public function getContentsFile($property, $value)
     {
@@ -55,7 +57,7 @@ trait ContentsFileTrait
             !empty($this->id) &&
             //設定値に設定されているとき
             preg_match('/^contents_file_(.*)$/', $property, $match) &&
-            array_key_exists($match[1] , $this->contentsFileSettings['fields'])
+            array_key_exists($match[1], $this->contentsFileSettings['fields'])
         ) {
             //何もセットされていないとき
             if (empty($this->_properties[$property])) {
@@ -118,7 +120,7 @@ trait ContentsFileTrait
                 if (!empty($fileInfo['tmp_name'])) {
                     $tmpFileName = Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss') . $fileInfo['name']);
 
-                    if ($this->getExt($fileInfo['name']) !== null ) {
+                    if ($this->getExt($fileInfo['name']) !== null) {
                         $tmpFileName .= '.' . $this->getExt($fileInfo['name']);
                     }
 
@@ -143,10 +145,11 @@ trait ContentsFileTrait
      * 拡張子の取得
      *
      * @author hagiwara
+     * @param string $file
      */
     private function getExt($file)
     {
-        $fileExplode = explode('.',$file);
+        $fileExplode = explode('.', $file);
         //この場合拡張子なし
         if (count($fileExplode) == 1) {
             return null;
@@ -159,6 +162,9 @@ trait ContentsFileTrait
      * tmpディレクトリへのアップロード
      *
      * @author hagiwara
+     * @param string $tmpFileName
+     * @param array $fieldSetting
+     * @param string $tmpFileName
      */
     private function tmpUpload($tmpName, $fieldSetting, $tmpFileName)
     {

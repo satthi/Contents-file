@@ -14,7 +14,10 @@ class ContentsFileHelper extends Helper {
 
     /**
      * link
-     *
+     * @author hagiwara
+     * @param array $fileInfo
+     * @param array $options
+     * @param string $title
      */
     public function link($fileInfo, $options = [], $title = null)
     {
@@ -40,7 +43,9 @@ class ContentsFileHelper extends Helper {
 
     /**
      * image
-     *
+     * @author hagiwara
+     * @param array $fileInfo
+     * @param array $options
      */
     public function image($fileInfo, $options = [])
     {
@@ -49,26 +54,29 @@ class ContentsFileHelper extends Helper {
                 $fileInfo['resize'] = $options['resize'];
                 unset($options['resize']);
             }
-            return $this->Html->image($this->urlArray($fileInfo) ,$options);
+            return $this->Html->image($this->urlArray($fileInfo), $options);
         }
         return '';
     }
 
     /**
      * url
-     *
+     * @author hagiwara
+     * @param array $fileInfo
+     * @param array $options
      */
     public function url($fileInfo, $full = false)
     {
         if (!isset($fileInfo['resize'])) {
             $fileInfo['resize'] = false;
         }
-        return $this->Url->build($this->urlArray($fileInfo),$full);
+        return $this->Url->build($this->urlArray($fileInfo), $full);
     }
 
     /**
      * urlArray
-     *
+     * @author hagiwara
+     * @param array $fileInfo
      */
     private function urlArray($fileInfo)
     {
