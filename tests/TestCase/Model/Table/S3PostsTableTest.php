@@ -40,7 +40,7 @@ class S3PostsTableTest extends TestCase
         Configure::write('ContentsFile.Setting', [
             'type' => 's3',
             'S3' => [
-                // Key/Secretをコミットはできないので。。。
+                // Key/Secretをコミットはできないので自動テストは走らせない
                 'key' => 'KEY',
                 'secret' => 'SECRET',
                 'bucket' => 'contents-file-dev',
