@@ -71,6 +71,12 @@ Configure::write('ContentsFile.Setting', [
 ※ 作業するbucketについてs3:GetObject、s3:PutObject、s3:DeleteObject、s3:ListBucketの権限があれば良いです
 
 ###各種基本設定(共通)
+マイグレーション実行
+
+`ContentsFile/config/Migrations/20161109095904_AttachmentsAdd`
+
+にファイルを置いているので利用してください。
+
 ※topicsを例とする
 Table
 ```php
