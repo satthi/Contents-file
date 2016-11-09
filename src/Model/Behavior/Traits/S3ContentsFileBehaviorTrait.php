@@ -22,26 +22,26 @@ trait S3ContentsFileBehaviorTrait
      * 画像をS3に保存
      * @author hagiwara
      */
-    private function s3FileSave($file_info, $field_settings, $attachmentSaveData)
+    private function s3FileSave($fileInfo, $fieldSettings, $attachmentSaveData)
     {
         $S3 = new S3();
-        $new_filedir = 'file/' . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
-        $new_filepath = $new_filedir . $file_info['field_name'];
-        $old_filepath = 'tmp/' . $file_info['tmp_file_name'];
+        $newFiledir = Configure::read('ContentsFile.Setting.S3.fileDir') . '/' . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
+        $newFilepath = $newFiledir . $fileInfo['field_name'];
+        $oldFilepath = Configure::read('ContentsFile.Setting.S3.tmpDir') . '/' . $fileInfo['tmp_file_name'];
 
         // tmpに挙がっているファイルを移
-        if (!$S3->move($old_filepath, $new_filepath)) {
+        if (!$S3->move($oldFilepath, $newFilepath)) {
             return false;
         }
 
         // リサイズディレクトリはまず削除する
         // 失敗=ディレクトリが存在しないため、成功失敗判定は行わない。
-        $S3->deleteRecursive($new_filepath . '/' . 'contents_file_resize_' . $file_info['field_name']);
+        $S3->deleteRecursive($newFilepath . '/' . 'contents_file_resize_' . $fileInfo['field_name']);
 
         //リサイズ画像作成
-        if (!empty($field_settings['resize'])) {
-            foreach ($field_settings['resize'] as $resize_settings) {
-                if (!$this->s3ImageResize($new_filepath, $resize_settings)) {
+        if (!empty($fieldSettings['resize'])) {
+            foreach ($fieldSettings['resize'] as $resizeSettings) {
+                if (!$this->s3ImageResize($newFilepath, $resizeSettings)) {
                     return false;
                 }
             }
@@ -58,13 +58,13 @@ trait S3ContentsFileBehaviorTrait
     {
         $S3 = new S3();
         // リサイズのディレクトリ
-        $resizeDir = 'file/' . $modelName . '/' . $modelId . '/' . 'contents_file_resize_' . $field . '/';
+        $resizeDir = Configure::read('ContentsFile.Setting.S3.fileDir') . '/' . $modelName . '/' . $modelId . '/' . 'contents_file_resize_' . $field . '/';
         if (!$S3->deleteRecursive($resizeDir)) {
             return false;
         }
 
         // 大元のファイル
-        $deleteFile = 'file/' . $modelName . '/' . $modelId . '/' . $field;
+        $deleteFile = Configure::read('ContentsFile.Setting.S3.fileDir') . '/' . $modelName . '/' . $modelId . '/' . $field;
         if (!$S3->delete($deleteFile)) {
             return false;
         }
@@ -81,8 +81,8 @@ trait S3ContentsFileBehaviorTrait
         $imagepathinfo = $this->getPathinfo($filepath, $resize);
         $S3 = new S3();
         // Exception = 存在していない場合
-        $tmp_file_name = Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss'));
-        $tmpPath = TMP . $tmp_file_name;
+        $tmpFileName = Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss'));
+        $tmpPath = TMP . $tmpFileName;
         // ベースのファイルを取得
         $baseObject = $S3->download($filepath);
         $fp = fopen($tmpPath, 'w');
@@ -93,7 +93,7 @@ trait S3ContentsFileBehaviorTrait
             unlink($tmpPath);
             return $filepath;
         }
-        $resizeFileDir = TMP . 'contents_file_resize_' . $tmp_file_name;
+        $resizeFileDir = TMP . 'contents_file_resize_' . $tmpFileName;
         $resizeFolder = new Folder($resizeFileDir);
         // 一つのはず
         $resizeImg = $resizeFolder->findRecursive()[0];

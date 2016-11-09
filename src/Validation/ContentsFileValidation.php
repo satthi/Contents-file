@@ -12,8 +12,8 @@ class ContentsFileValidation extends Validation
      */
     public static function checkMaxSize ($value, $max, $context)
     {
-        $max_value = ContentsFileValidation::__calcFileSizeUnit($max);
-        return $max_value >= $value['size'];
+        $maxValue = self::calcFileSizeUnit($max);
+        return $maxValue >= $value['size'];
     }
 
     /**
@@ -33,7 +33,7 @@ class ContentsFileValidation extends Validation
      * @param $size mixed
      * @return int file size
      */
-    private static function __calcFileSizeUnit($size) {
+    private static function calcFileSizeUnit($size) {
         $units = ['K', 'M', 'G', 'T'];
         $byte = 1024;
 

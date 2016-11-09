@@ -5,15 +5,11 @@ namespace ContentsFile\Model\Behavior;
 use ArrayObject;
 use Cake\Core\Configure;
 use Cake\Event\Event;
-use Cake\Filesystem\Folder;
-use Cake\I18n\Time;
 use Cake\Network\Exception\InternalErrorException;
 use Cake\ORM\Behavior;
 use Cake\ORM\Entity;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
-use Cake\Utility\Security;
-use ContentsFile\Aws\S3;
 use ContentsFile\Model\Behavior\Traits\NormalContentsFileBehaviorTrait;
 use ContentsFile\Model\Behavior\Traits\S3ContentsFileBehaviorTrait;
 
@@ -21,7 +17,6 @@ class ContentsFileBehavior extends Behavior {
 
     use NormalContentsFileBehaviorTrait;
     use S3ContentsFileBehaviorTrait;
-    private $__attachmentModel;
 
     /**
      * __construct
@@ -45,8 +40,8 @@ class ContentsFileBehavior extends Behavior {
     {
         //設定値をentityから取得
         $contentsFileConfig = $entity->getContentsFileSettings();
-        $this->__attachmentModel = TableRegistry::get('Attachments');
-        foreach ($contentsFileConfig['fields'] as $field => $field_settings) {
+        $attachmentModel = TableRegistry::get('Attachments');
+        foreach ($contentsFileConfig['fields'] as $field => $fieldSettings) {
             // ファイルの削除を最初に確認
             if ($entity->{'delete_' . $field} == true) {
                 // 該当フィールドを削除
@@ -57,37 +52,37 @@ class ContentsFileBehavior extends Behavior {
                 continue;
             }
             //contents_file_の方に入ったentityをベースに処理する
-            $file_info = $entity->{'contents_file_' . $field};
+            $fileInfo = $entity->{'contents_file_' . $field};
             if (
-                !empty($file_info) &&
+                !empty($fileInfo) &&
                 //tmp_file_nameがある=アップロードしたファイルがある
-                array_key_exists('tmp_file_name', $file_info)
+                array_key_exists('tmp_file_name', $fileInfo)
             ) {
                 // ファイルの削除
                 $attachmentSaveData = [
                     'model' => $this->_table->alias(),
                     'model_id' => $entity->id,
-                    'field_name' => $file_info['field_name'],
-                    'file_name' => $file_info['file_name'],
-                    'file_content_type' => $file_info['file_content_type'],
-                    'file_size' => $file_info['file_size'],
+                    'field_name' => $fileInfo['field_name'],
+                    'file_name' => $fileInfo['file_name'],
+                    'file_content_type' => $fileInfo['file_content_type'],
+                    'file_size' => $fileInfo['file_size'],
                 ];
-                $attachmentEntity = $this->__attachmentModel->newEntity($attachmentSaveData);
+                $attachmentEntity = $attachmentModel->newEntity($attachmentSaveData);
                 // 通常とS3で画像保存方法の切り替え
-                if (!$this->{Configure::read('ContentsFile.Setting.type') . 'FileSave'}($file_info, $field_settings, $attachmentSaveData)) {
+                if (!$this->{Configure::read('ContentsFile.Setting.type') . 'FileSave'}($fileInfo, $fieldSettings, $attachmentSaveData)) {
                     return false;
                 }
 
                 //元のデータがあるかfind(あれば更新にする)
-                $attachmentDataCheck = $this->__attachmentModel->find('all')
-                    ->where(['model' => $file_info['model']])
+                $attachmentDataCheck = $attachmentModel->find('all')
+                    ->where(['model' => $fileInfo['model']])
                     ->where(['model_id' => $entity->id])
-                    ->where(['field_name' => $file_info['field_name']])
+                    ->where(['field_name' => $fileInfo['field_name']])
                     ->first(1);
                 if (!empty($attachmentDataCheck)) {
                     $attachmentEntity->id = $attachmentDataCheck->id;
                 }
-                if (!$this->__attachmentModel->save($attachmentEntity)) {
+                if (!$attachmentModel->save($attachmentEntity)) {
                     return false;
                 }
             }

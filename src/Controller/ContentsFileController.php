@@ -2,7 +2,6 @@
 
 namespace ContentsFile\Controller;
 
-use Cake\Event\Event;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use ContentsFile\Controller\AppController;
@@ -13,8 +12,7 @@ class ContentsFileController extends AppController
 {
     use S3ContentsFileControllerTrait;
     use NormalContentsFileControllerTrait;
-    private $__baseModel;
-    private $__attachmentModel;
+    private $baseModel;
 
     /**
      * loader
@@ -25,13 +23,10 @@ class ContentsFileController extends AppController
         $this->autoRender = false;
 
         //Entityに接続して設定値を取得
-        $this->__baseModel = TableRegistry::get($this->request->query['model']);
-        $entity = $this->__baseModel->newEntity();
-        $field_name = $this->request->query['field_name'];
+        $this->baseModel = TableRegistry::get($this->request->query['model']);
 
-        $contentsFileConfig = $entity->getContentsFileSettings();
         // このレベルで切り出す
-        $this->{Configure::read('ContentsFile.Setting.type') . 'Loader'}($contentsFileConfig['fields'][$field_name]);
+        $this->{Configure::read('ContentsFile.Setting.type') . 'Loader'}();
 
     }
 

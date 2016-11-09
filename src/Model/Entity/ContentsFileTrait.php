@@ -11,21 +11,20 @@ use Cake\Core\Configure;
 
 trait ContentsFileTrait
 {
-    private $__contentsFileSettings = [];
-    private $__attachmentModel;
+    private $contentsFileSettings = [];
 
     /**
-     * __contentsFileSettings
+     * contentsFileSettings
      * 設定値のセッティング
      *
      * @author hagiwara
      */
-    private function __contentsFileSettings()
+    private function contentsFileSettings()
     {
         $default = [];
         //設定値はまとめる
         $settings = $this->contentsFileConfig;
-        $this->__contentsFileSettings = array_merge($default,$settings);
+        $this->contentsFileSettings = array_merge($default,$settings);
     }
 
     /**
@@ -36,10 +35,10 @@ trait ContentsFileTrait
      */
     public function getContentsFileSettings()
     {
-        if (empty($this->__contentsFileSettings)) {
-            $this->__contentsFileSettings();
+        if (empty($this->contentsFileSettings)) {
+            $this->contentsFileSettings();
         }
-        return $this->__contentsFileSettings;
+        return $this->contentsFileSettings;
     }
 
     /**
@@ -50,19 +49,19 @@ trait ContentsFileTrait
      */
     public function getContentsFile($property, $value)
     {
-        $this->__contentsFileSettings();
+        $this->contentsFileSettings();
         if (
             //attachmentにデータが登録時のみ
             !empty($this->id) &&
             //設定値に設定されているとき
             preg_match('/^contents_file_(.*)$/', $property, $match) &&
-            array_key_exists($match[1] , $this->__contentsFileSettings['fields'])
+            array_key_exists($match[1] , $this->contentsFileSettings['fields'])
         ) {
             //何もセットされていないとき
             if (empty($this->_properties[$property])) {
                 //attachmentからデータを探しに行く
-                $this->__attachmentModel = TableRegistry::get('Attachments');
-                $attachmentData = $this->__attachmentModel->find('all')
+                $attachmentModel = TableRegistry::get('Attachments');
+                $attachmentData = $attachmentModel->find('all')
                     ->where(['model' => $this->source()])
                     ->where(['model_id' => $this->id])
                     ->where(['field_name' => $match[1]])
@@ -94,45 +93,45 @@ trait ContentsFileTrait
      */
     public function setContentsFile()
     {
-        $this->__contentsFileSettings();
-        foreach ($this->__contentsFileSettings['fields'] as $field => $field_setting) {
-            $file_info = $this->{$field};
+        $this->contentsFileSettings();
+        foreach ($this->contentsFileSettings['fields'] as $field => $fieldSetting) {
+            $fileInfo = $this->{$field};
             if (
                 //ファイルの情報がある
-                !empty($file_info) &&
+                !empty($fileInfo) &&
                 //エラーのフィールドがある=ファイルをアップロード中
-                array_key_exists('error', $file_info) &&
+                array_key_exists('error', $fileInfo) &&
                 //空アップロード時は通さない(もともとのデータを活かす)
-                $file_info['error'] != UPLOAD_ERR_NO_FILE
+                $fileInfo['error'] != UPLOAD_ERR_NO_FILE
             ) {
-                $file_set = [
+                $fileSet = [
                     'model' => $this->source(),
                     'model_id' => $this->id,
                     'field_name' => $field,
-                    'file_name' => $file_info['name'],
+                    'file_name' => $fileInfo['name'],
                     'file_content_type' => Configure::read('ContentsFile.Setting.type'),
-                    'file_size' => $file_info['size'],
-                    'file_error' => $file_info['error'],
+                    'file_size' => $fileInfo['size'],
+                    'file_error' => $fileInfo['error'],
                 ];
 
-                //$file_infoにtmp_nameがいるときはtmpディレクトリへのファイルのコピーを行う
-                if (!empty($file_info['tmp_name'])) {
-                    $tmp_file_name = Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss') . $file_info['name']);
+                //$fileInfoにtmp_nameがいるときはtmpディレクトリへのファイルのコピーを行う
+                if (!empty($fileInfo['tmp_name'])) {
+                    $tmpFileName = Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss') . $fileInfo['name']);
 
-                    if ($this->getExt($file_info['name']) !== null ) {
-                        $tmp_file_name .= '.' . $this->getExt($file_info['name']);
+                    if ($this->getExt($fileInfo['name']) !== null ) {
+                        $tmpFileName .= '.' . $this->getExt($fileInfo['name']);
                     }
 
                     // tmpディレクトリへのアップロードのエラー(パーミッションなど)
-                    if (!$this->tmpUpload($file_info['tmp_name'], $field_setting, $tmp_file_name)) {
+                    if (!$this->tmpUpload($fileInfo['tmp_name'], $fieldSetting, $tmpFileName)) {
                         throw new InternalErrorException('tmp upload error');
                     }
-                    $file_set['tmp_file_name'] = $tmp_file_name;
+                    $fileSet['tmp_file_name'] = $tmpFileName;
                 }
                 //これを残して次に引き渡したくないので
                 unset($this->{$field});
 
-                $this->{'contents_file_' . $field} = $file_set;
+                $this->{'contents_file_' . $field} = $fileSet;
             }
 
         }
@@ -147,12 +146,12 @@ trait ContentsFileTrait
      */
     private function getExt($file)
     {
-        $file_explode = explode('.',$file);
+        $fileExplode = explode('.',$file);
         //この場合拡張子なし
-        if (count($file_explode) == 1) {
+        if (count($fileExplode) == 1) {
             return null;
         }
-        return $file_explode[(count($file_explode) - 1)];
+        return $fileExplode[(count($fileExplode) - 1)];
     }
 
     /**
@@ -161,14 +160,15 @@ trait ContentsFileTrait
      *
      * @author hagiwara
      */
-    private function tmpUpload($tmp_name, $field_setting, $tmp_file_name)
+    private function tmpUpload($tmpName, $fieldSetting, $tmpFileName)
     {
+        // すでにtraitのため、ここはif文での分岐処理
         if (Configure::read('ContentsFile.Setting.type') == 'normal') {
-            return copy($tmp_name, Configure::read('ContentsFile.Setting.cacheTempDir') . $tmp_file_name);
+            return copy($tmpName, Configure::read('ContentsFile.Setting.cacheTempDir') . $tmpFileName);
         } elseif (Configure::read('ContentsFile.Setting.type') == 's3') {
-            $upload_file_name = 'tmp/' . $tmp_file_name;
+            $uploadFileName = Configure::read('ContentsFile.Setting.S3.tmpDir') . '/' . $tmpFileName;
             $S3 = new S3();
-            return $S3->upload($tmp_name, $upload_file_name);
+            return $S3->upload($tmpName, $uploadFileName);
         } else {
             throw new InternalErrorException('contentsFileConfig type illegal');
         }

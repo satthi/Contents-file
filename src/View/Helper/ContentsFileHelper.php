@@ -7,76 +7,92 @@ use Cake\View\Helper;
 class ContentsFileHelper extends Helper {
 
     public $helpers = ['Html', 'Url'];
-    private $__default_option = [
+    private $defaultOption = [
         'target' => '_blank',
         'escape' => false
     ];
 
-    public function link($file_info, $options = [], $title = null)
+    /**
+     * link
+     *
+     */
+    public function link($fileInfo, $options = [], $title = null)
     {
         //一時パス用の設定
         if ($title === null) {
-            $title = $file_info['file_name'];
+            $title = $fileInfo['file_name'];
         }
         if (isset($options['resize'])) {
-            $file_info['resize'] = $options['resize'];
+            $fileInfo['resize'] = $options['resize'];
             unset($options['resize']);
         }
         $options = array_merge(
-            $this->__default_option,
+            $this->defaultOption,
             $options
         );
 
         return $this->Html->link(
             $title,
-            $this->__urlArray($file_info),
+            $this->urlArray($fileInfo),
             $options
         );
     }
 
-    public function image($file_info, $options = [])
+    /**
+     * image
+     *
+     */
+    public function image($fileInfo, $options = [])
     {
-        if (!empty($file_info)) {
+        if (!empty($fileInfo)) {
             if (isset($options['resize'])) {
-                $file_info['resize'] = $options['resize'];
+                $fileInfo['resize'] = $options['resize'];
                 unset($options['resize']);
             }
-            return $this->Html->image($this->__urlArray($file_info) ,$options);
+            return $this->Html->image($this->urlArray($fileInfo) ,$options);
         }
         return '';
     }
 
-    public function url($file_info, $full = false)
+    /**
+     * url
+     *
+     */
+    public function url($fileInfo, $full = false)
     {
-        if (!isset($file_info['resize'])) {
-            $file_info['resize'] = false;
+        if (!isset($fileInfo['resize'])) {
+            $fileInfo['resize'] = false;
         }
-        return $this->Url->build($this->__urlArray($file_info),$full);
+        return $this->Url->build($this->urlArray($fileInfo),$full);
     }
 
-    private function __urlArray($file_info)
+    /**
+     * urlArray
+     *
+     */
+    private function urlArray($fileInfo)
     {
-        if (!empty($file_info['tmp_file_name'])) {
+        if (!empty($fileInfo['tmp_file_name'])) {
             return [
                 'controller' => 'contents_file',
                 'action' => 'loader',
                 'plugin' => 'ContentsFile',
-                'model' => $file_info['model'],
-                'field_name' => $file_info['field_name'],
-                'tmp_file_name' => $file_info['tmp_file_name'],
+                'model' => $fileInfo['model'],
+                'field_name' => $fileInfo['field_name'],
+                'tmp_file_name' => $fileInfo['tmp_file_name'],
             ];
         } else {
-            if (!isset($file_info['resize'])) {
-                $file_info['resize'] = false;
+            if (!isset($fileInfo['resize'])) {
+                $fileInfo['resize'] = false;
             }
             return [
                 'controller' => 'contents_file',
                 'action' => 'loader',
                 'plugin' => 'ContentsFile',
-                'model' => $file_info['model'],
-                'field_name' => $file_info['field_name'],
-                'model_id' => $file_info['model_id'],
-                'resize' => $file_info['resize'],
+                'model' => $fileInfo['model'],
+                'field_name' => $fileInfo['field_name'],
+                'model_id' => $fileInfo['model_id'],
+                'resize' => $fileInfo['resize'],
             ];
         }
     }

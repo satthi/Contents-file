@@ -3,7 +3,6 @@
 namespace ContentsFile\Controller\Traits;
 
 use Cake\Core\Configure;
-use Cake\Network\Exception\InternalErrorException;
 use Cake\Network\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Inflector;
@@ -19,22 +18,22 @@ trait NormalContentsFileControllerTrait
      * 通常のローダー
      * @author hagiwara
      */
-    private function normalLoader($field_setting)
+    private function normalLoader()
     {
-        $field_name = $this->request->query['field_name'];
+        $fieldName = $this->request->query['field_name'];
         if (!empty($this->request->query['tmp_file_name'])) {
             $filename = $this->request->query['tmp_file_name'];
             $filepath = Configure::read('ContentsFile.Setting.cacheTempDir') . $filename;
         } elseif (!empty($this->request->query['model_id'])) {
             //表示条件をチェックする
-            $check_method_name = 'contentsFileCheck' . Inflector::camelize($field_name);
-            if (method_exists($this->__baseModel, $check_method_name)) {
+            $checkMethodName = 'contentsFileCheck' . Inflector::camelize($fieldName);
+            if (method_exists($this->baseModel, $checkMethodName)) {
                 //エラーなどの処理はTableに任せる
-                $this->__baseModel->{$check_method_name}($this->request->query['model_id']);
+                $this->baseModel->{$checkMethodName}($this->request->query['model_id']);
             }
             //attachementからデータを取得
-            $this->__attachmentModel = TableRegistry::get('Attachments');
-            $attachmentData = $this->__attachmentModel->find('all')
+            $attachmentModel = TableRegistry::get('Attachments');
+            $attachmentData = $attachmentModel->find('all')
                 ->where(['model' => $this->request->query['model']])
                 ->where(['model_id' => $this->request->query['model_id']])
                 ->where(['field_name' => $this->request->query['field_name']])
@@ -52,18 +51,18 @@ trait NormalContentsFileControllerTrait
             }
         }
 
-        $file_ext = null;
+        $fileExt = null;
         if (preg_match('/\.([^\.]*)$/', $filename, $ext)) {
             if ($ext[1]) {
-                $file_ext = strtolower($ext[1]);
+                $fileExt = strtolower($ext[1]);
             }
         }
 
         $file = $filepath;
 
         header('Content-Length: ' . filesize($file));
-        if(!empty($file_ext)) {
-            $fileContentType = $this->getFileType($file_ext);
+        if(!empty($fileExt)) {
+            $fileContentType = $this->getFileType($fileExt);
             header('Content-Type: ' . $fileContentType);
         } else {
             $fileContentType = $this->getMimeType($file);
@@ -90,7 +89,7 @@ trait NormalContentsFileControllerTrait
         if ($resize['width'] == 0 && $resize['height'] == 0) {
             return $filepath;
         }
-        $imagepathinfo = $this->__baseModel->getPathinfo($filepath, $resize);
+        $imagepathinfo = $this->baseModel->getPathinfo($filepath, $resize);
 
         //ファイルの存在チェック
         if (file_exists($imagepathinfo['resize_filepath'])) {
@@ -98,7 +97,7 @@ trait NormalContentsFileControllerTrait
         }
 
         //ない場合はリサイズを実行
-        if (!$this->__baseModel->imageResize($filepath, $resize)) {
+        if (!$this->baseModel->imageResize($filepath, $resize)) {
             //失敗時はそのままのパスを返す(画像以外の可能性あり)
             return $filepath;
         }

@@ -20,25 +20,25 @@ trait NormalContentsFileBehaviorTrait
      * 画像を保存
      * @author hagiwara
      */
-    private function normalFileSave($file_info, $field_settings, $attachmentSaveData)
+    private function normalFileSave($fileInfo, $fieldSettings, $attachmentSaveData)
     {
-        $new_filedir = Configure::read('ContentsFile.Setting.filePath') . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
-        $new_filepath = $new_filedir . $file_info['field_name'];
+        $newFiledir = Configure::read('ContentsFile.Setting.filePath') . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
+        $newFilepath = $newFiledir . $fileInfo['field_name'];
         if (
-            !$this->mkdir($new_filedir, 0777, true) ||
-            !rename(Configure::read('ContentsFile.Setting.cacheTempDir') . $file_info['tmp_file_name'] , $new_filepath)
+            !$this->mkdir($newFiledir, 0777, true) ||
+            !rename(Configure::read('ContentsFile.Setting.cacheTempDir') . $fileInfo['tmp_file_name'] , $newFilepath)
         ) {
             return false;
         }
 
         //リサイズディレクトリはまず削除する
-        $Folder = new Folder($new_filepath);
+        $Folder = new Folder($newFilepath);
         $Folder->delete();
 
         //リサイズ画像作成
-        if (!empty($field_settings['resize'])) {
-            foreach ($field_settings['resize'] as $resize_settings) {
-                if (!$this->normalImageResize($new_filepath, $resize_settings)) {
+        if (!empty($fieldSettings['resize'])) {
+            foreach ($fieldSettings['resize'] as $resizeSettings) {
+                if (!$this->normalImageResize($newFilepath, $resizeSettings)) {
                     return false;
                 }
             }
@@ -70,8 +70,8 @@ trait NormalContentsFileBehaviorTrait
         return true;
     }
 
-    private function normalImageResize($new_filepath, $resize_settings)
+    private function normalImageResize($newFilepath, $resizeSettings)
     {
-        return $this->imageResize($new_filepath, $resize_settings);
+        return $this->imageResize($newFilepath, $resizeSettings);
     }
 }
