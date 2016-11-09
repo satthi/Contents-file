@@ -63,17 +63,7 @@ class AttachmentsAdd extends AbstractMigration
             ])
             ->addIndex(
                 [
-                    'model',
-                ]
-            )
-            ->addIndex(
-                [
                     'model_id',
-                ]
-            )
-            ->addIndex(
-                [
-                    'field_name',
                 ]
             )
             ->create();
