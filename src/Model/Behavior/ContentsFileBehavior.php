@@ -114,33 +114,49 @@ class ContentsFileBehavior extends Behavior {
         if (empty($entity->id)) {
             return true;
         }
-        $attachmentModel = TableRegistry::get('Attachments');
         $contentsFileConfig = $entity->getContentsFileSettings();
         if (!empty($contentsFileConfig['fields'])) {
             foreach ($contentsFileConfig['fields'] as $field => $config) {
                 // fieldsの指定がない場合は全部消す
-                if (empty($fields) || in_array($field, $fields)) {
-
-                    $modelName = $entity->source();
-                    $modelId = $entity->id;
-                    // 添付ファイルデータの削除
-                    $deleteAttachmentData = $attachmentModel->find('all')
-                        ->where(['Attachments.model' => $modelName])
-                        ->where(['Attachments.model_id' => $modelId])
-                        ->where(['Attachments.field_name' => $field])
-                        ->first();
-
-                    if (!empty($deleteAttachmentData->id)) {
-                        $attachmentModel->delete($deleteAttachmentData);
-                        // 通常とS3でファイルの削除方法の切り替え
-                        if (!$this->{Configure::read('ContentsFile.Setting.type') . 'FileDelete'}($modelName, $modelId, $field)) {
-                            return false;
-                        }
-                    }
+                if (!empty($fields) && !in_array($field, $fields)) {
+                    continue;
+                }
+                if (!$this->fileDeleteParts($entity, $field)) {
+                    return false;
                 }
             }
         }
         return true;
+    }
+
+    /**
+     * fileDeleteParts
+     * ファイル削除
+     * @author hagiwara
+     * @param EntityInterface $entity
+     * @param string $field
+     */
+    private function fileDeleteParts($entity, $field)
+    {
+        $attachmentModel = TableRegistry::get('Attachments');
+        $modelName = $entity->source();
+        $modelId = $entity->id;
+        // 添付ファイルデータの削除
+        $deleteAttachmentData = $attachmentModel->find('all')
+            ->where(['Attachments.model' => $modelName])
+            ->where(['Attachments.model_id' => $modelId])
+            ->where(['Attachments.field_name' => $field])
+            ->first();
+
+        if (!empty($deleteAttachmentData->id)) {
+            $attachmentModel->delete($deleteAttachmentData);
+            // 通常とS3でファイルの削除方法の切り替え
+            if (!$this->{Configure::read('ContentsFile.Setting.type') . 'FileDelete'}($modelName, $modelId, $field)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * mkdir

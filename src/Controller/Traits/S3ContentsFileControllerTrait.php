@@ -18,39 +18,8 @@ trait S3ContentsFileControllerTrait
      * S3用のファイルローダー
      * @author hagiwara
      */
-    private function s3Loader()
+    private function s3Loader($filename, $filepath)
     {
-        $fieldName = $this->request->query['field_name'];
-        if (!empty($this->request->query['tmp_file_name'])) {
-            $filename = $this->request->query['tmp_file_name'];
-            $filepath = Configure::read('ContentsFile.Setting.S3.tmpDir') . '/' . $filename;
-        } elseif (!empty($this->request->query['model_id'])) {
-            // //表示条件をチェックする
-            $checkMethodName = 'contentsFileCheck' . Inflector::camelize($fieldName);
-            if (method_exists($this->baseModel, $checkMethodName)) {
-                //エラーなどの処理はTableに任せる
-                $this->baseModel->{$checkMethodName}($this->request->query['model_id']);
-            }
-            //attachementからデータを取得
-            $attachmentModel = TableRegistry::get('Attachments');
-            $attachmentData = $attachmentModel->find('all')
-                ->where(['model' => $this->request->query['model']])
-                ->where(['model_id' => $this->request->query['model_id']])
-                ->where(['field_name' => $this->request->query['field_name']])
-                ->first()
-            ;
-            if (empty($attachmentData)) {
-                throw new NotFoundException('404 error');
-            }
-            $filename = $attachmentData->file_name;
-            $filepath = Configure::read('ContentsFile.Setting.S3.fileDir') . '/' . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->field_name;
-
-            //通常のセットの時のみresize設定があれば見る
-            if (!empty($this->request->query['resize'])) {
-                $filepath = $this->s3ResizeSet($filepath, $this->request->query['resize']);
-            }
-        }
-
         // S3より該当ファイルを取得
         $S3 = new S3();
         $fileObject = $S3->download($filepath);
@@ -68,6 +37,29 @@ trait S3ContentsFileControllerTrait
         // サーバー上にファイルを残しておく必要がないので削除する
         unlink($topath);
     }
+
+    /**
+     * s3TmpFilePath
+     * S3のtmpのパス作成
+     * @author hagiwara
+     * @param string $filename
+     */
+    private function s3TmpFilePath($filename)
+    {
+        return Configure::read('ContentsFile.Setting.S3.tmpDir') . '/' . $filename;
+    }
+
+    /**
+     * s3FilePath
+     * S3のファイルのパス作成
+     * @author hagiwara
+     * @param Entity $attachmentData
+     */
+    private function s3FilePath($attachmentData)
+    {
+        return Configure::read('ContentsFile.Setting.S3.fileDir') . '/' . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->field_name;
+    }
+
 
     /**
      * s3ResizeSet

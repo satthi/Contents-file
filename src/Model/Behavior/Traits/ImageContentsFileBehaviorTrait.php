@@ -218,8 +218,6 @@ trait ImageContentsFileBehaviorTrait
         return false;
     }
 
-    }
-
     /**
      * getPathInfo
      * 通常のpathinfoに加えてContentsFile独自のpathも一緒に設定する

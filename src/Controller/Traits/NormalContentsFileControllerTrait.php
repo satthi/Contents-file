@@ -5,7 +5,6 @@ namespace ContentsFile\Controller\Traits;
 use Cake\Core\Configure;
 use Cake\Network\Exception\NotFoundException;
 use Cake\ORM\TableRegistry;
-use Cake\Utility\Inflector;
 
 /**
  * 通常のファイルローダー周り
@@ -18,39 +17,8 @@ trait NormalContentsFileControllerTrait
      * 通常のローダー
      * @author hagiwara
      */
-    private function normalLoader()
+    private function normalLoader($filename, $filepath)
     {
-        $fieldName = $this->request->query['field_name'];
-        if (!empty($this->request->query['tmp_file_name'])) {
-            $filename = $this->request->query['tmp_file_name'];
-            $filepath = Configure::read('ContentsFile.Setting.Normal.tmpDir') . $filename;
-        } elseif (!empty($this->request->query['model_id'])) {
-            //表示条件をチェックする
-            $checkMethodName = 'contentsFileCheck' . Inflector::camelize($fieldName);
-            if (method_exists($this->baseModel, $checkMethodName)) {
-                //エラーなどの処理はTableに任せる
-                $this->baseModel->{$checkMethodName}($this->request->query['model_id']);
-            }
-            //attachementからデータを取得
-            $attachmentModel = TableRegistry::get('Attachments');
-            $attachmentData = $attachmentModel->find('all')
-                ->where(['model' => $this->request->query['model']])
-                ->where(['model_id' => $this->request->query['model_id']])
-                ->where(['field_name' => $this->request->query['field_name']])
-                ->first()
-            ;
-            if (empty($attachmentData)) {
-                throw new NotFoundException('404 error');
-            }
-            $filename = $attachmentData->file_name;
-            $filepath = Configure::read('ContentsFile.Setting.Normal.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->field_name;
-
-            //通常のセットの時のみresize設定があれば見る
-            if (!empty($this->request->query['resize'])) {
-                $filepath = $this->normalResizeSet($filepath, $this->request->query['resize']);
-            }
-        }
-
         $fileExt = null;
         if (preg_match('/\.([^\.]*)$/', $filename, $ext)) {
             if ($ext[1]) {
@@ -58,18 +26,38 @@ trait NormalContentsFileControllerTrait
             }
         }
 
-        $file = $filepath;
-
-        header('Content-Length: ' . filesize($file));
+        header('Content-Length: ' . filesize($filepath));
         if (!empty($fileExt)) {
             $fileContentType = $this->getFileType($fileExt);
             header('Content-Type: ' . $fileContentType);
         } else {
-            $fileContentType = $this->getMimeType($file);
+            $fileContentType = $this->getMimeType($filepath);
             header('Content-Type: ' . $fileContentType);
         }
         @ob_end_clean(); // clean
-        readfile($file);
+        readfile($filepath);
+    }
+
+    /**
+     * normalTmpFilePath
+     * 通常用のtmpのパス作成
+     * @author hagiwara
+     * @param string $filename
+     */
+    private function normalTmpFilePath($filename)
+    {
+        return Configure::read('ContentsFile.Setting.Normal.tmpDir') . $filename;
+    }
+
+    /**
+     * normalFilePath
+     * 通常用のファイルのパス作成
+     * @author hagiwara
+     * @param Entity $attachmentData
+     */
+    private function normalFilePath($attachmentData)
+    {
+        return Configure::read('ContentsFile.Setting.Normal.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->field_name;
     }
 
     /**
