@@ -70,6 +70,9 @@ trait NormalContentsFileBehaviorTrait
      * normalFileDelete
      * 通常のファイル削除
      * @author hagiwara
+     * @param string $modelName
+     * @param integer $modelId
+     * @param string $field
      */
     private function normalFileDelete($modelName, $modelId, $field)
     {
@@ -90,6 +93,13 @@ trait NormalContentsFileBehaviorTrait
         return true;
     }
 
+    /**
+     * normalImageResize
+     * 通常のファイルのリサイズ
+     * @author hagiwara
+     * @param string $newFilepath
+     * @param array $resizeSettings
+     */
     private function normalImageResize($newFilepath, $resizeSettings)
     {
         return $this->imageResize($newFilepath, $resizeSettings);

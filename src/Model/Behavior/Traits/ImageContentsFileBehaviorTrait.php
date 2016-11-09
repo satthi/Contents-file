@@ -2,13 +2,6 @@
 
 namespace ContentsFile\Model\Behavior\Traits;
 
-use ContentsFile\Aws\S3;
-use Cake\Core\Configure;
-use Cake\Filesystem\Folder;
-use Cake\I18n\Time;
-use Cake\Network\Exception\InternalErrorException;
-use Cake\Utility\Security;
-
 /**
  * ImageContentsFileBehaviorTrait
  * 画像関係の処理
@@ -78,7 +71,7 @@ trait ImageContentsFileBehaviorTrait
      * imageSizeInfo
      * 画像リサイズ情報の取得
      * @author hagiwara
-     * @param string $imagePath
+     * @param string $image
      * @param array $baseSize
      */
     private function imageSizeInfo($image, $baseSize)

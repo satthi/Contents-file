@@ -63,7 +63,7 @@ class ContentsFileHelper extends Helper {
      * url
      * @author hagiwara
      * @param array $fileInfo
-     * @param array $options
+     * @param boolean $full
      */
     public function url($fileInfo, $full = false)
     {
