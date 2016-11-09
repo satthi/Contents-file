@@ -5,6 +5,7 @@ namespace ContentsFile\Aws;
 use Aws\Sdk;
 use Cake\Core\Configure;
 use Cake\Network\Exception\InternalErrorException;
+use Cake\Network\Exception\NotFoundException;
 
 /**
  * S3
@@ -54,6 +55,10 @@ class S3
      */
     public function upload($filepath, $filename)
     {
+        // アップロードするべきファイルがない場合
+        if (!file_exists($filepath)) {
+            throw new InternalErrorException('upload file not found');
+        }
         $bucketName = Configure::read('ContentsFile.Setting.S3.bucket');
         $mimetype = mime_content_type($filepath);
 
@@ -92,7 +97,7 @@ class S3
      */
     public function copy($oldFilename, $newFilename)
     {
-        // ファイルが存在しない場合は404
+        // ファイルが存在しない
         if (!$this->fileExists($oldFilename)) {
             return false;
         }
@@ -154,6 +159,10 @@ class S3
      */
     public function move($oldFilename, $newFilename)
     {
+        // 移動するファイルが存在しない
+        if (!$this->fileExists($oldFilename)) {
+            return false;
+        }
         // 失敗時はException
         return $this->copy($oldFilename, $newFilename) && $this->delete($oldFilename);
     }

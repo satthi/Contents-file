@@ -23,7 +23,7 @@ trait NormalContentsFileControllerTrait
         $fieldName = $this->request->query['field_name'];
         if (!empty($this->request->query['tmp_file_name'])) {
             $filename = $this->request->query['tmp_file_name'];
-            $filepath = Configure::read('ContentsFile.Setting.cacheTempDir') . $filename;
+            $filepath = Configure::read('ContentsFile.Setting.Normal.tmpDir') . $filename;
         } elseif (!empty($this->request->query['model_id'])) {
             //表示条件をチェックする
             $checkMethodName = 'contentsFileCheck' . Inflector::camelize($fieldName);
@@ -43,7 +43,7 @@ trait NormalContentsFileControllerTrait
                 throw new NotFoundException('404 error');
             }
             $filename = $attachmentData->file_name;
-            $filepath = Configure::read('ContentsFile.Setting.filePath') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->field_name;
+            $filepath = Configure::read('ContentsFile.Setting.Normal.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->field_name;
 
             //通常のセットの時のみresize設定があれば見る
             if (!empty($this->request->query['resize'])) {

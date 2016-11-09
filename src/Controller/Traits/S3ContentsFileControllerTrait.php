@@ -49,13 +49,12 @@ trait S3ContentsFileControllerTrait
             if (!empty($this->request->query['resize'])) {
                 $filepath = $this->s3ResizeSet($filepath, $this->request->query['resize']);
             }
-
         }
 
         // S3より該当ファイルを取得
         $S3 = new S3();
         $fileObject = $S3->download($filepath);
-        $topath = Configure::read('ContentsFile.Setting.cacheTempDir') . $filename;
+        $topath = Configure::read('ContentsFile.Setting.Normal.tmpDir') . $filename;
         $fp = fopen($topath, 'w');
         fwrite($fp, $fileObject['Body']);
         fclose($fp);

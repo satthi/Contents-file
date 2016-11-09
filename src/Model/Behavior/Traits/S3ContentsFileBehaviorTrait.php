@@ -3,11 +3,12 @@
 namespace ContentsFile\Model\Behavior\Traits;
 
 use ContentsFile\Aws\S3;
-use Cake\Utility\Security;
 use Cake\Core\Configure;
-use Cake\I18n\Time;
 use Cake\Filesystem\Folder;
+use Cake\I18n\Time;
+use Cake\Network\Exception\InternalErrorException;
 use Cake\ORM\TableRegistry;
+use Cake\Utility\Security;
 
 /**
  * S3ContentsFileBehaviorTrait
@@ -17,9 +18,25 @@ use Cake\ORM\TableRegistry;
 trait S3ContentsFileBehaviorTrait
 {
 
+    private function s3ParamCheck()
+    {
+        // S3に必要な設定がそろっているかチェックする
+        $s3Setting = Configure::read('ContentsFile.Setting.S3');
+        if (
+            !is_array($s3Setting) ||
+            !array_key_exists('key', $s3Setting) ||
+            !array_key_exists('secret', $s3Setting) ||
+            !array_key_exists('bucket', $s3Setting) ||
+            !array_key_exists('tmpDir', $s3Setting) ||
+            !array_key_exists('fileDir', $s3Setting)
+        ) {
+            throw new InternalErrorException('contentsFileS3Config paramater shortage');
+        }
+    }
+
     /**
      * s3FileSave
-     * 画像をS3に保存
+     * ファイルをS3に保存
      * @author hagiwara
      */
     private function s3FileSave($fileInfo, $fieldSettings, $attachmentSaveData)

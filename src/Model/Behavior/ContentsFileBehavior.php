@@ -29,7 +29,9 @@ class ContentsFileBehavior extends Behavior {
         if (!in_array(Configure::read('ContentsFile.Setting.type'), ['s3', 'normal'])) {
             throw new InternalErrorException('contentsFileConfig type illegal');
         }
-    }
+        // Configureの設定不足をチェックする
+        $this->{Configure::read('ContentsFile.Setting.type') . 'ParamCheck'}();
+}
 
     /**
      * afterSave
@@ -99,6 +101,7 @@ class ContentsFileBehavior extends Behavior {
      */
     public function fileDelete(Entity $entity, $fields = [])
     {
+        $attachmentModel = TableRegistry::get('Attachments');
         $contentsFileConfig = $entity->getContentsFileSettings();
         if (!empty($contentsFileConfig['fields'])) {
             foreach ($contentsFileConfig['fields'] as $field => $config) {
@@ -111,7 +114,6 @@ class ContentsFileBehavior extends Behavior {
                     $modelName = $entity->source();
                     $modelId = $entity->id;
                     // 添付ファイルデータの削除
-                    $attachmentModel = TableRegistry::get('Attachments');
                     $deleteAttachmentData = $attachmentModel->find('all')
                         ->where(['Attachments.model' => $modelName])
                         ->where(['Attachments.model_id' => $modelId])
@@ -312,7 +314,6 @@ class ContentsFileBehavior extends Behavior {
             }
             $pathinfo['resize_filepath'] = $pathinfo['resize_dir'] . '/' . $resize['width'] . '_' . $resize['height'];
         }
-
         return $pathinfo;
     }
 
@@ -331,5 +332,4 @@ class ContentsFileBehavior extends Behavior {
         umask($oldumask);
         return $result;
     }
-
 }

@@ -164,7 +164,7 @@ trait ContentsFileTrait
     {
         // すでにtraitのため、ここはif文での分岐処理
         if (Configure::read('ContentsFile.Setting.type') == 'normal') {
-            return copy($tmpName, Configure::read('ContentsFile.Setting.cacheTempDir') . $tmpFileName);
+            return copy($tmpName, Configure::read('ContentsFile.Setting.Normal.tmpDir') . $tmpFileName);
         } elseif (Configure::read('ContentsFile.Setting.type') == 's3') {
             $uploadFileName = Configure::read('ContentsFile.Setting.S3.tmpDir') . '/' . $tmpFileName;
             $S3 = new S3();
