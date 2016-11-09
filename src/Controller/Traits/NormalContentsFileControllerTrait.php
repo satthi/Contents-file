@@ -3,8 +3,6 @@
 namespace ContentsFile\Controller\Traits;
 
 use Cake\Core\Configure;
-use Cake\Network\Exception\NotFoundException;
-use Cake\ORM\TableRegistry;
 
 /**
  * 通常のファイルローダー周り

@@ -2,9 +2,6 @@
 namespace ContentsFile\Controller\Traits;
 
 use Cake\Core\Configure;
-use Cake\Network\Exception\NotFoundException;
-use Cake\ORM\TableRegistry;
-use Cake\Utility\Inflector;
 use ContentsFile\Aws\S3;
 
 /**
