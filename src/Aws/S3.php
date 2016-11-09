@@ -49,6 +49,16 @@ class S3
     }
 
     /**
+     * getClient
+     * clientを取得
+     * @author hagiwara
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
      * upload
      * S3へのファイルアップロード
      * @author hagiwara

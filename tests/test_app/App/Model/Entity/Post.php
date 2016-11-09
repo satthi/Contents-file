@@ -16,7 +16,8 @@ use ContentsFileTrait;
      * @var array
      */
     protected $_accessible = [
-        'name' => true,
+        '*' => true,
+        'id' => false
     ];
 
     public $contentsFileConfig = [
@@ -33,7 +34,7 @@ use ContentsFileTrait;
         ],
     ];
 
-    //&getメソッドをoverride
+    //&get繝｡繧ｽ繝�繝峨ｒoverride
     public function &get($property)
     {
         $value = parent::get($property);
@@ -43,7 +44,7 @@ use ContentsFileTrait;
         return $value;
     }
 
-    //setメソッドをoverride
+    //set繝｡繧ｽ繝�繝峨ｒoverride
 
     public function set($property, $value = null, array $options = [])
     {
