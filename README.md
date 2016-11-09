@@ -1,5 +1,8 @@
 # Contents-file
 
+[![Build Status](https://travis-ci.org/satthi/Contents-file.svg?branch=master)](https://travis-ci.org/satthi/Contents-file)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/satthi/Contents-file/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/satthi/Contents-file/?branch=master)
+
 このプラグインはCakePHP用ファイルアップロードツールです。  
 Ver 3.1 よりS3にも。対応しました。
 
