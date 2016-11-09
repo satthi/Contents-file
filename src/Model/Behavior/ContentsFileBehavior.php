@@ -20,7 +20,6 @@ class ContentsFileBehavior extends Behavior {
     use S3ContentsFileBehaviorTrait;
     use ImageContentsFileBehaviorTrait;
 
-    private $tp;
     /**
      * __construct
      * @author hagiwara
@@ -142,31 +141,6 @@ class ContentsFileBehavior extends Behavior {
             }
         }
         return true;
-    }
-
-    /**
-     * getPathInfo
-     * 通常のpathinfoに加えてContentsFile独自のpathも一緒に設定する
-     * @author hagiwara
-     * @param string $imagePath
-     * @param array $resize
-     */
-    public function getPathInfo($imagePath, $resize = []) {
-        $pathinfo = pathinfo($imagePath);
-        $pathinfo['resize_dir'] = $pathinfo['dirname'] . '/contents_file_resize_' . $pathinfo['filename'];
-        //一旦ベースのパスを通しておく
-        $pathinfo['resize_filepath'] = $imagePath;
-        if (!empty($resize)) {
-            if (!isset($resize['width'])) {
-                $resize['width'] = 0;
-            }
-            if (!isset($resize['height'])) {
-                $resize['height'] = 0;
-            }
-            $pathinfo['resize_filepath'] = $pathinfo['resize_dir'] . '/' . $resize['width'] . '_' . $resize['height'];
-        }
-        return $pathinfo;
-    }
 
     /**
      * mkdir

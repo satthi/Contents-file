@@ -8,6 +8,8 @@ namespace ContentsFile\Model\Behavior\Traits;
  */
 trait ImageContentsFileBehaviorTrait
 {
+    private $tp;
+
     /**
      * imageResize
      * 画像のリサイズ処理(外からでもたたけるようにpublicにする
@@ -71,7 +73,7 @@ trait ImageContentsFileBehaviorTrait
      * imageSizeInfo
      * 画像リサイズ情報の取得
      * @author hagiwara
-     * @param string $image
+     * @param resource $image
      * @param array $baseSize
      */
     private function imageSizeInfo($image, $baseSize)
@@ -110,7 +112,7 @@ trait ImageContentsFileBehaviorTrait
      * imageResizeMake
      * 画像リサイズ情報の取得
      * @author hagiwara
-     * @param string $image
+     * @param resource $image
      * @param integer $imagetype
      * @param string $imagePath
      * @param array $baseSize
@@ -214,5 +216,31 @@ trait ImageContentsFileBehaviorTrait
         }
         // 透過GIFではない
         return false;
+    }
+
+    }
+
+    /**
+     * getPathInfo
+     * 通常のpathinfoに加えてContentsFile独自のpathも一緒に設定する
+     * @author hagiwara
+     * @param string $imagePath
+     * @param array $resize
+     */
+    public function getPathInfo($imagePath, $resize = []) {
+        $pathinfo = pathinfo($imagePath);
+        $pathinfo['resize_dir'] = $pathinfo['dirname'] . '/contents_file_resize_' . $pathinfo['filename'];
+        //一旦ベースのパスを通しておく
+        $pathinfo['resize_filepath'] = $imagePath;
+        if (!empty($resize)) {
+            if (!isset($resize['width'])) {
+                $resize['width'] = 0;
+            }
+            if (!isset($resize['height'])) {
+                $resize['height'] = 0;
+            }
+            $pathinfo['resize_filepath'] = $pathinfo['resize_dir'] . '/' . $resize['width'] . '_' . $resize['height'];
+        }
+        return $pathinfo;
     }
 }
