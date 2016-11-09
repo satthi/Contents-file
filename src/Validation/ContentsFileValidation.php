@@ -10,7 +10,7 @@ class ContentsFileValidation extends Validation
      * checkMaxSize
      *
      */
-    public static function checkMaxSize ($value, $max, $context)
+    public static function checkMaxSize($value, $max, $context)
     {
         $maxValue = self::calcFileSizeUnit($max);
         return $maxValue >= $value['size'];
@@ -20,7 +20,7 @@ class ContentsFileValidation extends Validation
      * uploadMaxSizeCheck
      *
      */
-    public static function uploadMaxSizeCheck ($value,$context)
+    public static function uploadMaxSizeCheck($value, $context)
     {
        return $value['error'] != UPLOAD_ERR_INI_SIZE;
     }
@@ -33,7 +33,8 @@ class ContentsFileValidation extends Validation
      * @param $size mixed
      * @return int file size
      */
-    private static function calcFileSizeUnit($size) {
+    private static function calcFileSizeUnit($size)
+    {
         $units = ['K', 'M', 'G', 'T'];
         $byte = 1024;
 
@@ -42,8 +43,6 @@ class ContentsFileValidation extends Validation
         } else if (is_string($size) && preg_match('/^([0-9]+(?:\.[0-9]+)?)(' . implode('|', $units) . ')B?$/i', $size, $matches)) {
             return $matches[1] * pow($byte, array_search($matches[2], $units) + 1);
         }
-
         return false;
     }
-
 }

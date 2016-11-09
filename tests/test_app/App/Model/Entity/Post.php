@@ -23,16 +23,12 @@ use ContentsFileTrait;
         'fields' => [
             'file' => [
                 'resize' => false,
-                'cacheTempDir' => CONTENTS_FILE_CACHE_PATH,
-                'filePath' => CONTENTS_FILE_PATH,
             ],
             'img' => [
                 'resize' => [
                     ['width' => 300],
                     ['width' => 300, 'height' => 400],
                 ],
-                'cacheTempDir' => CONTENTS_FILE_CACHE_PATH,
-                'filePath' => CONTENTS_FILE_PATH,
             ],
         ],
     ];

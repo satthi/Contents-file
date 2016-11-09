@@ -6,6 +6,7 @@ use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use PluginTestSupport\Test\TestCase\AppTestCase;
 use Cake\Utility\Security;
+use Cake\Core\Configure;
 
 /**
  * App\Model\Table\PostsTable Test Case
@@ -53,6 +54,15 @@ class PostsTableTest extends AppTestCase
     public function setUp()
     {
         parent::setUp();
+        $this->tmpDir = dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/tmp/';
+        $this->fileDir = dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/files/';
+        Configure::write('ContentsFile.Setting', [
+            'type' => 'normal',
+            'Normal' => [
+                'tmpDir' => $this->tmpDir,
+                'fileDir' => $this->fileDir,
+            ],
+        ]);
         $config = TableRegistry::exists('Posts') ? [] : ['className' => 'ContentsFile\Test\App\Model\Table\PostsTable'];
         $this->Posts = TableRegistry::get('Posts', $config);
 
@@ -60,14 +70,6 @@ class PostsTableTest extends AppTestCase
         $this->fixtureManager->fixturize($this);
         $this->fixtureManager->loadSingle('Posts');
         $this->fixtureManager->loadSingle('Attachments');
-
-        if (!defined('CONTENTS_FILE_CACHE_PATH')) {
-            define('CONTENTS_FILE_CACHE_PATH', dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/tmp/');
-        }
-
-        if (!defined('CONTENTS_FILE_PATH')) {
-            define('CONTENTS_FILE_PATH', dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/files/');
-        }
 
         $this->demoFileDir = dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/demo/';
     }
@@ -82,7 +84,7 @@ class PostsTableTest extends AppTestCase
         unset($this->Posts);
 
         //不要なディレクトリは削除する必要がある
-        $this->removeDir(CONTENTS_FILE_PATH . 'Posts/');
+        $this->removeDir($this->fileDir . 'Posts/');
 
         parent::tearDown();
     }
@@ -97,7 +99,7 @@ class PostsTableTest extends AppTestCase
         //デモ画像をtmpディレクトリにコピーしておく
         $demo_filepath = $this->demoFileDir . 'demo1.png';
         $rand = Security::hash(rand());
-        copy($demo_filepath , CONTENTS_FILE_CACHE_PATH . $rand);
+        copy($demo_filepath , $this->tmpDir . $rand);
 
         $fileinfo = [
             'model' => 'Posts',
@@ -133,7 +135,7 @@ class PostsTableTest extends AppTestCase
         $this->assertTrue($check_data->contents_file_file === $assert_data);
 
         //ファイルが指定の個所にアップロードされており、同一ファイルか
-        $uploaded_filepath = CONTENTS_FILE_PATH . '/Posts/' . $last_id . '/file';
+        $uploaded_filepath = $this->fileDir . '/Posts/' . $last_id . '/file';
         $this->assertTrue(file_exists($uploaded_filepath));
 
         $origin_fp = fopen($demo_filepath, 'r');
@@ -157,7 +159,7 @@ class PostsTableTest extends AppTestCase
         //デモ画像をtmpディレクトリにコピーしておく
         $demo_filepath = $this->demoFileDir . 'demo1.png';
         $rand = Security::hash(rand());
-        copy($demo_filepath , CONTENTS_FILE_CACHE_PATH . $rand);
+        copy($demo_filepath , $this->tmpDir . $rand);
 
         $fileinfo = [
             'model' => 'Posts',
@@ -193,7 +195,7 @@ class PostsTableTest extends AppTestCase
         $this->assertTrue($check_data->contents_file_img === $assert_data);
 
         //ファイルが指定の個所にアップロードされており、同一ファイルか
-        $uploaded_filepath = CONTENTS_FILE_PATH . '/Posts/' . $last_id . '/img';
+        $uploaded_filepath = $this->fileDir . '/Posts/' . $last_id . '/img';
         $this->assertTrue(file_exists($uploaded_filepath));
 
         $origin_fp = fopen($demo_filepath, 'r');
@@ -207,8 +209,8 @@ class PostsTableTest extends AppTestCase
         $this->assertEquals($origin_fp , $upload_fp);
 
         //リサイズ画像が上がっているか
-        $resize_filepath1 = CONTENTS_FILE_PATH . '/Posts/' . $last_id . '/contents_file_resize_img/300_0';
-        $resize_filepath2 = CONTENTS_FILE_PATH . '/Posts/' . $last_id . '/contents_file_resize_img/300_400';
+        $resize_filepath1 = $this->fileDir . '/Posts/' . $last_id . '/contents_file_resize_img/300_0';
+        $resize_filepath2 = $this->fileDir . '/Posts/' . $last_id . '/contents_file_resize_img/300_400';
         $this->assertTrue(file_exists($resize_filepath1));
         $this->assertTrue(file_exists($resize_filepath2));
 
