@@ -28,7 +28,9 @@ trait S3ContentsFileBehaviorTrait
             !array_key_exists('secret', $s3Setting) ||
             !array_key_exists('bucket', $s3Setting) ||
             !array_key_exists('tmpDir', $s3Setting) ||
-            !array_key_exists('fileDir', $s3Setting)
+            !array_key_exists('fileDir', $s3Setting) ||
+            !array_key_exists('workingDir', $s3Setting)
+
         ) {
             throw new InternalErrorException('contentsFileS3Config paramater shortage');
         }
@@ -99,7 +101,7 @@ trait S3ContentsFileBehaviorTrait
         $S3 = new S3();
         // Exception = 存在していない場合
         $tmpFileName = Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss'));
-        $tmpPath = TMP . $tmpFileName;
+        $tmpPath = Configure::read('ContentsFile.Setting.S3.workingDir') . $tmpFileName;
         // ベースのファイルを取得
         $baseObject = $S3->download($filepath);
         $fp = fopen($tmpPath, 'w');
@@ -110,7 +112,7 @@ trait S3ContentsFileBehaviorTrait
             unlink($tmpPath);
             return $filepath;
         }
-        $resizeFileDir = TMP . 'contents_file_resize_' . $tmpFileName;
+        $resizeFileDir = Configure::read('ContentsFile.Setting.S3.workingDir') . 'contents_file_resize_' . $tmpFileName;
         $resizeFolder = new Folder($resizeFileDir);
         // 一つのはず
         $resizeImg = $resizeFolder->findRecursive()[0];
