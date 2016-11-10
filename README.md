@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/satthi/Contents-file.svg?branch=master)](https://travis-ci.org/satthi/Contents-file)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/satthi/Contents-file/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/satthi/Contents-file/?branch=master)
 
-このプラグインはCakePHP用ファイルアップロードツールです。  
+このプラグインはCakePHP用ファイルアップロードツールです。
 Ver 3.1 よりS3にも。対応しました。
 
 ## インストール
@@ -45,6 +45,13 @@ Configure::write('ContentsFile.Setting', [
         'tmpDir' => 'tmp',
         'fileDir' => 'file',
         'workingDir' => TMP,
+        // ファイルのURLをloaderを通さず直接awsに接続したい場合に設定
+        /*
+        //s3-ap-northeast-1.amazonaws.com/BUCKET_NAME でも
+        //BUCKET_NAME.s3-website-ap-northeast-1.amazonaws.com でも
+        //指定の文字列.cloudfront.net でも使用したいものを設定
+        */
+        'static_domain' => '//s3-ap-northeast-1.amazonaws.com/BUCKET_NAME',
     ]
 ]);
 ```
@@ -234,6 +241,13 @@ view.ctp
 <?= $this->ContentsFile->link($topic->contents_file_file);?>
 <?php // imgでimgタグ作成 リサイズお画像の指定はオプションで指定?>
 <?= $this->ContentsFile->image($topic->contents_file_img, ['resize' => ['width' => 300]]);?>
+
+<?php // 静的ホスティングにアクセス?>
+<?php // linkでファイルのリンク作成?>
+<?= $this->ContentsFile->link($topic->contents_file_file, ['static_s3' => true]);?>
+<?php // imgでimgタグ作成 リサイズお画像の指定はオプションで指定?>
+<?= $this->ContentsFile->image($topic->contents_file_img, ['resize' => ['width' => 300], 'static_s3' => true]);?>
+
 ```
 
 
