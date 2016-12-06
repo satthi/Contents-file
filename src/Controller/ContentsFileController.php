@@ -60,7 +60,6 @@ class ContentsFileController extends AppController
         }
 
         $this->{Configure::read('ContentsFile.Setting.type') . 'Loader'}($filename, $filepath);
-
     }
 
     /**
