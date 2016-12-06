@@ -5,6 +5,7 @@ namespace ContentsFile\Controller;
 use Cake\Core\Configure;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Inflector;
+use Cake\Network\Exception\NotFoundException;
 use ContentsFile\Controller\AppController;
 use ContentsFile\Controller\Traits\NormalContentsFileControllerTrait;
 use ContentsFile\Controller\Traits\S3ContentsFileControllerTrait;
