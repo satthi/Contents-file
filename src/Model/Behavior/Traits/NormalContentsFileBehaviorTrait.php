@@ -30,6 +30,13 @@ trait NormalContentsFileBehaviorTrait
         ) {
             throw new InternalErrorException('contentsFileNormalConfig paramater shortage');
         }
+        // /が最後についていない場合はつける
+        if (!preg_match('#/$#', $normalSetting['tmpDir'])) {
+            Configure::write('ContentsFile.Setting.Normal.tmpDir', $normalSetting['tmpDir'] . '/');
+        }
+        if (!preg_match('#/$#', $normalSetting['fileDir'])) {
+            Configure::write('ContentsFile.Setting.Normal.fileDir', $normalSetting['fileDir'] . '/');
+        }
     }
 
     /**

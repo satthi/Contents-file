@@ -12,7 +12,7 @@ use Cake\Utility\Security;
 /**
  * S3ContentsFileBehaviorTrait
  * 通常のファイルアップ系の処理
- * メソッド名の先頭に必ずs4を付けること
+ * メソッド名の先頭に必ずs3を付けること
  */
 trait S3ContentsFileBehaviorTrait
 {
@@ -38,6 +38,17 @@ trait S3ContentsFileBehaviorTrait
         ) {
             throw new InternalErrorException('contentsFileS3Config paramater shortage');
         }
+
+        // /が最後についていない場合はつける
+        if (!preg_match('#/$#', $s3Setting['tmpDir'])) {
+            Configure::write('ContentsFile.Setting.S3.tmpDir', $s3Setting['tmpDir'] . '/');
+        }
+        if (!preg_match('#/$#', $s3Setting['fileDir'])) {
+            Configure::write('ContentsFile.Setting.S3.fileDir', $s3Setting['fileDir'] . '/');
+        }
+        if (!preg_match('#/$#', $s3Setting['workingDir'])) {
+            Configure::write('ContentsFile.Setting.S3.workingDir', $s3Setting['workingDir'] . '/');
+        }
     }
 
     /**
@@ -51,9 +62,9 @@ trait S3ContentsFileBehaviorTrait
     private function s3FileSave($fileInfo, $fieldSettings, $attachmentSaveData)
     {
         $S3 = new S3();
-        $newFiledir = Configure::read('ContentsFile.Setting.S3.fileDir') . '/' . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
+        $newFiledir = Configure::read('ContentsFile.Setting.S3.fileDir') . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
         $newFilepath = $newFiledir . $fileInfo['field_name'];
-        $oldFilepath = Configure::read('ContentsFile.Setting.S3.tmpDir') . '/' . $fileInfo['tmp_file_name'];
+        $oldFilepath = Configure::read('ContentsFile.Setting.S3.tmpDir') . $fileInfo['tmp_file_name'];
 
         // tmpに挙がっているファイルを移
         if (!$S3->move($oldFilepath, $newFilepath)) {
@@ -87,13 +98,13 @@ trait S3ContentsFileBehaviorTrait
     {
         $S3 = new S3();
         // リサイズのディレクトリ
-        $resizeDir = Configure::read('ContentsFile.Setting.S3.fileDir') . '/' . $modelName . '/' . $modelId . '/' . 'contents_file_resize_' . $field . '/';
+        $resizeDir = Configure::read('ContentsFile.Setting.S3.fileDir') . $modelName . '/' . $modelId . '/' . 'contents_file_resize_' . $field . '/';
         if (!$S3->deleteRecursive($resizeDir)) {
             return false;
         }
 
         // 大元のファイル
-        $deleteFile = Configure::read('ContentsFile.Setting.S3.fileDir') . '/' . $modelName . '/' . $modelId . '/' . $field;
+        $deleteFile = Configure::read('ContentsFile.Setting.S3.fileDir') . $modelName . '/' . $modelId . '/' . $field;
         if (!$S3->delete($deleteFile)) {
             return false;
         }
