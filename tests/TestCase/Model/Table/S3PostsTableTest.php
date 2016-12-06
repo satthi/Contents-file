@@ -6,15 +6,15 @@ use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use Cake\Utility\Security;
 use Cake\Core\Configure;
+use ContentsFile\Aws\S3;
 use Cake\Datasource\ConnectionManager;
 use Cake\TestSuite\Fixture\FixtureManager;
-
 
 
 /**
  * App\Model\Table\PostsTable Test Case
  */
-class PostsTableTest extends TestCase
+class S3PostsTableTest extends TestCase
 {
 
     /**
@@ -27,6 +27,7 @@ class PostsTableTest extends TestCase
         'plugin.contents_file.attachments',
     ];
 
+
     /**
      * setUp method
      *
@@ -35,16 +36,20 @@ class PostsTableTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-
         $this->tmpDir = dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/tmp/';
-        $this->fileDir = dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/files/';
         Configure::write('ContentsFile.Setting', [
-            'type' => 'normal',
-            'Normal' => [
-                'tmpDir' => $this->tmpDir,
-                'fileDir' => $this->fileDir,
-            ],
+            'type' => 's3',
+            'S3' => [
+                // Key/Secretをコミットはできないので自動テストは走らせない
+                'key' => 'KEY',
+                'secret' => 'SECRET',
+                'bucket' => 'contents-file-dev',
+                'tmpDir' => 'contents_file_test/tmp',
+                'fileDir' => 'contents_file_test/file',
+                'workingDir' => $this->tmpDir,
+            ]
         ]);
+
         $this->connection = ConnectionManager::get('test');
         $this->Posts = new PostsTable([
             'alias' => 'Posts',
@@ -59,6 +64,9 @@ class PostsTableTest extends TestCase
         $this->fixtureManager->loadSingle('Attachments');
 
         $this->demoFileDir = dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/demo/';
+
+        $this->S3 = new S3();
+
     }
 
     /**
@@ -71,8 +79,9 @@ class PostsTableTest extends TestCase
         unset($this->Posts);
 
         //不要なディレクトリは削除する必要がある
-        $this->removeDir($this->fileDir . 'Posts/');
+        $this->deleteRecursive('contents_file_test');
 
+        unset($this->S3);
         parent::tearDown();
     }
 
@@ -89,20 +98,21 @@ class PostsTableTest extends TestCase
         copy($demo_filepath , $this->tmpDir . $rand);
 
         $fileinfo = [
-            'model' => 'Posts',
-            'model_id' => null,
-            'field_name' => 'file',
-            'file_name' => 'demo1.png',
-            'file_content_type' => 'image/png',
-            'file_size' => filesize($demo_filepath),
-            'file_error' => (int) 0,
-            'tmp_file_name' => $rand
+            'name' => 'demo1.png',
+            'type' => 'image/png',
+            'tmp_name' => $this->tmpDir . $rand,
+            'error' => 0,
+            'size' => filesize($demo_filepath)
         ];
 
         $entity = $this->Posts->newEntity();
-        $entity->name = 'test';
+        $data = [
+            'name' => 'text',
+            'file' => $fileinfo,
+        ];
 
-        $entity->contents_file_file = $fileinfo;
+        $entity =  $this->Posts->patchEntity($entity, $data);
+
         $this->assertTrue((bool) $this->Posts->save($entity));
 
         //保存データのチェック
@@ -115,25 +125,22 @@ class PostsTableTest extends TestCase
             'model_id' =>  $last_id,
             'field_name' => 'file',
             'file_name' => 'demo1.png',
-            'file_content_type' => 'image/png',
+            'file_content_type' => 's3',
             'file_size' => (string) filesize($demo_filepath),
         ];
 
         $this->assertTrue($check_data->contents_file_file === $assert_data);
 
+        $s3_file = $this->S3->download('contents_file_test/file/Posts/' . $last_id . '/file');
+        $s3_file_cont = $s3_file['Body']->getContents();
+
         //ファイルが指定の個所にアップロードされており、同一ファイルか
-        $uploaded_filepath = $this->fileDir . '/Posts/' . $last_id . '/file';
-        $this->assertTrue(file_exists($uploaded_filepath));
 
         $origin_fp = fopen($demo_filepath, 'r');
         $origin_cont = fread($origin_fp, filesize($demo_filepath));
         fclose($origin_fp);
 
-        $upload_fp = fopen($uploaded_filepath, 'r');
-        $upload_cont = fread($upload_fp, filesize($uploaded_filepath));
-        fclose($upload_fp);
-
-        $this->assertEquals($origin_fp , $upload_fp);
+        $this->assertEquals($origin_cont , $s3_file_cont);
     }
 
     /**
@@ -149,20 +156,21 @@ class PostsTableTest extends TestCase
         copy($demo_filepath , $this->tmpDir . $rand);
 
         $fileinfo = [
-            'model' => 'Posts',
-            'model_id' => null,
-            'field_name' => 'img',
-            'file_name' => 'demo1.png',
-            'file_content_type' => 'image/png',
-            'file_size' => filesize($demo_filepath),
-            'file_error' => (int) 0,
-            'tmp_file_name' => $rand
+            'name' => 'demo1.png',
+            'type' => 'image/png',
+            'tmp_name' => $this->tmpDir . $rand,
+            'error' => 0,
+            'size' => filesize($demo_filepath)
         ];
 
         $entity = $this->Posts->newEntity();
-        $entity->name = 'test';
+        $data = [
+            'name' => 'text',
+            'img' => $fileinfo,
+        ];
 
-        $entity->contents_file_img = $fileinfo;
+        $entity =  $this->Posts->patchEntity($entity, $data);
+
         $this->assertTrue((bool) $this->Posts->save($entity));
 
         //保存データのチェック
@@ -175,29 +183,42 @@ class PostsTableTest extends TestCase
             'model_id' =>  $last_id,
             'field_name' => 'img',
             'file_name' => 'demo1.png',
-            'file_content_type' => 'image/png',
+            'file_content_type' => 's3',
             'file_size' => (string) filesize($demo_filepath),
         ];
 
         $this->assertTrue($check_data->contents_file_img === $assert_data);
 
+        $s3_file = $this->S3->download('contents_file_test/file/Posts/' . $last_id . '/img');
+        $s3_file_cont = $s3_file['Body']->getContents();
+
         //ファイルが指定の個所にアップロードされており、同一ファイルか
-        $uploaded_filepath = $this->fileDir . '/Posts/' . $last_id . '/img';
-        $this->assertTrue(file_exists($uploaded_filepath));
 
         $origin_fp = fopen($demo_filepath, 'r');
         $origin_cont = fread($origin_fp, filesize($demo_filepath));
         fclose($origin_fp);
 
-        $upload_fp = fopen($uploaded_filepath, 'r');
-        $upload_cont = fread($upload_fp, filesize($uploaded_filepath));
-        fclose($upload_fp);
-
-        $this->assertEquals($origin_fp , $upload_fp);
+        $this->assertEquals($origin_cont , $s3_file_cont);
 
         //リサイズ画像が上がっているか
-        $resize_filepath1 = $this->fileDir . '/Posts/' . $last_id . '/contents_file_resize_img/300_0';
-        $resize_filepath2 = $this->fileDir . '/Posts/' . $last_id . '/contents_file_resize_img/300_400';
+        $resize_filepath1 = $this->tmpDir . 'Posts_' . $last_id . '_300_0';
+        $resize_filepath2 = $this->tmpDir . 'Posts_' . $last_id . '_300_400';
+
+        // S3からファイルを落としてくる
+        $s3_resize_file1 = $this->S3->download('contents_file_test/file/Posts/' . $last_id . '/contents_file_resize_img/300_0');
+        $s3_resize_file2 = $this->S3->download('contents_file_test/file/Posts/' . $last_id . '/contents_file_resize_img/300_400');
+
+        $s3_resize_file1_cont = $s3_resize_file1['Body']->getContents();
+        $s3_resize_file2_cont = $s3_resize_file2['Body']->getContents();
+
+        $fp = fopen($resize_filepath1, 'w');
+        fwrite($fp, $s3_resize_file1_cont);
+        fclose($fp);
+
+        $fp = fopen($resize_filepath2, 'w');
+        fwrite($fp, $s3_resize_file2_cont);
+        fclose($fp);
+
         $this->assertTrue(file_exists($resize_filepath1));
         $this->assertTrue(file_exists($resize_filepath2));
 
@@ -216,45 +237,26 @@ class PostsTableTest extends TestCase
             ($image2_x <= 300 && $image2_y == 400)
         );
         ImageDestroy($image2);
-
     }
 
     /**
-     * 再帰的にディレクトリを削除する。
-     * @param string $dir ディレクトリ名（フルパス）
-     *
-     * http://blog3.logosware.com/archives/624
+     * deleteRecursive
+     * テスト用のディレクトリ全消しをするので通常のロジックは使用しない
+     * @author hagiwara
      */
-    private function removeDir( $dir ) {
+    private function deleteRecursive($dirname)
+    {
+        $deleteFileLists = $this->S3->getFileList($dirname);
 
-        $cnt = 0;
-
-        $handle = opendir($dir);
-        if (!$handle) {
-            return ;
-        }
-
-        while (false !== ($item = readdir($handle))) {
-            if ($item === "." || $item === "..") {
-                continue;
-            }
-
-            $path = $dir . DIRECTORY_SEPARATOR . $item;
-
-            if (is_dir($path)) {
-                // 再帰的に削除
-                $cnt = $cnt + $this->removeDir($path);
-            }
-            else {
-                // ファイルを削除
-                unlink($path);
+        if (!empty($deleteFileLists)) {
+            foreach ($deleteFileLists as $deleteDirInfo) {
+                if (!$this->S3->delete($deleteDirInfo['Key'])) {
+                    return false;
+                }
             }
         }
-        closedir($handle);
-
-        // ディレクトリを削除
-        if (!rmdir($dir)) {
-            return ;
-        }
+        return true;
     }
+
+
 }

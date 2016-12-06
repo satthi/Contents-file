@@ -1,0 +1,2 @@
+#bin/sh
+mysql -uroot -e "create database cake_test_db;";

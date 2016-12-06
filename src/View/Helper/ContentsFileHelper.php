@@ -2,79 +2,152 @@
 
 namespace ContentsFile\View\Helper;
 
+use Cake\Core\Configure;
 use Cake\View\Helper;
 
 class ContentsFileHelper extends Helper {
 
     public $helpers = ['Html', 'Url'];
-    private $__default_option = [
+    private $defaultOption = [
         'target' => '_blank',
         'escape' => false
     ];
 
-    public function link($file_info, $options = [], $title = null) {
+    /**
+     * link
+     * @author hagiwara
+     * @param array $fileInfo
+     * @param array $options
+     * @param string $title
+     */
+    public function link($fileInfo, $options = [], $title = null)
+    {
         //一時パス用の設定
-        if ($title === null){
-            $title = $file_info['file_name'];
+        if ($title === null) {
+            $title = $fileInfo['file_name'];
         }
-        if (isset($options['resize'])){
-            $file_info['resize'] = $options['resize'];
+        if (isset($options['resize'])) {
+            $fileInfo['resize'] = $options['resize'];
             unset($options['resize']);
         }
         $options = array_merge(
-            $this->__default_option,
+            $this->defaultOption,
             $options
         );
-        
+
         return $this->Html->link(
             $title,
-            $this->__urlArray($file_info),
+            $this->urlArray($fileInfo, $options),
             $options
         );
     }
-    
-    public function image($file_info, $options = []) {
-        if (!empty($file_info)){
-            if (isset($options['resize'])){
-                $file_info['resize'] = $options['resize'];
+
+    /**
+     * image
+     * @author hagiwara
+     * @param array $fileInfo
+     * @param array $options
+     */
+    public function image($fileInfo, $options = [])
+    {
+        if (!empty($fileInfo)) {
+            if (isset($options['resize'])) {
+                $fileInfo['resize'] = $options['resize'];
                 unset($options['resize']);
             }
-            return $this->Html->image($this->__urlArray($file_info) ,$options);
+            return $this->Html->image($this->urlArray($fileInfo, $options), $options);
         }
         return '';
     }
 
-    public function url($file_info, $full = false){
-        if (!isset($file_info['resize'])){
-            $file_info['resize'] = false;
+    /**
+     * url
+     * @author hagiwara
+     * @param array $fileInfo
+     * @param boolean $full
+     * @param array $options
+     */
+    public function url($fileInfo, $full = false, $options = [])
+    {
+        if (!isset($fileInfo['resize'])) {
+            $fileInfo['resize'] = false;
         }
-        return $this->Url->build($this->__urlArray($file_info),$full);
+        return $this->Url->build($this->urlArray($fileInfo, $options), $full);
     }
-    
-    private function __urlArray($file_info){
-        if (!empty($file_info['tmp_file_name'])){
+
+    /**
+     * urlArray
+     * @author hagiwara
+     * @param array $fileInfo
+     */
+    private function urlArray($fileInfo, $options)
+    {
+        if (!empty($fileInfo['tmp_file_name'])) {
             return [
                 'controller' => 'contents_file',
                 'action' => 'loader',
                 'plugin' => 'ContentsFile',
-                'model' => $file_info['model'],
-                'field_name' => $file_info['field_name'],
-                'tmp_file_name' => $file_info['tmp_file_name'],
+                'model' => $fileInfo['model'],
+                'field_name' => $fileInfo['field_name'],
+                'tmp_file_name' => $fileInfo['tmp_file_name'],
             ];
         } else {
-            if (!isset($file_info['resize'])){
-                $file_info['resize'] = false;
+            if (!isset($fileInfo['resize'])) {
+                $fileInfo['resize'] = false;
             }
-            return [
-                'controller' => 'contents_file',
-                'action' => 'loader',
-                'plugin' => 'ContentsFile',
-                'model' => $file_info['model'],
-                'field_name' => $file_info['field_name'],
-                'model_id' => $file_info['model_id'],
-                'resize' => $file_info['resize'],
-            ];
+            // S3のホスティングの場合
+            if (
+                array_key_exists('static_s3', $options) &&
+                $options['static_s3'] == true &&
+                Configure::read('ContentsFile.Setting.type') == 's3' &&
+                !is_null(Configure::read('ContentsFile.Setting.S3.static_domain'))
+            ) {
+                return $this->makeStaticS3Url($fileInfo);
+            } else {
+                // loaderを通す場合
+                return [
+                    'controller' => 'contents_file',
+                    'action' => 'loader',
+                    'plugin' => 'ContentsFile',
+                    'model' => $fileInfo['model'],
+                    'field_name' => $fileInfo['field_name'],
+                    'model_id' => $fileInfo['model_id'],
+                    'resize' => $fileInfo['resize'],
+                ];
+            }
         }
     }
-    
+
+    /**
+     * makeStaticS3Url
+     * 静的ホスティング用のURL作成
+     * @author hagiwara
+     * @param array $fileInfo
+     */
+    private function makeStaticS3Url($fileInfo)
+    {
+        $staticS3Url = Configure::read('ContentsFile.Setting.S3.static_domain') . '/' . Configure::read('ContentsFile.Setting.S3.fileDir') . '/' . $fileInfo['model'] . '/' . $fileInfo['model_id'] . '/';
+        if ($fileInfo['resize'] == false) {
+            $staticS3Url .= $fileInfo['field_name'];
+        } else {
+            $resizeText = '';
+            if (
+                empty($fileInfo['resize']['width'])
+            ) {
+                $resizeText .= '0';
+            } else {
+                $resizeText .= $fileInfo['resize']['width'];
+            }
+            $resizeText .= '_';
+            if (
+                empty($fileInfo['resize']['height'])
+            ) {
+                $resizeText .= '0';
+            } else {
+                $resizeText .= $fileInfo['resize']['height'];
+            }
+            $staticS3Url .= 'contents_file_resize_' . $fileInfo['field_name'] . '/' . $resizeText;
+        }
+        return $staticS3Url;
+    }
 }

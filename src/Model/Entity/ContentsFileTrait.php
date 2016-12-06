@@ -5,43 +5,71 @@ namespace ContentsFile\Model\Entity;
 use Cake\Utility\Security;
 use Cake\ORM\TableRegistry;
 use Cake\I18n\Time;
+use ContentsFile\Aws\S3;
+use Cake\Network\Exception\InternalErrorException;
+use Cake\Core\Configure;
 
 trait ContentsFileTrait
 {
-    private $__contentsFileSettings = [];
-    private $__attachmentModel;
-    
-    private function __contentsFileSettings()
+    private $contentsFileSettings = [];
+
+    /**
+     * contentsFileSettings
+     * 設定値のセッティング
+     *
+     * @author hagiwara
+     */
+    private function contentsFileSettings()
     {
-        
         $default = [];
-        
         //設定値はまとめる
         $settings = $this->contentsFileConfig;
-        
-        $this->__contentsFileSettings = array_merge($default,$settings);
+        $this->contentsFileSettings = array_merge($default, $settings);
     }
-    
-    public function getContentsFile($property, $value){
-        $this->__contentsFileSettings();
+
+    /**
+     * getContentsFileSettings
+     * 設定値のセッティングの取得
+     *
+     * @author hagiwara
+     */
+    public function getContentsFileSettings()
+    {
+        if (empty($this->contentsFileSettings)) {
+            $this->contentsFileSettings();
+        }
+        return $this->contentsFileSettings;
+    }
+
+    /**
+     * getContentsFile
+     * ファイルのgetterのセッティング
+     *
+     * @author hagiwara
+     * @param string $property
+     * @param array $value
+     */
+    public function getContentsFile($property, $value)
+    {
+        $this->contentsFileSettings();
         if (
             //attachmentにデータが登録時のみ
-            !empty($this->id) && 
+            !empty($this->id) &&
             //設定値に設定されているとき
             preg_match('/^contents_file_(.*)$/', $property, $match) &&
-            array_key_exists($match[1] , $this->__contentsFileSettings['fields'])// &&
-        ){
+            array_key_exists($match[1], $this->contentsFileSettings['fields'])
+        ) {
             //何もセットされていないとき
-            if (empty($this->_properties[$property])){
+            if (empty($this->_properties[$property])) {
                 //attachmentからデータを探しに行く
-                $this->__attachmentModel = TableRegistry::get('Attachments');
-                $attachmentData = $this->__attachmentModel->find('all')
-                    ->where(['model' => $this->_registryAlias])
+                $attachmentModel = TableRegistry::get('Attachments');
+                $attachmentData = $attachmentModel->find('all')
+                    ->where(['model' => $this->source()])
                     ->where(['model_id' => $this->id])
                     ->where(['field_name' => $match[1]])
                     ->first()
                 ;
-                if (!empty($attachmentData)){
+                if (!empty($attachmentData)) {
                     $value = [
                         'model' => $attachmentData->model,
                         'model_id' => $attachmentData->model_id,
@@ -58,57 +86,97 @@ trait ContentsFileTrait
         }
         return $value;
     }
-    
-    public function setContentsFile(){
-        $this->__contentsFileSettings();
-        foreach ($this->__contentsFileSettings['fields'] as $field => $field_setting){
-            $file_info = $this->{$field};
+
+    /**
+     * getContentsFile
+     * ファイルのsetterのセッティング
+     *
+     * @author hagiwara
+     */
+    public function setContentsFile()
+    {
+        $this->contentsFileSettings();
+        foreach ($this->contentsFileSettings['fields'] as $field => $fieldSetting) {
+            $fileInfo = $this->{$field};
             if (
                 //ファイルの情報がある
-                !empty($file_info) && 
+                !empty($fileInfo) &&
                 //エラーのフィールドがある=ファイルをアップロード中
-                array_key_exists('error', $file_info) && 
+                array_key_exists('error', $fileInfo) &&
                 //空アップロード時は通さない(もともとのデータを活かす)
-                $file_info['error'] != UPLOAD_ERR_NO_FILE
+                $fileInfo['error'] != UPLOAD_ERR_NO_FILE
             ) {
-                $file_set = [
-                    'model' => $this->_registryAlias,
+                $fileSet = [
+                    'model' => $this->source(),
                     'model_id' => $this->id,
                     'field_name' => $field,
-                    'file_name' => $file_info['name'],
-                    'file_content_type' => $file_info['type'],
-                    'file_size' => $file_info['size'],
-                    'file_error' => $file_info['error'],
+                    'file_name' => $fileInfo['name'],
+                    'file_content_type' => Configure::read('ContentsFile.Setting.type'),
+                    'file_size' => $fileInfo['size'],
+                    'file_error' => $fileInfo['error'],
                 ];
-                
-                //$file_infoにtmp_nameがいるときはtmpディレクトリへのファイルのコピーを行う
-                if (!empty($file_info['tmp_name'])){
-                    $tmp_file_name = Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss') . $file_info['name']);
-                    
-                    if ($this->__getExt($file_info['name']) !== null ){
-                        $tmp_file_name .= '.' . $this->__getExt($file_info['name']);
+
+                //$fileInfoにtmp_nameがいるときはtmpディレクトリへのファイルのコピーを行う
+                if (!empty($fileInfo['tmp_name'])) {
+                    $tmpFileName = Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss') . $fileInfo['name']);
+
+                    if ($this->getExt($fileInfo['name']) !== null) {
+                        $tmpFileName .= '.' . $this->getExt($fileInfo['name']);
                     }
-                    if (!copy($file_info['tmp_name'], $field_setting['cacheTempDir'] . $tmp_file_name)){
-                        //エラー
+
+                    // tmpディレクトリへのアップロードのエラー(パーミッションなど)
+                    if (!$this->tmpUpload($fileInfo['tmp_name'], $fieldSetting, $tmpFileName)) {
+                        throw new InternalErrorException('tmp upload error');
                     }
-                    $file_set['tmp_file_name'] = $tmp_file_name;
+                    $fileSet['tmp_file_name'] = $tmpFileName;
                 }
                 //これを残して次に引き渡したくないので
                 unset($this->{$field});
 
-                $this->{'contents_file_' . $field} = $file_set;
+                $this->{'contents_file_' . $field} = $fileSet;
             }
-            
+
         }
         return $this;
     }
-    
-    private function __getExt($file){
-        $file_explode = explode('.',$file);
+
+    /**
+     * getExt
+     * 拡張子の取得
+     *
+     * @author hagiwara
+     * @param string $file
+     */
+    private function getExt($file)
+    {
+        $fileExplode = explode('.', $file);
         //この場合拡張子なし
-        if (count($file_explode) == 1){
+        if (count($fileExplode) == 1) {
             return null;
         }
-        return $file_explode[(count($file_explode) - 1)];
+        return $fileExplode[(count($fileExplode) - 1)];
+    }
+
+    /**
+     * tmpUpload
+     * tmpディレクトリへのアップロード
+     *
+     * @author hagiwara
+     * @param string $tmpFileName
+     * @param array $fieldSetting
+     * @param string $tmpFileName
+     */
+    private function tmpUpload($tmpName, $fieldSetting, $tmpFileName)
+    {
+        // すでにtraitのため、ここはif文での分岐処理
+        if (Configure::read('ContentsFile.Setting.type') == 'normal') {
+            return copy($tmpName, Configure::read('ContentsFile.Setting.Normal.tmpDir') . $tmpFileName);
+        } elseif (Configure::read('ContentsFile.Setting.type') == 's3') {
+            $uploadFileName = Configure::read('ContentsFile.Setting.S3.tmpDir') . '/' . $tmpFileName;
+            $S3 = new S3();
+            return $S3->upload($tmpName, $uploadFileName);
+        } else {
+            throw new InternalErrorException('contentsFileConfig type illegal');
+        }
     }
 }
