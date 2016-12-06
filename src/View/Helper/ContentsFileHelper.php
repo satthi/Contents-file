@@ -90,6 +90,8 @@ class ContentsFileHelper extends Helper {
                 'model' => $fileInfo['model'],
                 'field_name' => $fileInfo['field_name'],
                 'tmp_file_name' => $fileInfo['tmp_file_name'],
+                // prefixは無視する
+                'prefix' => false,
             ];
         } else {
             if (!isset($fileInfo['resize'])) {
@@ -113,6 +115,8 @@ class ContentsFileHelper extends Helper {
                     'field_name' => $fileInfo['field_name'],
                     'model_id' => $fileInfo['model_id'],
                     'resize' => $fileInfo['resize'],
+                    // prefixは無視する
+                    'prefix' => false,
                 ];
             }
         }

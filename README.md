@@ -22,10 +22,11 @@ composer.json
 ###(初期設定・ローカルファイル保存の場合)
 ① bootstrap.phpなど
 ```php
+Plugin::load('ContentsFile', ['routes' => true]);
 Configure::write('ContentsFile.Setting', [
     'type' => 'normal',
     'Normal' => [
-        'tmpDir' => TMP . 'cache/files',
+        'tmpDir' => TMP . 'cache/files/',
         'fileDir' => ROOT . '/files/',
     ],
 ]);
@@ -36,6 +37,7 @@ Configure::write('ContentsFile.Setting', [
 ###(初期設定・S3保存の場合)
 ① bootstrap.phpなど
 ```php
+Plugin::load('ContentsFile', ['routes' => true]);
 Configure::write('ContentsFile.Setting', [
     'type' => 's3',
     'S3' => [

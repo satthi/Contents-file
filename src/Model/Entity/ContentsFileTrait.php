@@ -172,7 +172,7 @@ trait ContentsFileTrait
         if (Configure::read('ContentsFile.Setting.type') == 'normal') {
             return copy($tmpName, Configure::read('ContentsFile.Setting.Normal.tmpDir') . $tmpFileName);
         } elseif (Configure::read('ContentsFile.Setting.type') == 's3') {
-            $uploadFileName = Configure::read('ContentsFile.Setting.S3.tmpDir') . '/' . $tmpFileName;
+            $uploadFileName = Configure::read('ContentsFile.Setting.S3.tmpDir') . $tmpFileName;
             $S3 = new S3();
             return $S3->upload($tmpName, $uploadFileName);
         } else {
