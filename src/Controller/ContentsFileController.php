@@ -47,6 +47,14 @@ class ContentsFileController extends AppController
     {
         $this->autoRender = false;
 
+        // 必要なパラメータがない場合はエラー
+        if (
+            empty($this->request->query['model']) ||
+            empty($this->request->query['field_name'])
+        ) {
+            throw new NotFoundException('404 error');
+        }
+
         //Entityに接続して設定値を取得
         $this->baseModel = TableRegistry::get($this->request->query['model']);
 
