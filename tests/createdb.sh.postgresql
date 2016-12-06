@@ -1,0 +1,2 @@
+#bin/sh
+psql -c 'create database cake_test_db;' -U postgres;

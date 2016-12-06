@@ -16,43 +16,41 @@ use ContentsFileTrait;
      * @var array
      */
     protected $_accessible = [
-        'name' => true,
+        '*' => true,
+        'id' => false
     ];
-    
+
     public $contentsFileConfig = [
         'fields' => [
             'file' => [
                 'resize' => false,
-                'cacheTempDir' => CONTENTS_FILE_CACHE_PATH,
-                'filePath' => CONTENTS_FILE_PATH,
             ],
             'img' => [
                 'resize' => [
                     ['width' => 300],
                     ['width' => 300, 'height' => 400],
                 ],
-                'cacheTempDir' => CONTENTS_FILE_CACHE_PATH,
-                'filePath' => CONTENTS_FILE_PATH,
             ],
         ],
     ];
-    
-    //&getメソッドをoverride
+
+    //&get繝｡繧ｽ繝�繝峨ｒoverride
     public function &get($property)
     {
         $value = parent::get($property);
-        
+
         $value = $this->getContentsFile($property, $value);
-        
+
         return $value;
     }
-    
-    //setメソッドをoverride
-    
-    public function set($property, $value = null, array $options = []){
-        
+
+    //set繝｡繧ｽ繝�繝峨ｒoverride
+
+    public function set($property, $value = null, array $options = [])
+    {
+
         parent::set($property, $value , $options);
-        
+
         $this->setContentsFile();
         return $this;
     }

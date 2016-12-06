@@ -16,12 +16,12 @@
     },
     "require": {
         "cakephp/cakephp": "~3.0",
-        "ext-gd": "*"
+        "ext-gd": "*",
+        "aws/aws-sdk-php": "3.*"
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "dev-master",
-        "phpunit/phpunit": "*",
-        "satthi/plugin-test-support": "dev-master"
+        "phpunit/phpunit": "*"
     },
     "autoload": {
         "psr-4": {

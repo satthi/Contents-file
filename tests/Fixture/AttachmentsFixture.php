@@ -27,7 +27,6 @@ class AttachmentsFixture extends TestFixture
         'created' => ['type' => 'timestamp', 'length' => null, 'default' => null, 'null' => true, 'comment' => '登録日時', 'precision' => null],
         'modified' => ['type' => 'timestamp', 'length' => null, 'default' => null, 'null' => true, 'comment' => '更新日時', 'precision' => null],
         '_indexes' => [
-            'attachments_model' => ['type' => 'index', 'columns' => ['model'], 'length' => []],
             'attachments_model_id' => ['type' => 'index', 'columns' => ['model_id'], 'length' => []],
         ],
         '_constraints' => [

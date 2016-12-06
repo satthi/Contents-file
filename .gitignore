@@ -4,3 +4,4 @@
 /vendor
 /tests/test_app/App/tmp/*
 /tests/test_app/App/files/*
+/tmp

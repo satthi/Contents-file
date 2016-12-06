@@ -52,28 +52,26 @@ class ContentsFileValidationTest extends TestCase
     {
         $value['error'] = UPLOAD_ERR_INI_SIZE;
         $this->assertFalse(ContentsFileValidation::uploadMaxSizeCheck($value,[]));
-        
+
         $value['error'] = UPLOAD_ERR_OK;
         $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($value,[]));
-        
+
         $value['error'] = UPLOAD_ERR_FORM_SIZE;
         $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($value,[]));
-        
+
         $value['error'] = UPLOAD_ERR_PARTIAL;
         $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($value,[]));
-        
+
         $value['error'] = UPLOAD_ERR_NO_FILE;
         $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($value,[]));
-        
+
         $value['error'] = UPLOAD_ERR_NO_TMP_DIR;
         $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($value,[]));
-        
+
         $value['error'] = UPLOAD_ERR_CANT_WRITE;
         $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($value,[]));
-        
+
         $value['error'] = UPLOAD_ERR_EXTENSION;
         $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($value,[]));
     }
-
-
 }

@@ -6,16 +6,25 @@ use Cake\Validation\Validation;
 
 class ContentsFileValidation extends Validation
 {
-    public static function checkMaxSize ($value, $max, $context){
-        $max_value = ContentsFileValidation::__calcFileSizeUnit($max);
-        return $max_value >= $value['size'];
+    /**
+     * checkMaxSize
+     *
+     */
+    public static function checkMaxSize($value, $max, $context)
+    {
+        $maxValue = self::calcFileSizeUnit($max);
+        return $maxValue >= $value['size'];
     }
-    
-    
-    public static function uploadMaxSizeCheck ($value,$context){
-       return $value['error'] != UPLOAD_ERR_INI_SIZE;
+
+    /**
+     * uploadMaxSizeCheck
+     *
+     */
+    public static function uploadMaxSizeCheck($value, $context)
+    {
+        return $value['error'] != UPLOAD_ERR_INI_SIZE;
     }
-    
+
     /**
      * Calculate file size by unit
      *
@@ -24,7 +33,8 @@ class ContentsFileValidation extends Validation
      * @param $size mixed
      * @return int file size
      */
-    private static function __calcFileSizeUnit($size) {
+    private static function calcFileSizeUnit($size)
+    {
         $units = ['K', 'M', 'G', 'T'];
         $byte = 1024;
 
@@ -33,8 +43,6 @@ class ContentsFileValidation extends Validation
         } else if (is_string($size) && preg_match('/^([0-9]+(?:\.[0-9]+)?)(' . implode('|', $units) . ')B?$/i', $size, $matches)) {
             return $matches[1] * pow($byte, array_search($matches[2], $units) + 1);
         }
-
         return false;
     }
-    
 }
