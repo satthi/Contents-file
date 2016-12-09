@@ -69,7 +69,7 @@ class ContentsFileBehavior extends Behavior {
             ) {
                 // ファイルの削除
                 $attachmentSaveData = [
-                    'model' => $this->_table->alias(),
+                    'model' => $fileInfo['model'],
                     'model_id' => $entity->id,
                     'field_name' => $fileInfo['field_name'],
                     'file_name' => $fileInfo['file_name'],
