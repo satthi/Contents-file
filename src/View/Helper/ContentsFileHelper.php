@@ -22,6 +22,9 @@ class ContentsFileHelper extends Helper {
      */
     public function link($fileInfo, $options = [], $title = null)
     {
+        if (empty($fileInfo)) {
+            return '';
+        }
         //一時パス用の設定
         if ($title === null) {
             $title = $fileInfo['file_name'];
@@ -50,6 +53,9 @@ class ContentsFileHelper extends Helper {
      */
     public function image($fileInfo, $options = [])
     {
+        if (empty($fileInfo)) {
+            return '';
+        }
         if (!empty($fileInfo)) {
             if (isset($options['resize'])) {
                 $fileInfo['resize'] = $options['resize'];
@@ -69,6 +75,9 @@ class ContentsFileHelper extends Helper {
      */
     public function url($fileInfo, $full = false, $options = [])
     {
+        if (empty($fileInfo)) {
+            return [];
+        }
         if (!isset($fileInfo['resize'])) {
             $fileInfo['resize'] = false;
         }
