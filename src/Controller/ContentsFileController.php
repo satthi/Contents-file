@@ -22,6 +22,7 @@ class ContentsFileController extends AppController
      */
     public function initialize()
     {
+        parent::initialize();
         // /が最後についていない場合はつける
         if (!preg_match('#/$#', Configure::read('ContentsFile.Setting.Normal.tmpDir'))) {
             Configure::write('ContentsFile.Setting.Normal.tmpDir', Configure::read('ContentsFile.Setting.Normal.tmpDir') . '/');
