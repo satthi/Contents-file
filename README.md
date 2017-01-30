@@ -222,14 +222,14 @@ form.ctp
         <?php
             echo $this->Form->input('file', ['type' => 'file']);
             // バリデーションに引っかかった際に、再度ファイルを登録しなくて済むための対応
-            echo $this->ContentsFile->contentsFileHidden($topic, 'file');
+            echo $this->ContentsFile->contentsFileHidden($topic->contents_file_file, 'contents_file_file');
             if (!empty($topic->contents_file_file)) {
                 echo $this->ContentsFile->link($topic->contents_file_file);
                 // 「delete_フィールド名」がtrueでファイルを削除
                 echo $this->Form->input('delete_file', ['type' => 'checkbox', 'label' => 'delete']);
             }
             echo $this->Form->input('img', ['type' => 'file']);
-            echo $this->ContentsFile->contentsFileHidden($img, 'file');
+            echo $this->ContentsFile->contentsFileHidden($topic->contents_file_img, 'contents_file_img');
             if (!empty($topic->contents_file_img)) {
                 echo $this->ContentsFile->image($topic->contents_file_img);
                 echo $this->Form->input('delete_img', ['type' => 'checkbox', 'label' => 'delete']);
