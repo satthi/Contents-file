@@ -90,16 +90,15 @@ class ContentsFileHelper extends Helper {
      * バリデーションに引っかかった際にファイルをそのまま送る用
      *
      * @author hagiwara
-     * @param entity $entity
+     * @param array|null $contentFileData
      * @param text $field
      */
-    public function contentsFileHidden($entity, $field)
+    public function contentsFileHidden($contentFileData, $field)
     {
-        $contentFileField = 'contents_file_' . $field;
         $hiddenInput = '';
-        if (!empty($entity->{$contentFileField})) {
-            foreach ($entity->{$contentFileField} as $fieldParts => $v) {
-                $hiddenInput .= $this->Form->input($contentFileField . '.' . $fieldParts, ['type' => 'hidden']);
+        if (!empty($contentFileData)) {
+            foreach ($contentFileData as $fieldParts => $v) {
+                $hiddenInput .= $this->Form->input($field . '.' . $fieldParts, ['type' => 'hidden']);
             }
         }
         return $hiddenInput;
