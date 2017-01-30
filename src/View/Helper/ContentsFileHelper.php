@@ -7,7 +7,7 @@ use Cake\View\Helper;
 
 class ContentsFileHelper extends Helper {
 
-    public $helpers = ['Html', 'Url'];
+    public $helpers = ['Html', 'Url', 'Form'];
     private $defaultOption = [
         'target' => '_blank',
         'escape' => false
@@ -82,6 +82,27 @@ class ContentsFileHelper extends Helper {
             $fileInfo['resize'] = false;
         }
         return $this->Url->build($this->urlArray($fileInfo, $options), $full);
+    }
+    
+    /**
+     * contentsFileHidden
+     *
+     * バリデーションに引っかかった際にファイルをそのまま送る用
+     *
+     * @author hagiwara
+     * @param entity $entity
+     * @param text $field
+     */
+    public function contentsFileHidden($entity, $field)
+    {
+        $contentFileField = 'contents_file_' . $field;
+        $hiddenInput = '';
+        if (!empty($entity->{$contentFileField})) {
+            foreach ($entity->{$contentFileField} as $fieldParts => $v) {
+                $hiddenInput .= $this->Form->input($contentFileField . '.' . $fieldParts, ['type' => 'hidden']);
+            }
+        }
+        return $hiddenInput;
     }
 
     /**
