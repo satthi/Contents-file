@@ -20,7 +20,7 @@ trait S3ContentsFileControllerTrait
         // S3より該当ファイルを取得
         $S3 = new S3();
         $fileObject = $S3->download($filepath);
-        $topath = Configure::read('ContentsFile.Setting.Normal.tmpDir') . $filename;
+        $topath = Configure::read('ContentsFile.Setting.S3.workingDir') . $filename;
         $fp = fopen($topath, 'w');
         fwrite($fp, $fileObject['Body']);
         fclose($fp);
@@ -43,7 +43,7 @@ trait S3ContentsFileControllerTrait
      */
     private function s3TmpFilePath($filename)
     {
-        return Configure::read('ContentsFile.Setting.S3.tmpDir') . '/' . $filename;
+        return Configure::read('ContentsFile.Setting.S3.tmpDir') . $filename;
     }
 
     /**
@@ -54,7 +54,7 @@ trait S3ContentsFileControllerTrait
      */
     private function s3FilePath($attachmentData)
     {
-        return Configure::read('ContentsFile.Setting.S3.fileDir') . '/' . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->field_name;
+        return Configure::read('ContentsFile.Setting.S3.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->field_name;
     }
 
 
