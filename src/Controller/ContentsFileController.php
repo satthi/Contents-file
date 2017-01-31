@@ -180,10 +180,8 @@ class ContentsFileController extends AppController
             // IE/Edge対応
             if (strstr(env('HTTP_USER_AGENT'), 'MSIE') || strstr(env('HTTP_USER_AGENT'), 'Trident') || strstr(env('HTTP_USER_AGENT'), 'Edge')) {
                 $filename = mb_convert_encoding($filename, "SJIS", "UTF-8");
-                header('Content-Disposition: attachment;filename="' . $filename . '"');
-            } else {
-                header('Content-Disposition: attachment;filename="' . $filename . '"');
             }
+            header('Content-Disposition: attachment;filename="' . $filename . '"');
         }
     }
 }
