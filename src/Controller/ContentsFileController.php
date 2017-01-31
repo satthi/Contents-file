@@ -92,6 +92,16 @@ class ContentsFileController extends AppController
                 $filepath = $this->{Configure::read('ContentsFile.Setting.type') . 'ResizeSet'}($filepath, $this->request->query['resize']);
             }
         }
+        // loaderよりダウンロードするかどうか
+        if (!empty($this->request->query['download']) && $this->request->query['download'] == true) {
+            // IE/Edge対応
+            if (strstr(env('HTTP_USER_AGENT'), 'MSIE') || strstr(env('HTTP_USER_AGENT'), 'Trident') || strstr(env('HTTP_USER_AGENT'), 'Edge')) {
+                $filename = mb_convert_encoding($filename, "SJIS", "UTF-8");
+                header('Content-Disposition: attachment;filename="' . $filename . '"');
+            } else {
+                header('Content-Disposition: attachment;filename="' . $filename . '"');
+            }
+        }
 
         $this->{Configure::read('ContentsFile.Setting.type') . 'Loader'}($filename, $filepath);
     }

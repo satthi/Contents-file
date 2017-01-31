@@ -111,6 +111,10 @@ class ContentsFileHelper extends Helper {
      */
     private function urlArray($fileInfo, $options)
     {
+        $download = false;
+        if (!empty($options['download']) && $options['download'] == true) {
+            $download = true;
+        }
         if (!empty($fileInfo['tmp_file_name'])) {
             return [
                 'controller' => 'contents_file',
@@ -121,12 +125,14 @@ class ContentsFileHelper extends Helper {
                 'tmp_file_name' => $fileInfo['tmp_file_name'],
                 // prefixは無視する
                 'prefix' => false,
+                'download' => $download,
             ];
         } else {
             if (!isset($fileInfo['resize'])) {
                 $fileInfo['resize'] = false;
             }
             // S3のホスティングの場合
+            // downloadとかはつけられないので無視
             if (
                 array_key_exists('static_s3', $options) &&
                 $options['static_s3'] == true &&
@@ -146,6 +152,7 @@ class ContentsFileHelper extends Helper {
                     'resize' => $fileInfo['resize'],
                     // prefixは無視する
                     'prefix' => false,
+                    'download' => $download,
                 ];
             }
         }
