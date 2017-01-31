@@ -34,7 +34,7 @@ before_script:
   - export TESTDB=${TESTDB}
 
 script:
-  - sh -c "if [ '$DEFAULT' = '1' ]; then phpunit --stderr; fi"
+  - sh -c "if [ '$DEFAULT' = '1' ]; then vendor/bin/phpunit --stderr; fi"
 
 notifications:
   email: false
