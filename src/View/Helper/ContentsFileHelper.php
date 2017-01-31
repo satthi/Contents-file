@@ -10,7 +10,8 @@ class ContentsFileHelper extends Helper {
     public $helpers = ['Html', 'Url', 'Form'];
     private $defaultOption = [
         'target' => '_blank',
-        'escape' => false
+        'escape' => false,
+        'download' => false
     ];
 
     /**
@@ -111,10 +112,6 @@ class ContentsFileHelper extends Helper {
      */
     private function urlArray($fileInfo, $options)
     {
-        $download = false;
-        if (!empty($options['download']) && $options['download'] == true) {
-            $download = true;
-        }
         if (!empty($fileInfo['tmp_file_name'])) {
             return [
                 'controller' => 'contents_file',
@@ -125,7 +122,7 @@ class ContentsFileHelper extends Helper {
                 'tmp_file_name' => $fileInfo['tmp_file_name'],
                 // prefixは無視する
                 'prefix' => false,
-                'download' => $download,
+                'download' => $options['download'],
             ];
         } else {
             if (!isset($fileInfo['resize'])) {
@@ -152,7 +149,7 @@ class ContentsFileHelper extends Helper {
                     'resize' => $fileInfo['resize'],
                     // prefixは無視する
                     'prefix' => false,
-                    'download' => $download,
+                    'download' => $options['download'],
                 ];
             }
         }
