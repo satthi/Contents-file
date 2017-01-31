@@ -10,7 +10,8 @@ class ContentsFileHelper extends Helper {
     public $helpers = ['Html', 'Url', 'Form'];
     private $defaultOption = [
         'target' => '_blank',
-        'escape' => false
+        'escape' => false,
+        'download' => false
     ];
 
     /**
@@ -121,12 +122,14 @@ class ContentsFileHelper extends Helper {
                 'tmp_file_name' => $fileInfo['tmp_file_name'],
                 // prefixは無視する
                 'prefix' => false,
+                'download' => $options['download'],
             ];
         } else {
             if (!isset($fileInfo['resize'])) {
                 $fileInfo['resize'] = false;
             }
             // S3のホスティングの場合
+            // downloadとかはつけられないので無視
             if (
                 array_key_exists('static_s3', $options) &&
                 $options['static_s3'] == true &&
@@ -146,6 +149,7 @@ class ContentsFileHelper extends Helper {
                     'resize' => $fileInfo['resize'],
                     // prefixは無視する
                     'prefix' => false,
+                    'download' => $options['download'],
                 ];
             }
         }
