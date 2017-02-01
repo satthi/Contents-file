@@ -57,6 +57,10 @@ class ContentsFileHelper extends Helper {
         if (empty($fileInfo)) {
             return '';
         }
+        $options = array_merge(
+            $this->defaultOption,
+            $options
+        );
         if (!empty($fileInfo)) {
             if (isset($options['resize'])) {
                 $fileInfo['resize'] = $options['resize'];
@@ -82,6 +86,10 @@ class ContentsFileHelper extends Helper {
         if (!isset($fileInfo['resize'])) {
             $fileInfo['resize'] = false;
         }
+        $options = array_merge(
+            $this->defaultOption,
+            $options
+        );
         return $this->Url->build($this->urlArray($fileInfo, $options), $full);
     }
     
