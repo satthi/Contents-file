@@ -93,7 +93,7 @@ class ContentsFileController extends AppController
                 $filepath = $this->{Configure::read('ContentsFile.Setting.type') . 'ResizeSet'}($filepath, $this->request->query['resize']);
             }
         }
-        
+
         $this->fileDownloadHeader($filename);
         $this->{Configure::read('ContentsFile.Setting.type') . 'Loader'}($filename, $filepath);
     }
@@ -121,7 +121,10 @@ class ContentsFileController extends AppController
             'swf'=>'application/x-shockwave-flash',
             'lzh'=>'application/x-lha-compressed',
             'zip'=>'application/x-zip-compressed',
-            'sit'=>'application/x-stuffit'
+            'sit'=>'application/x-stuffit',
+            'mp3' => 'audio/mpeg',
+            'wav' => 'audio/wav',
+            'mp4' => 'video/mp4',
         ];
         $sContentType = 'application/octet-stream';
 
@@ -154,7 +157,10 @@ class ContentsFileController extends AppController
             'swf'=>'application/x-shockwave-flash',
             'lzh'=>'application/x-lha-compressed',
             'zip'=>'application/x-zip-compressed',
-            'sit'=>'application/x-stuffit'
+            'sit'=>'application/x-stuffit',
+            'mp3' => 'audio/mpeg',
+            'wav' => 'audio/wav',
+            'mp4' => 'video/mp4',
         ];
         $sContentType = 'application/octet-stream';
 
@@ -167,7 +173,7 @@ class ContentsFileController extends AppController
         }
         return $sContentType;
     }
-    
+
     /**
      * fileDownloadHeader
      * @author hagiwara
