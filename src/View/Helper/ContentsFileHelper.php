@@ -92,7 +92,7 @@ class ContentsFileHelper extends Helper {
         );
         return $this->Url->build($this->urlArray($fileInfo, $options), $full);
     }
-    
+
     /**
      * contentsFileHidden
      *
@@ -171,7 +171,7 @@ class ContentsFileHelper extends Helper {
      */
     private function makeStaticS3Url($fileInfo)
     {
-        $staticS3Url = Configure::read('ContentsFile.Setting.S3.static_domain') . '/' . Configure::read('ContentsFile.Setting.S3.fileDir') . '/' . $fileInfo['model'] . '/' . $fileInfo['model_id'] . '/';
+        $staticS3Url = Configure::read('ContentsFile.Setting.S3.static_domain') . '/' . Configure::read('ContentsFile.Setting.S3.fileDir') . $fileInfo['model'] . '/' . $fileInfo['model_id'] . '/';
         if ($fileInfo['resize'] == false) {
             $staticS3Url .= $fileInfo['field_name'];
         } else {
