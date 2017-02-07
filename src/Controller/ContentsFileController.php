@@ -187,7 +187,7 @@ class ContentsFileController extends AppController
             if (strstr(env('HTTP_USER_AGENT'), 'MSIE') || strstr(env('HTTP_USER_AGENT'), 'Trident') || strstr(env('HTTP_USER_AGENT'), 'Edge')) {
                 $filename = mb_convert_encoding($filename, "SJIS", "UTF-8");
             }
-            header('Content-Disposition: attachment;filename="' . $filename . '"');
+            $this->response->header('Content-Disposition', 'attachment;filename="' . $filename . '"');
         }
     }
 }
