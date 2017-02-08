@@ -25,6 +25,8 @@ composer.json
 Plugin::load('ContentsFile', ['routes' => true]);
 Configure::write('ContentsFile.Setting', [
     'type' => 'normal',
+    // trueでファイル名がランダム文字列に
+    'randomFile' => true,
     'Normal' => [
         'tmpDir' => TMP . 'cache/files/',
         'fileDir' => ROOT . '/files/',
@@ -40,6 +42,8 @@ Configure::write('ContentsFile.Setting', [
 Plugin::load('ContentsFile', ['routes' => true]);
 Configure::write('ContentsFile.Setting', [
     'type' => 's3',
+    // trueでファイル名がランダム文字列に
+    'randomFile' => true,
     'S3' => [
         'key' => 'KEY',
         'secret' => 'SECRET',
