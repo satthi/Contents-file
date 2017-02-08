@@ -7,6 +7,7 @@ use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
 use Cake\I18n\Time;
 use Cake\Network\Exception\InternalErrorException;
+use Cake\ORM\TableRegistry;
 use Cake\Utility\Security;
 
 /**
@@ -63,17 +64,22 @@ trait S3ContentsFileBehaviorTrait
     {
         $S3 = new S3();
         $newFiledir = Configure::read('ContentsFile.Setting.S3.fileDir') . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
-        $newFilepath = $newFiledir . $fileInfo['field_name'];
+        if (Configure::read('ContentsFile.Setting.randomFile') === true) {
+            $newFilepath = $newFiledir . $attachmentSaveData['file_random_path'];
+        } else {
+            $newFilepath = $newFiledir . $fileInfo['field_name'];
+        }
         $oldFilepath = Configure::read('ContentsFile.Setting.S3.tmpDir') . $fileInfo['tmp_file_name'];
+
+        // 該当ファイルを消す
+        // 失敗=ディレクトリが存在しないため、成功失敗判定は行わない。
+        $this->s3FileDelete($attachmentSaveData['model'], $attachmentSaveData['model_id'], $fileInfo['field_name']);
 
         // tmpに挙がっているファイルを移
         if (!$S3->move($oldFilepath, $newFilepath)) {
             return false;
         }
 
-        // リサイズディレクトリはまず削除する
-        // 失敗=ディレクトリが存在しないため、成功失敗判定は行わない。
-        $S3->deleteRecursive($newFilepath . '/' . 'contents_file_resize_' . $fileInfo['field_name']);
 
         //リサイズ画像作成
         if (!empty($fieldSettings['resize'])) {
@@ -96,15 +102,33 @@ trait S3ContentsFileBehaviorTrait
      */
     private function s3FileDelete($modelName, $modelId, $field)
     {
-        $S3 = new S3();
+        //attachementからデータを取得
+        $attachmentModel = TableRegistry::get('Attachments');
+        $attachmentData = $attachmentModel->find('all')
+            ->where(['model' => $modelName])
+            ->where(['model_id' => $modelId])
+            ->where(['field_name' => $field])
+            ->first()
+        ;
+        // 削除するべきファイルがない
+        if (empty($attachmentData)) {
+            return false;
+        }
+        if (Configure::read('ContentsFile.Setting.randomFile') === true && $attachmentData->file_random_path != '') {
+            $deleteField = $attachmentData->file_random_path;
+        } else {
+            $deleteField = $attachmentData->field_name;
+        }
+
+       $S3 = new S3();
         // リサイズのディレクトリ
-        $resizeDir = Configure::read('ContentsFile.Setting.S3.fileDir') . $modelName . '/' . $modelId . '/' . 'contents_file_resize_' . $field . '/';
+        $resizeDir = Configure::read('ContentsFile.Setting.S3.fileDir') . $modelName . '/' . $modelId . '/' . 'contents_file_resize_' . $deleteField . '/';
         if (!$S3->deleteRecursive($resizeDir)) {
             return false;
         }
 
         // 大元のファイル
-        $deleteFile = Configure::read('ContentsFile.Setting.S3.fileDir') . $modelName . '/' . $modelId . '/' . $field;
+        $deleteFile = Configure::read('ContentsFile.Setting.S3.fileDir') . $modelName . '/' . $modelId . '/' . $deleteField;
         if (!$S3->delete($deleteFile)) {
             return false;
         }

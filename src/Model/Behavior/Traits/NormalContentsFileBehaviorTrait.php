@@ -5,6 +5,7 @@ namespace ContentsFile\Model\Behavior\Traits;
 use Cake\Core\Configure;
 use Cake\Filesystem\Folder;
 use Cake\Network\Exception\InternalErrorException;
+use Cake\ORM\TableRegistry;
 
 /**
  * NormalContentsFileBehaviorTrait
@@ -50,17 +51,22 @@ trait NormalContentsFileBehaviorTrait
     private function normalFileSave($fileInfo, $fieldSettings, $attachmentSaveData)
     {
         $newFiledir = Configure::read('ContentsFile.Setting.Normal.fileDir') . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
-        $newFilepath = $newFiledir . $fileInfo['field_name'];
+        // ランダムパスの場合の分岐
+        if (Configure::read('ContentsFile.Setting.randomFile') === true) {
+            $newFilepath = $newFiledir . $attachmentSaveData['file_random_path'];
+        } else {
+            $newFilepath = $newFiledir . $fileInfo['field_name'];
+        }
+
+        //元ファイルは削除する
+        $this->normalFileDelete($attachmentSaveData['model'], $attachmentSaveData['model_id'], $fileInfo['field_name']);
+
         if (
             !$this->mkdir($newFiledir, 0777, true) ||
             !rename(Configure::read('ContentsFile.Setting.Normal.tmpDir') . $fileInfo['tmp_file_name'], $newFilepath)
         ) {
             return false;
         }
-
-        //リサイズディレクトリはまず削除する
-        $Folder = new Folder($newFilepath);
-        $Folder->delete();
 
         //リサイズ画像作成
         if (!empty($fieldSettings['resize'])) {
@@ -83,8 +89,26 @@ trait NormalContentsFileBehaviorTrait
      */
     private function normalFileDelete($modelName, $modelId, $field)
     {
+        //attachementからデータを取得
+        $attachmentModel = TableRegistry::get('Attachments');
+        $attachmentData = $attachmentModel->find('all')
+            ->where(['model' => $modelName])
+            ->where(['model_id' => $modelId])
+            ->where(['field_name' => $field])
+            ->first()
+        ;
+        // 削除するべきファイルがない
+        if (empty($attachmentData)) {
+            return false;
+        }
+        if (Configure::read('ContentsFile.Setting.randomFile') === true && $attachmentData->file_random_path != '') {
+            $deleteField = $attachmentData->file_random_path;
+        } else {
+            $deleteField = $attachmentData->field_name;
+        }
+
         // リサイズのディレクトリ
-        $resizeDir = Configure::read('ContentsFile.Setting.Normal.fileDir') . $modelName . '/' . $modelId . '/' . 'contents_file_resize_' . $field . '/';
+        $resizeDir = Configure::read('ContentsFile.Setting.Normal.fileDir') . $modelName . '/' . $modelId . '/' . 'contents_file_resize_' . $deleteField . '/';
         if (is_dir($resizeDir)) {
             $deleteFolder = new Folder($resizeDir);
             if (!$deleteFolder->delete()) {
@@ -93,7 +117,7 @@ trait NormalContentsFileBehaviorTrait
         }
 
         // 大元のファイル
-        $deleteFile = Configure::read('ContentsFile.Setting.Normal.fileDir') . $modelName . '/' . $modelId . '/' . $field;
+        $deleteFile = Configure::read('ContentsFile.Setting.Normal.fileDir') . $modelName . '/' . $modelId . '/' . $deleteField;
         if (file_exists($deleteFile) && !unlink($deleteFile)) {
             return false;
         }

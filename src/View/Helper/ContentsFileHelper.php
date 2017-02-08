@@ -173,7 +173,11 @@ class ContentsFileHelper extends Helper {
     {
         $staticS3Url = Configure::read('ContentsFile.Setting.S3.static_domain') . '/' . Configure::read('ContentsFile.Setting.S3.fileDir') . $fileInfo['model'] . '/' . $fileInfo['model_id'] . '/';
         if ($fileInfo['resize'] == false) {
-            $staticS3Url .= $fileInfo['field_name'];
+            if (Configure::read('ContentsFile.Setting.randomFile') === true && $fileInfo['file_random_path'] != '') {
+                $staticS3Url .= $fileInfo['file_random_path'];
+            } else {
+                $staticS3Url .= $fileInfo['field_name'];
+            }
         } else {
             $resizeText = '';
             if (
@@ -191,7 +195,11 @@ class ContentsFileHelper extends Helper {
             } else {
                 $resizeText .= $fileInfo['resize']['height'];
             }
-            $staticS3Url .= 'contents_file_resize_' . $fileInfo['field_name'] . '/' . $resizeText;
+            if (Configure::read('ContentsFile.Setting.randomFile') === true && $fileInfo['file_random_path'] != '') {
+                $staticS3Url .= 'contents_file_resize_' . $fileInfo['file_random_path'] . '/' . $resizeText;
+            } else {
+                $staticS3Url .= 'contents_file_resize_' . $fileInfo['field_name'] . '/' . $resizeText;
+            }
         }
         return $staticS3Url;
     }

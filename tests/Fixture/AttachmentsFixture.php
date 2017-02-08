@@ -24,6 +24,7 @@ class AttachmentsFixture extends TestFixture
         'file_name' => ['type' => 'text', 'length' => null, 'default' => null, 'null' => true, 'comment' => 'ファイル名', 'precision' => null],
         'file_content_type' => ['type' => 'text', 'length' => null, 'default' => null, 'null' => true, 'comment' => 'ファイルタイプ', 'precision' => null],
         'file_size' => ['type' => 'text', 'length' => null, 'default' => null, 'null' => true, 'comment' => 'ファイルサイズ', 'precision' => null],
+        'file_random_path' => ['type' => 'text', 'length' => null, 'default' => null, 'null' => true, 'comment' => 'ファイルサイズ', 'precision' => null],
         'created' => ['type' => 'timestamp', 'length' => null, 'default' => null, 'null' => true, 'comment' => '登録日時', 'precision' => null],
         'modified' => ['type' => 'timestamp', 'length' => null, 'default' => null, 'null' => true, 'comment' => '更新日時', 'precision' => null],
         '_indexes' => [

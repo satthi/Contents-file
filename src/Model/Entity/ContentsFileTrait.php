@@ -77,6 +77,7 @@ trait ContentsFileTrait
                         'file_name' => $attachmentData->file_name,
                         'file_content_type' => $attachmentData->file_content_type,
                         'file_size' => $attachmentData->file_size,
+                        'file_random_path' => $attachmentData->file_random_path,
                     ];
                 }
             } else {

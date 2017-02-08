@@ -49,6 +49,12 @@ class AttachmentsAdd extends AbstractMigration
                 'limit' => null,
                 'null' => true,
             ])
+            ->addColumn('file_random_path', 'text', [
+                'comment' => 'ランダムパス',
+                'default' => null,
+                'limit' => null,
+                'null' => true,
+            ])
             ->addColumn('created', 'timestamp', [
                 'comment' => '作成日',
                 'default' => null,
