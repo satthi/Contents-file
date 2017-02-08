@@ -91,7 +91,7 @@ trait S3ContentsFileControllerTrait
         if ($S3->fileExists($imagepathinfo['resize_filepath'])) {
             return $imagepathinfo['resize_filepath'];
         } else {
-            return $this->baseModel->s3ImageResize($imagepathinfo, $resize);
+            return $this->baseModel->s3ImageResize($filepath, $resize);
         }
     }
 }
