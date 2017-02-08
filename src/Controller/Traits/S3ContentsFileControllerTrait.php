@@ -57,7 +57,11 @@ trait S3ContentsFileControllerTrait
      */
     private function s3FilePath($attachmentData)
     {
-        return Configure::read('ContentsFile.Setting.S3.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->field_name;
+        if (Configure::read('ContentsFile.Setting.randomFile') === true && $attachmentData->file_random_path != '') {
+            return Configure::read('ContentsFile.Setting.S3.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->file_random_path;
+        } else {
+            return Configure::read('ContentsFile.Setting.S3.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->field_name;
+        }
     }
 
 

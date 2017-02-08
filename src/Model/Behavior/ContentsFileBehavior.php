@@ -13,6 +13,7 @@ use Cake\ORM\TableRegistry;
 use ContentsFile\Model\Behavior\Traits\NormalContentsFileBehaviorTrait;
 use ContentsFile\Model\Behavior\Traits\S3ContentsFileBehaviorTrait;
 use ContentsFile\Model\Behavior\Traits\ImageContentsFileBehaviorTrait;
+use Cake\Utility\Security;
 
 class ContentsFileBehavior extends Behavior {
 
@@ -76,20 +77,25 @@ class ContentsFileBehavior extends Behavior {
                     'file_content_type' => $fileInfo['file_content_type'],
                     'file_size' => $fileInfo['file_size'],
                 ];
-                $attachmentEntity = $attachmentModel->newEntity($attachmentSaveData);
-                // 通常とS3で画像保存方法の切り替え
-                if (!$this->{Configure::read('ContentsFile.Setting.type') . 'FileSave'}($fileInfo, $fieldSettings, $attachmentSaveData)) {
-                    return false;
+                if (Configure::read('ContentsFile.Setting.randomFile') === true) {
+                    $attachmentSaveData['file_random_path'] = $this->makeRandomPath();
                 }
-
-                //元のデータがあるかfind(あれば更新にする)
-                $attachmentDataCheck = $attachmentModel->find('all')
+                $attachmentEntity = $attachmentModel->newEntity($attachmentSaveData);
+                //元のデータがあるかfind(あれば元のファイルを消す)
+                $oldAttachmentData = $attachmentModel->find('all')
                     ->where(['model' => $fileInfo['model']])
                     ->where(['model_id' => $entity->id])
                     ->where(['field_name' => $fileInfo['field_name']])
                     ->first();
-                if (!empty($attachmentDataCheck)) {
-                    $attachmentEntity->id = $attachmentDataCheck->id;
+
+                // 通常とS3で画像保存方法の切り替え
+                if (!$this->{Configure::read('ContentsFile.Setting.type') . 'FileSave'}($fileInfo, $fieldSettings, $attachmentSaveData, $oldAttachmentData)) {
+                    return false;
+                }
+
+                //元のデータがあれば更新にする
+                if (!empty($oldAttachmentData)) {
+                    $attachmentEntity->id = $oldAttachmentData->id;
                 }
                 if (!$attachmentModel->save($attachmentEntity)) {
                     return false;
@@ -149,11 +155,11 @@ class ContentsFileBehavior extends Behavior {
             ->first();
 
         if (!empty($deleteAttachmentData->id)) {
-            $attachmentModel->delete($deleteAttachmentData);
             // 通常とS3でファイルの削除方法の切り替え
             if (!$this->{Configure::read('ContentsFile.Setting.type') . 'FileDelete'}($modelName, $modelId, $field)) {
                 return false;
             }
+            $attachmentModel->delete($deleteAttachmentData);
         }
         return true;
     }
@@ -175,5 +181,23 @@ class ContentsFileBehavior extends Behavior {
         $result = mkdir($path, $permission, $recursive);
         umask($oldumask);
         return $result;
+    }
+
+    /**
+     * makeRandomKey
+     * @author hagiwara
+     */
+    private function makeRandomPath()
+    {
+        $hash = Security::hash(time() . rand());
+        $attachmentModel = TableRegistry::get('Attachments');
+        $check = $attachmentModel->find('all')
+            ->where(['Attachments.file_random_path' => $hash])
+            ->count();
+        // データがある場合は再作成
+        if ($check > 0) {
+            return $this->makeRandomPath();
+        }
+        return $hash;
     }
 }

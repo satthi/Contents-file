@@ -117,6 +117,7 @@ class PostsTableTest extends TestCase
             'file_name' => 'demo1.png',
             'file_content_type' => 'image/png',
             'file_size' => (string) filesize($demo_filepath),
+            'file_random_path' => null,
         ];
 
         $this->assertTrue($check_data->contents_file_file === $assert_data);
@@ -177,6 +178,7 @@ class PostsTableTest extends TestCase
             'file_name' => 'demo1.png',
             'file_content_type' => 'image/png',
             'file_size' => (string) filesize($demo_filepath),
+            'file_random_path' => null,
         ];
 
         $this->assertTrue($check_data->contents_file_img === $assert_data);
