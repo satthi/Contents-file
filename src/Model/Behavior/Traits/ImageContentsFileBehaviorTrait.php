@@ -88,23 +88,44 @@ trait ImageContentsFileBehaviorTrait
         if (!array_key_exists('width', $baseSize)) {
             $baseSize['width'] = 0;
         }
+        // リサイズ種別
+        if (!array_key_exists('type', $baseSize)) {
+            $baseSize['type'] = 'normal';
+        }
 
-        if (empty($baseSize['width']) || !empty($baseSize['height']) && $sizeX * $baseSize['height'] < $sizeY * $baseSize['width']) {
-            // 縦基準
-            $mag = $baseSize['height'] / $sizeY;
-            $reSizeY = $baseSize['height'];
-            $reSizeX = $sizeX * $mag;
+        if ($baseSize['type'] == 'normal_s' || $baseSize['type'] == 'scoop') {
+            // 短い方基準もしくは、くりぬき
+            if (empty($baseSize['width']) || !empty($baseSize['height']) && $sizeX * $baseSize['height'] < $sizeY * $baseSize['width']) {
+                // 縦基準
+                $mag = $baseSize['width'] / $sizeX;
+                $reSizeX = $baseSize['width'];
+                $reSizeY = $sizeY * $mag;
+            } else {
+                // 横基準
+                $mag = $baseSize['height'] / $sizeY;
+                $reSizeY = $baseSize['height'];
+                $reSizeX = $sizeX * $mag;
+            }
         } else {
-            // 横基準
-            $mag = $baseSize['width'] / $sizeX;
-            $reSizeX = $baseSize['width'];
-            $reSizeY = $sizeY * $mag;
+            // 長い方基準
+            if (empty($baseSize['width']) || !empty($baseSize['height']) && $sizeX * $baseSize['height'] < $sizeY * $baseSize['width']) {
+                // 縦基準
+                $mag = $baseSize['height'] / $sizeY;
+                $reSizeY = $baseSize['height'];
+                $reSizeX = $sizeX * $mag;
+            } else {
+                // 横基準
+                $mag = $baseSize['width'] / $sizeX;
+                $reSizeX = $baseSize['width'];
+                $reSizeY = $sizeY * $mag;
+            }
         }
         return [
             'sizeX' => $sizeX,
             'sizeY' => $sizeY,
             'reSizeX' => $reSizeX,
             'reSizeY' => $reSizeY,
+            'type' => $baseSize['type'],
         ];
     }
 
@@ -121,7 +142,15 @@ trait ImageContentsFileBehaviorTrait
     private function imageResizeMake($image, $imagetype, $imagePath, $baseSize, $imageSizeInfo)
     {
         // サイズ変更後の画像データを生成
-        $outImage = ImageCreateTrueColor($imageSizeInfo['reSizeX'], $imageSizeInfo['reSizeY']);
+        $campusX = $imageSizeInfo['reSizeX'];
+        $campusY = $imageSizeInfo['reSizeY'];
+        debug($baseSize);
+        // くりぬきの場合(幅と高さが両方必要)
+        if ($imageSizeInfo['type'] == 'scoop' && !empty($baseSize['width']) && !empty($baseSize['height'])) {
+            $campusX = $baseSize['width'];
+            $campusY = $baseSize['height'];
+        }
+        $outImage = ImageCreateTrueColor($campusX, $campusY);
         if (!$outImage) {
             // リサイズ後の画像作成失敗
             return false;
@@ -139,8 +168,15 @@ trait ImageContentsFileBehaviorTrait
         imagecolortransparent($outImage, $bgcolor);
         //!透過GIF.PNG対策
         // 画像リサイズ
-        $ret = imagecopyresampled($outImage, $image, 0, 0, 0, 0, $imageSizeInfo['reSizeX'], $imageSizeInfo['reSizeY'], $imageSizeInfo['sizeX'], $imageSizeInfo['sizeY']);
-
+        
+        $diffX = 0;
+        $diffY = 0;
+        // くりぬきの場合(幅と高さが両方必要)
+        if ($imageSizeInfo['type'] == 'scoop' && !empty($baseSize['width']) && !empty($baseSize['height'])) {
+            $diffX = ($imageSizeInfo['sizeX'] - ($baseSize['width'] * $imageSizeInfo['sizeX'] / $imageSizeInfo['reSizeX'])) / 2;
+            $diffY = ($imageSizeInfo['sizeY'] - ($baseSize['height'] * $imageSizeInfo['sizeY'] / $imageSizeInfo['reSizeY'])) / 2;
+        }
+        $ret = imagecopyresampled($outImage, $image, 0, 0, $diffX, $diffY, $imageSizeInfo['reSizeX'], $imageSizeInfo['reSizeY'], $imageSizeInfo['sizeX'], $imageSizeInfo['sizeY']);
         if ($ret === false) {
             // リサイズ失敗
             return false;
@@ -237,7 +273,13 @@ trait ImageContentsFileBehaviorTrait
             if (!isset($resize['height'])) {
                 $resize['height'] = 0;
             }
+            if (!isset($resize['type'])) {
+                $resize['type'] = 'normal';
+            }
             $pathinfo['resize_filepath'] = $pathinfo['resize_dir'] . '/' . $resize['width'] . '_' . $resize['height'];
+            if (isset($resize['type']) && $resize['type'] == true) {
+                $pathinfo['resize_filepath'] .= '_' . $resize['type'];
+            }
         }
         return $pathinfo;
     }
