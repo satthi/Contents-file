@@ -144,7 +144,6 @@ trait ImageContentsFileBehaviorTrait
         // サイズ変更後の画像データを生成
         $campusX = $imageSizeInfo['reSizeX'];
         $campusY = $imageSizeInfo['reSizeY'];
-        debug($baseSize);
         // くりぬきの場合(幅と高さが両方必要)
         if ($imageSizeInfo['type'] == 'scoop' && !empty($baseSize['width']) && !empty($baseSize['height'])) {
             $campusX = $baseSize['width'];
@@ -276,10 +275,7 @@ trait ImageContentsFileBehaviorTrait
             if (!isset($resize['type'])) {
                 $resize['type'] = 'normal';
             }
-            $pathinfo['resize_filepath'] = $pathinfo['resize_dir'] . '/' . $resize['width'] . '_' . $resize['height'];
-            if (isset($resize['type']) && $resize['type'] == true) {
-                $pathinfo['resize_filepath'] .= '_' . $resize['type'];
-            }
+            $pathinfo['resize_filepath'] = $pathinfo['resize_dir'] . '/' . $resize['width'] . '_' . $resize['height'] . '_' . $resize['type'];
         }
         return $pathinfo;
     }
