@@ -180,6 +180,11 @@ class Topic extends Entity
                     // 画像のリサイズが必要な場合
                     ['width' => 300],
                     ['width' => 300, 'height' => 400],
+                    // typeには
+                    // normal(default) 長い方を基準に画像をリサイズする
+                    // normal_s 短い方を基準に画像をリサイズする
+                    // scoop 短い方を基準に画像をリサイズし、中央でくりぬきする
+                    ['width' => 300, 'height' => 400, 'type' => 'scoop'],
                 ],
             ],
         ],
@@ -249,7 +254,7 @@ view.ctp
 <?php // linkでファイルのリンク作成?>
 <?= $this->ContentsFile->link($topic->contents_file_file);?>
 <?php // imgでimgタグ作成 リサイズお画像の指定はオプションで指定?>
-<?= $this->ContentsFile->image($topic->contents_file_img, ['resize' => ['width' => 300]]);?>
+<?= $this->ContentsFile->image($topic->contents_file_img, ['resize' => ['width' => 300, 'height' => 400, 'type' => 'scoop']]);?>
 
 <?php // 静的ホスティングにアクセス?>
 <?php // linkでファイルのリンク作成?>

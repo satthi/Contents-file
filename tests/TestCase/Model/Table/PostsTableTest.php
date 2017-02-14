@@ -198,8 +198,8 @@ class PostsTableTest extends TestCase
         $this->assertEquals($origin_fp , $upload_fp);
 
         //リサイズ画像が上がっているか
-        $resize_filepath1 = $this->fileDir . '/Posts/' . $last_id . '/contents_file_resize_img/300_0';
-        $resize_filepath2 = $this->fileDir . '/Posts/' . $last_id . '/contents_file_resize_img/300_400';
+        $resize_filepath1 = $this->fileDir . '/Posts/' . $last_id . '/contents_file_resize_img/300_0_normal';
+        $resize_filepath2 = $this->fileDir . '/Posts/' . $last_id . '/contents_file_resize_img/300_400_normal';
         $this->assertTrue(file_exists($resize_filepath1));
         $this->assertTrue(file_exists($resize_filepath2));
 
