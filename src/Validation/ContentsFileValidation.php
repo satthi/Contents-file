@@ -45,4 +45,29 @@ class ContentsFileValidation extends Validation
         }
         return false;
     }
+
+    /**
+     * checkExtension
+     * 拡張子のチェック
+     *
+     * @param $value mixed
+     * @return bool
+     */
+    public static function checkExtension($value, $extensions = ['gif', 'jpeg', 'png', 'jpg'])
+    {
+        // データがない場合はチェックしない
+        if (!is_array($value) || !array_key_exists('name', $value)) {
+            return true;
+        }
+        $check = $value['name'];
+
+        $extension = strtolower(pathinfo($check, PATHINFO_EXTENSION));
+        foreach ($extensions as $value) {
+            if ($extension === strtolower($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
