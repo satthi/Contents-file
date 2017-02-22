@@ -136,6 +136,31 @@ class ContentsFileBehavior extends Behavior {
     }
 
     /**
+     * fileValidationWhen
+     * ファイルのバリデーションのwhenに使用可能なメソッド
+     * @author hagiwara
+     * @param array $context
+     * @param string $field
+     */
+    public function fileValidationWhen($context, $field)
+    {
+        // content_file_fileがいる場合はチェックしない
+        if (!empty($context['data']['contents_file_' . $field])) {
+            return false;
+        }
+
+        // 新規作成時はチェックする
+        if ($context['newRecord'] == true) {
+            return true;
+        }
+        $fileInfo = $this->_table->find('all')
+            ->where([$this->_table->alias() . '.id' => $context['data']['id']])
+            ->first();
+        // 編集時はfileがアップロードされていなければチェックする
+        return empty($fileInfo->{'contents_file_' . $field});
+    }
+
+    /**
      * fileDeleteParts
      * ファイル削除
      * @author hagiwara
