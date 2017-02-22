@@ -120,15 +120,8 @@ class TopicsTable extends Table
         $validator->provider('contents_file', 'ContentsFile\Validation\ContentsFileValidation');
         $validator
             ->notEmpty('img', 'ファイルを添付してください' , function ($context){
-                // 新規作成時はチェックする
-                if ($context['newRecord'] == true) {
-                    return true;
-                }
-                $fileInfo = $this->find('all')
-                    ->where([$this->alias() . '.id' => $context['data']['id']])
-                    ->first();
-                // 編集時はfileがアップロードされていなければチェックする
-                return empty($fileInfo->contents_file_img);
+                // fileValidationWhenメソッドを追加しました。
+                return $this->fileValidationWhen($context, 'img');
             })
             ->add('img', 'uploadMaxSizeCheck', [
                 'rule' => 'uploadMaxSizeCheck',
