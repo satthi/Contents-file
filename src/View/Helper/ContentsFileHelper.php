@@ -83,8 +83,9 @@ class ContentsFileHelper extends Helper {
         if (empty($fileInfo)) {
             return [];
         }
-        if (!isset($fileInfo['resize'])) {
-            $fileInfo['resize'] = false;
+        if (isset($options['resize'])) {
+            $fileInfo['resize'] = $options['resize'];
+            unset($options['resize']);
         }
         $options = array_merge(
             $this->defaultOption,
