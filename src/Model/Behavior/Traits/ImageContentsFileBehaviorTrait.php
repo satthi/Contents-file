@@ -155,13 +155,25 @@ trait ImageContentsFileBehaviorTrait
             return false;
         }
 
-        //透過GIF.PNG対策
-        //ブレンドモードを無効にする
-        imagealphablending($outImage, false);
-        //完全なアルファチャネル情報を保存するフラグをonにする
-        imagesavealpha($outImage, true);
-        //!透過GIF.PNG対策
-        // 画像リサイズ
+        switch ($imagetype) {
+            case IMAGETYPE_GIF:
+                //透過GIF対策
+                $alpha = imagecolortransparent($image);  // 元画像から透過色を取得する
+                imagefill($outImage, 0, 0, $alpha);       // その色でキャンバスを塗りつぶす
+                imagecolortransparent($outImage, $alpha); // 塗りつぶした色を透過色として指定する
+                //!透過GIF対策
+                break;
+            case IMAGETYPE_PNG:
+                //透過PNG対策
+                //ブレンドモードを無効にする
+                imagealphablending($outImage, false);
+                //完全なアルファチャネル情報を保存するフラグをonにする
+                imagesavealpha($outImage, true);
+                //!透過PNG対策
+                break;
+            default:
+                break;
+        }
         
         $diffX = 0;
         $diffY = 0;
