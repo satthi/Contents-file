@@ -156,15 +156,10 @@ trait ImageContentsFileBehaviorTrait
         }
 
         //透過GIF.PNG対策
-        $this->setTPinfo($image, $imageSizeInfo['sizeX'], $imageSizeInfo['sizeY']);
-
-        // 画像で使用する色を透過度を指定して作成
-        $bgcolor = imagecolorallocatealpha($outImage, @$this->tp["red"], @$this->tp["green"], @$this->tp["blue"], @$this->tp["alpha"]);
-
-        // 塗り潰す
-        imagefill($outImage, 0, 0, $bgcolor);
-        // 透明色を定義
-        imagecolortransparent($outImage, $bgcolor);
+        //ブレンドモードを無効にする
+        imagealphablending($outImage, false);
+        //完全なアルファチャネル情報を保存するフラグをonにする
+        imagesavealpha($outImage, true);
         //!透過GIF.PNG対策
         // 画像リサイズ
         
@@ -209,48 +204,6 @@ trait ImageContentsFileBehaviorTrait
         ImageDestroy($outImage);
 
         return true;
-    }
-
-    /**
-     * setTPinfo
-     *  透過GIFか否か？および透過GIF情報セット
-     *
-     *   透過GIFである場合
-     *   プロパティ$tpに透過GIF情報がセットされる
-     *
-     *     $tp["red"]   = 赤コンポーネントの値
-     *     $tp["green"] = 緑コンポーネントの値
-     *     $tp["blue"]  = 青コンポーネントの値
-     *     $tp["alpha"] = 透過度(0から127/0は完全に不透明な状態/127は完全に透明な状態)
-     *
-     * @access private
-     * @param  resource $src 画像リソース
-     * @param  int   $w  対象画像幅(px)
-     * @param  int   $h  対象画像高(px)
-     * @return boolean
-     */
-    private function setTPinfo($src, $w, $h) {
-
-        for ($sx = 0; $sx < $w; $sx++) {
-            for ($sy = 0; $sy < $h; $sy++) {
-                $rgb = imagecolorat($src, $sx, $sy);
-                $idx = imagecolorsforindex($src, $rgb);
-                if ($idx["alpha"] !== 0) {
-                    $tp = $idx;
-                    break;
-                }
-            }
-            if (!isset($tp) || $tp !== null) {
-                break;
-            }
-        }
-        // 透過GIF
-        if (isset($tp) && is_array($tp)) {
-            $this->tp = $tp;
-            return true;
-        }
-        // 透過GIFではない
-        return false;
     }
 
     /**
