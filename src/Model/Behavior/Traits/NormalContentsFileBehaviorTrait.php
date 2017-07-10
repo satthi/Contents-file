@@ -58,6 +58,11 @@ trait NormalContentsFileBehaviorTrait
             $newFilepath = $newFiledir . $fileInfo['field_name'];
         }
 
+        if (Configure::read('ContentsFile.Setting.ext') === true) {
+            $ext = (new \SplFileInfo($attachmentSaveData['file_name']))->getExtension();
+            $newFilepath .= '.' . $ext;
+        }
+
         //元ファイルは削除する
         $this->normalFileDelete($attachmentSaveData['model'], $attachmentSaveData['model_id'], $fileInfo['field_name']);
 
@@ -118,6 +123,10 @@ trait NormalContentsFileBehaviorTrait
 
         // 大元のファイル
         $deleteFile = Configure::read('ContentsFile.Setting.Normal.fileDir') . $modelName . '/' . $modelId . '/' . $deleteField;
+        if (Configure::read('ContentsFile.Setting.ext') === true) {
+            $ext = (new \SplFileInfo($attachmentData->file_name))->getExtension();
+            $deleteFile .= '.' . $ext;
+        }
         if (file_exists($deleteFile) && !unlink($deleteFile)) {
             return false;
         }

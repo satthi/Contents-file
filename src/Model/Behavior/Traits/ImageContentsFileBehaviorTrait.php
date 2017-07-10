@@ -2,6 +2,8 @@
 
 namespace ContentsFile\Model\Behavior\Traits;
 
+use Cake\Core\Configure;
+
 /**
  * ImageContentsFileBehaviorTrait
  * 画像関係の処理
@@ -174,7 +176,7 @@ trait ImageContentsFileBehaviorTrait
             default:
                 break;
         }
-        
+
         $diffX = 0;
         $diffY = 0;
         // くりぬきの場合(幅と高さが両方必要)
@@ -241,6 +243,10 @@ trait ImageContentsFileBehaviorTrait
                 $resize['type'] = 'normal';
             }
             $pathinfo['resize_filepath'] = $pathinfo['resize_dir'] . '/' . $resize['width'] . '_' . $resize['height'] . '_' . $resize['type'];
+            if (Configure::read('ContentsFile.Setting.ext') === true) {
+                $ext = (new \SplFileInfo($imagePath))->getExtension();
+                $pathinfo['resize_filepath'] .= '.' . $ext;
+            }
         }
         return $pathinfo;
     }
