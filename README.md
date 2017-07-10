@@ -27,6 +27,8 @@ Configure::write('ContentsFile.Setting', [
     'type' => 'normal',
     // trueでファイル名がランダム文字列に
     'randomFile' => true,
+    // trueで拡張子付きでファイルを保存する。loaderを通さずに使用する場合は設定しておいたほうが良い。
+    'ext' => true,
     'Normal' => [
         'tmpDir' => TMP . 'cache/files/',
         'fileDir' => ROOT . '/files/',
@@ -44,6 +46,8 @@ Configure::write('ContentsFile.Setting', [
     'type' => 's3',
     // trueでファイル名がランダム文字列に
     'randomFile' => true,
+    // trueで拡張子付きでファイルを保存する。awsの場合は別途ヘッダーを吐き出すため設定する必要性はあまり高くない。
+    'ext' => true,
     'S3' => [
         'key' => 'KEY',
         'secret' => 'SECRET',
