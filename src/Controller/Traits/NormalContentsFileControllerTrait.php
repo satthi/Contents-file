@@ -57,10 +57,14 @@ trait NormalContentsFileControllerTrait
      */
     private function normalFilePath($attachmentData)
     {
+        $ext = '';
+        if (Configure::read('ContentsFile.Setting.ext') === true) {
+            $ext = '.' . (new \SplFileInfo($attachmentData->file_name))->getExtension();
+        }
         if (Configure::read('ContentsFile.Setting.randomFile') === true && $attachmentData->file_random_path != '') {
-            return Configure::read('ContentsFile.Setting.Normal.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->file_random_path;
+            return Configure::read('ContentsFile.Setting.Normal.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->file_random_path . $ext;
         } else {
-            return Configure::read('ContentsFile.Setting.Normal.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->field_name;
+            return Configure::read('ContentsFile.Setting.Normal.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->field_name . $ext;
         }
     }
 

@@ -69,6 +69,10 @@ trait S3ContentsFileBehaviorTrait
         } else {
             $newFilepath = $newFiledir . $fileInfo['field_name'];
         }
+        if (Configure::read('ContentsFile.Setting.ext') === true) {
+            $ext = (new \SplFileInfo($attachmentSaveData['file_name']))->getExtension();
+            $newFilepath .= '.' . $ext;
+        }
         $oldFilepath = Configure::read('ContentsFile.Setting.S3.tmpDir') . $fileInfo['tmp_file_name'];
 
         // 該当ファイルを消す
@@ -129,6 +133,10 @@ trait S3ContentsFileBehaviorTrait
 
         // 大元のファイル
         $deleteFile = Configure::read('ContentsFile.Setting.S3.fileDir') . $modelName . '/' . $modelId . '/' . $deleteField;
+        if (Configure::read('ContentsFile.Setting.ext') === true) {
+            $ext = (new \SplFileInfo($attachmentData->file_name))->getExtension();
+            $deleteFile .= '.' . $ext;
+        }
         if (!$S3->delete($deleteFile)) {
             return false;
         }
