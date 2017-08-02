@@ -50,7 +50,7 @@ class ContentsFileBehavior extends Behavior {
     {
         //設定値をentityから取得
         $contentsFileConfig = $entity->getContentsFileSettings();
-        $attachmentModel = TableRegistry::get('Attachments');
+        $attachmentModel = TableRegistry::get('ContentsFile.Attachments');
         foreach ($contentsFileConfig['fields'] as $field => $fieldSettings) {
             // ファイルの削除を最初に確認
             if ($entity->{'delete_' . $field} == true) {
@@ -169,7 +169,7 @@ class ContentsFileBehavior extends Behavior {
      */
     private function fileDeleteParts($entity, $field)
     {
-        $attachmentModel = TableRegistry::get('Attachments');
+        $attachmentModel = TableRegistry::get('ContentsFile.Attachments');
         $modelName = $entity->source();
         $modelId = $entity->id;
         // 添付ファイルデータの削除
@@ -215,7 +215,7 @@ class ContentsFileBehavior extends Behavior {
     private function makeRandomPath()
     {
         $hash = Security::hash(time() . rand());
-        $attachmentModel = TableRegistry::get('Attachments');
+        $attachmentModel = TableRegistry::get('ContentsFile.Attachments');
         $check = $attachmentModel->find('all')
             ->where(['Attachments.file_random_path' => $hash])
             ->count();
