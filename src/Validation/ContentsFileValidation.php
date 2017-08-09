@@ -70,4 +70,30 @@ class ContentsFileValidation extends Validation
 
         return false;
     }
+
+    /* ドラッグアンドドロップアップロード専用 */
+    /**
+     * extensionDd
+     * 拡張子のチェック
+     *
+     * @param $value mixed
+     * @return bool
+     */
+    public static function extensionDd($value, $extensions, $filenameField, $context)
+    {
+        // チェックに必要なフィールドがない
+        if (!array_key_exists($filenameField, $context['data'])) {
+            return false;
+        }
+        $filename = $context['data'][$filenameField];
+        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        foreach ($extensions as $value) {
+            if ($extension === strtolower($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

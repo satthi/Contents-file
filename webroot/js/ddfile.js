@@ -10,7 +10,8 @@
   $.event.props.push("dataTransfer");
 
   $.fn.ddfile = function(settings) {
-    settings　=　jQuery.extend({
+    settings = jQuery.extend({
+      uploadFileSizeLimit: 2 * 1024 * 1024,
       imgBlock: null,
       dataInput: null,
       fileInput: null,
@@ -76,6 +77,11 @@
     //ファイルの読み込み処理
     function readImage(file){
       var filename = file.name;
+      // ファイルのアップロード上限の設定
+      if (file.size > settings.uploadFileSizeLimit) {
+        alert('ファイルのアップロード上限を超えています');
+        return;
+      }
       var reader = new FileReader();
       //dataURL形式でファイルを読み込む
       reader.readAsDataURL(file);
