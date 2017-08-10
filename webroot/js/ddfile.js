@@ -17,10 +17,11 @@
       fileInput: null,
       dropZone: null,
       fileName: null,
-      fileNameHidden: null
+      fileNameHidden: null,
+      exampleText: null
     },settings);
 
-    var imgBlockDom,dataInputDom,fileInputDom,dropZoneDom,fileNameDom,fileNameHiddenDom;
+    var imgBlockDom,dataInputDom,fileInputDom,dropZoneDom,fileNameDom,fileNameHiddenDom,exampleTextDom;
     if (!settings.imgBlock || !settings.dataInput || !settings.fileInput || !settings.dropZone || !settings.fileNameHidden) {
       alert('必要な設定が不足しています');
       return;
@@ -33,6 +34,10 @@
       fileNameDom = $(settings.fileName);
     }
     fileNameHiddenDom = $(settings.fileNameHidden);
+    if (settings.exampleText) {
+      exampleTextDom = $(settings.exampleText);
+    }
+
 
     if (checkFileApi()){
       //ファイル選択
@@ -90,12 +95,11 @@
         //ファイル読み取り後の処理
         var result_DataURL = reader.result;
         //読み込んだ画像とdataURLを書き出す
-        var img = document.getElementById('image');
-        var src = document.createAttribute('src');
-        src.value = result_DataURL;
-        img.setAttributeNode(src);
+        imgBlockDom.attr('src', result_DataURL)
         dataInputDom.val(result_DataURL);
-        $('#example-text').hide();
+        if (typeof exampleTextDom !== "undefined") {
+          exampleTextDom.hide();
+        }
         if (typeof fileNameDom !== "undefined") {
           fileNameDom.html(filename);
         }
