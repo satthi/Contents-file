@@ -8,6 +8,7 @@ use Cake\I18n\Time;
 use ContentsFile\Aws\S3;
 use Cake\Network\Exception\InternalErrorException;
 use Cake\Core\Configure;
+use Cake\Filesystem\File;
 
 trait ContentsFileTrait
 {
@@ -89,7 +90,7 @@ trait ContentsFileTrait
     }
 
     /**
-     * getContentsFile
+     * setContentsFile
      * ファイルのsetterのセッティング
      *
      * @author hagiwara
@@ -98,6 +99,24 @@ trait ContentsFileTrait
     {
         $this->contentsFileSettings();
         foreach ($this->contentsFileSettings['fields'] as $field => $fieldSetting) {
+            // 通常のパターン
+            if (!array_key_exists('type', $fieldSetting) || $fieldSetting['type'] == 'normal') {
+                $this->normalSetContentsFile($field, $fieldSetting);
+            } else {
+                $this->ddSetContentsFile($field, $fieldSetting);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * normalSetContentsFile
+     * ファイルのsetterのセッティング
+     *
+     * @author hagiwara
+     */
+    private function normalSetContentsFile($field, $fieldSetting)
+    {
             $fileInfo = $this->{$field};
             if (
                 //ファイルの情報がある
@@ -135,10 +154,65 @@ trait ContentsFileTrait
                 unset($this->{$field});
 
                 $this->{'contents_file_' . $field} = $fileSet;
+                $this->{'contents_file_' . $field . '_filename'} = $fileInfo['name'];
             }
+    }
 
+    /**
+     * ddSetContentsFile
+     * ファイルのsetterのセッティング
+     *
+     * @author hagiwara
+     */
+    private function ddSetContentsFile($field, $fieldSetting)
+    {
+
+        $fileInfo = $this->{$field};
+        if (!empty($fileInfo)) {
+            if (!preg_match('/^data:([^;]+);base64,(.+)$/', $fileInfo, $fileMatch)) {
+                // ちゃんとファイルアップがないのでエラー
+                throw new InternalErrorException('tmp upload erroar');
+            }
+            $filename = $this->{'contents_file_' . $field . '_filename'};
+
+            $filebody = base64_decode($fileMatch[2]);
+            $filesize = strlen($filebody);
+
+            $tmpFileName = Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss') . $filename);
+
+            if ($this->getExt($filename) !== null) {
+                $tmpFileName .= '.' . $this->getExt($filename);
+            }
+            // まずは一時的にファイルを書き出す
+            $ddTmpFileName = TMP . Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss') . $filename);
+            $fp = new File($ddTmpFileName);
+            $fp->write($filebody);
+
+            // tmpディレクトリへのアップロードのエラー(パーミッションなど)
+            if (!$this->tmpUpload($ddTmpFileName, $fieldSetting, $tmpFileName)) {
+                throw new InternalErrorException('tmp upload error');
+            }
+            $fp->delete();
+            $fp->close();
+
+            $fileSet = [
+                'model' => $this->source(),
+                'model_id' => $this->id,
+                'field_name' => $field,
+                'file_name' => $filename,
+                'file_content_type' => Configure::read('ContentsFile.Setting.type'),
+                'file_size' => $filesize,
+                'file_error' => 0,
+            ];
+
+            $fileSet['tmp_file_name'] = $tmpFileName;
+
+            //これを残して次に引き渡したくないので
+            unset($this->{$field});
+
+            $this->{'contents_file_' . $field} = $fileSet;
+            $this->{'contents_file_' . $field . '_filename'} = $filename;
         }
-        return $this;
     }
 
     /**

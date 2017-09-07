@@ -204,4 +204,16 @@ class ContentsFileHelper extends Helper {
         }
         return $staticS3Url;
     }
+
+    /* ここからはDD専用のHelper */
+    public function displayFilename($entity, $field)
+    {
+        if (!is_null($entity->{'contents_file_' . $field . '_filename'})) {
+            return $entity->{'contents_file_' . $field . '_filename'};
+        } elseif (is_array($entity->{'contents_file_' . $field})) {
+            return $entity->{'contents_file_' . $field}['file_name'];
+        } else {
+            return '';
+        }
+    }
 }
