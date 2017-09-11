@@ -101,7 +101,7 @@
         //ファイル読み取り後の処理
         var result_DataURL = reader.result;
         //読み込んだ画像とdataURLを書き出す
-        imgBlockDom.attr('src', result_DataURL)
+        imgBlockDom.prop('src', result_DataURL);
         dataInputDom.val(result_DataURL);
         if (typeof exampleTextDom !== "undefined") {
           exampleTextDom.hide();
@@ -109,7 +109,6 @@
         if (typeof fileNameDom !== "undefined") {
           fileNameDom.html(filename);
         }
-        console.log(fileNameHiddenDom);
         fileNameHiddenDom.val(filename);
       }
 
