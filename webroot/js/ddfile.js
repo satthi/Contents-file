@@ -7,7 +7,13 @@
 
   // dataTransferをevent内の属性に含める
   // http://qiita.com/sengok/items/5cbe4cd32a17bbaea7eb
-  $.event.props.push("dataTransfer");
+  if (typeof $.event.props !== 'undefined') {
+    // jquery1/2
+    $.event.props.push("dataTransfer");
+  } else {
+    // jquery 3
+    $.event.addProp('dataTransfer');
+  }
 
   $.fn.ddfile = function(settings) {
     settings = jQuery.extend({
