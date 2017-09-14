@@ -87,6 +87,10 @@
 
     //ファイルの読み込み処理
     function readImage(file){
+      // dataを入れるinputがdisabledなら何もしない※これでイベントを設定する
+      if (dataInputDom.is(':disabled')) {
+        return;
+      }
       var filename = file.name;
       // ファイルのアップロード上限の設定
       if (file.size > settings.uploadFileSizeLimit) {
