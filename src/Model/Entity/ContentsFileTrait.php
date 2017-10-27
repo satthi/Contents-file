@@ -328,7 +328,7 @@ trait ContentsFileTrait
                     $image = $this->imageRotate($image,90, 0);
                 }
             }
-    }
+        }
 
         switch ($imagetype) {
             case IMAGETYPE_GIF:
