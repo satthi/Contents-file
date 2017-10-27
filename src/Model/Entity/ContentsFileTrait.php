@@ -297,38 +297,38 @@ trait ContentsFileTrait
 
         // 向き補正
         if(isset($exif_datas['Orientation'])){
-              $orientation = $exif_datas['Orientation'];
-              if($image){
-                      // 未定義
-                      if($orientation == 0){
-                      // 通常
-                      }else if($orientation == 1){
-                      // 左右反転
-                      }else if($orientation == 2){
-                            $image = $this->imageFlop($image);
-                      // 180°回転
-                      }else if($orientation == 3){
-                            $image = $this->imageRotate($image,180, 0);
-                      // 上下反転
-                      }else if($orientation == 4){
-                            $image = $this->imageFlip($image);
-                      // 反時計回りに90°回転 上下反転
-                      }else if($orientation == 5){
-                            $image = $this->imageRotate($image,90, 0);
-                            $image = $this->imageFlip($image);
-                      // 時計回りに90°回転
-                      }else if($orientation == 6){
-                            $image = $this->imageRotate($image,-90, 0);
-                      // 時計回りに90°回転 上下反転
-                      }else if($orientation == 7){
-                            $image = $this->imageRotate($image,-90, 0);
-                            $image = $this->imageFlip($image);
-                      // 反時計回りに90°回転
-                      }else if($orientation == 8){
-                            $image = $this->imageRotate($image,90, 0);
-                      }
-              }
-        }
+            $orientation = $exif_datas['Orientation'];
+            if($image){
+                // 未定義
+                if($orientation == 0) {
+                    // 通常
+                }else if($orientation == 1) {
+                    // 左右反転
+                }else if($orientation == 2) {
+                    $image = $this->imageFlop($image);
+                    // 180°回転
+                }else if($orientation == 3) {
+                    $image = $this->imageRotate($image,180, 0);
+                    // 上下反転
+                }else if($orientation == 4) {
+                    $image = $this->imageFlip($image);
+                    // 反時計回りに90°回転 上下反転
+                }else if($orientation == 5) {
+                    $image = $this->imageRotate($image,90, 0);
+                    $image = $this->imageFlip($image);
+                    // 時計回りに90°回転
+                }else if($orientation == 6) {
+                    $image = $this->imageRotate($image,-90, 0);
+                    // 時計回りに90°回転 上下反転
+                }else if($orientation == 7) {
+                    $image = $this->imageRotate($image,-90, 0);
+                    $image = $this->imageFlip($image);
+                // 反時計回りに90°回転
+                }else if($orientation == 8) {
+                    $image = $this->imageRotate($image,90, 0);
+                }
+            }
+    }
 
         switch ($imagetype) {
             case IMAGETYPE_GIF:
@@ -375,6 +375,7 @@ trait ContentsFileTrait
      * imageFlip
      * http://www.glic.co.jp/blog/archives/88 よりコピペ
      * 上下反転
+     * @param resource $image
      *
      * @author hagiwara
      */
@@ -402,12 +403,13 @@ trait ContentsFileTrait
      * imageRotate
      * http://www.glic.co.jp/blog/archives/88 よりコピペ
      * 画像を回転
+     * @param integer $angle
+     * @param integer $bgd_color
      *
      * @author hagiwara
      */
     private function imageRotate($image, $angle, $bgd_color)
     {
-         return imagerotate($image, $angle, $bgd_color, 0);
+        return imagerotate($image, $angle, $bgd_color, 0);
     }
-
 }
