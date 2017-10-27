@@ -243,6 +243,10 @@ trait ContentsFileTrait
      */
     private function tmpUpload($tmpName, $fieldSetting, $tmpFileName)
     {
+        // 向きの調整をする場合
+        if (Configure::read('ContentsFile.Setting.exifRotate') == true) {
+            $this->orientationFixedImage($tmpName, $tmpName);
+        }
         // すでにtraitのため、ここはif文での分岐処理
         if (Configure::read('ContentsFile.Setting.type') == 'normal') {
             return copy($tmpName, Configure::read('ContentsFile.Setting.Normal.tmpDir') . $tmpFileName);
@@ -253,5 +257,159 @@ trait ContentsFileTrait
         } else {
             throw new InternalErrorException('contentsFileConfig type illegal');
         }
+    }
+
+    /**
+     * orientationFixedImage
+     * http://www.glic.co.jp/blog/archives/88 よりコピペ
+     * 画像の方向を正す
+     * 向きだけロジックが逆そうなので調整
+     *
+     * @author hagiwara
+     */
+    private function orientationFixedImage($input, $output){
+        $imagetype = exif_imagetype($input);
+        // 何も取れない場合何もしない
+        if ($imagetype === false) {
+            return;
+        }
+        // exif情報の取得
+        $exif_datas = @exif_read_data($input);
+        // 画像読み込み
+        switch ($imagetype) {
+            case IMAGETYPE_GIF:
+                $image = ImageCreateFromGIF($input);
+                break;
+            case IMAGETYPE_JPEG:
+                $image = ImageCreateFromJPEG($input);
+                break;
+            case IMAGETYPE_PNG:
+                $image = ImageCreateFromPNG($input);
+                break;
+            default:
+                $image = false;
+        }
+
+        // 画像以外は何もしない
+        if (!$image) {
+            return;
+        }
+
+        // 向き補正
+        if(isset($exif_datas['Orientation'])){
+            $orientation = $exif_datas['Orientation'];
+            if($image){
+                // 未定義
+                if($orientation == 0) {
+                    // 通常
+                }else if($orientation == 1) {
+                    // 左右反転
+                }else if($orientation == 2) {
+                    $image = $this->imageFlop($image);
+                    // 180°回転
+                }else if($orientation == 3) {
+                    $image = $this->imageRotate($image,180, 0);
+                    // 上下反転
+                }else if($orientation == 4) {
+                    $image = $this->imageFlip($image);
+                    // 反時計回りに90°回転 上下反転
+                }else if($orientation == 5) {
+                    $image = $this->imageRotate($image,90, 0);
+                    $image = $this->imageFlip($image);
+                    // 時計回りに90°回転
+                }else if($orientation == 6) {
+                    $image = $this->imageRotate($image,-90, 0);
+                    // 時計回りに90°回転 上下反転
+                }else if($orientation == 7) {
+                    $image = $this->imageRotate($image,-90, 0);
+                    $image = $this->imageFlip($image);
+                // 反時計回りに90°回転
+                }else if($orientation == 8) {
+                    $image = $this->imageRotate($image,90, 0);
+                }
+            }
+        }
+
+        switch ($imagetype) {
+            case IMAGETYPE_GIF:
+                ImageGIF($image ,$output);
+                break;
+            case IMAGETYPE_JPEG:
+                ImageJPEG($image ,$output, 100);
+                break;
+            case IMAGETYPE_PNG:
+                ImagePNG($image ,$output);
+                break;
+            default:
+                return;
+        }
+    }
+
+    /**
+     * imageFlop
+     * http://www.glic.co.jp/blog/archives/88 よりコピペ
+     * 画像の左右反転
+     *
+     * @author hagiwara
+     */
+    private function imageFlop($image)
+    {
+        // 画像の幅を取得
+        $w = imagesx($image);
+        // 画像の高さを取得
+        $h = imagesy($image);
+        // 変換後の画像の生成（元の画像と同じサイズ）
+        $destImage = @imagecreatetruecolor($w,$h);
+        // 逆側から色を取得
+        for($i=($w-1);$i>=0;$i--){
+            for($j=0;$j<$h;$j++){
+                $color_index = imagecolorat($image,$i,$j);
+                $colors = imagecolorsforindex($image,$color_index);
+                imagesetpixel($destImage,abs($i-$w+1),$j,imagecolorallocate($destImage,$colors["red"],$colors["green"],$colors["blue"]));
+            }
+        }
+        return $destImage;
+    }
+
+    /**
+     * imageFlip
+     * http://www.glic.co.jp/blog/archives/88 よりコピペ
+     * 上下反転
+     * @param resource $image
+     *
+     * @author hagiwara
+     */
+    private function imageFlip($image)
+    {
+        // 画像の幅を取得
+        $w = imagesx($image);
+        // 画像の高さを取得
+        $h = imagesy($image);
+        // 変換後の画像の生成（元の画像と同じサイズ）
+        $destImage = @imagecreatetruecolor($w,$h);
+        // 逆側から色を取得
+        for($i=0;$i<$w;$i++){
+            for($j=($h-1);$j>=0;$j--){
+                $color_index = imagecolorat($image,$i,$j);
+                $colors = imagecolorsforindex($image,$color_index);
+                imagesetpixel($destImage,$i,abs($j-$h+1),imagecolorallocate($destImage,$colors["red"],$colors["green"],$colors["blue"]));
+            }
+        }
+        return $destImage;
+    }
+
+
+    /**
+     * imageRotate
+     * http://www.glic.co.jp/blog/archives/88 よりコピペ
+     * 画像を回転
+     * @param integer $angle
+     * @param integer $bgd_color
+     *
+     * @author hagiwara
+     */
+    private function imageRotate($image, $angle, $bgd_color)
+    {
+        return imagerotate($image, $angle, $bgd_color, 0);
     }
 }
