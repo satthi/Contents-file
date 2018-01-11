@@ -274,7 +274,7 @@ trait ContentsFileTrait
             return;
         }
         // exif情報の取得
-        $exif_datas = @exif_read_data($input);
+        $exif_datas = [];
         // 画像読み込み
         switch ($imagetype) {
             case IMAGETYPE_GIF:
@@ -282,6 +282,8 @@ trait ContentsFileTrait
                 break;
             case IMAGETYPE_JPEG:
                 $image = ImageCreateFromJPEG($input);
+                // exif情報の取得(jpegのみ
+                $exif_datas = @exif_read_data($input);
                 break;
             case IMAGETYPE_PNG:
                 $image = ImageCreateFromPNG($input);
