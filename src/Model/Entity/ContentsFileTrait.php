@@ -65,7 +65,7 @@ trait ContentsFileTrait
                 //attachmentからデータを探しに行く
                 $attachmentModel = TableRegistry::get('Attachments');
                 $attachmentData = $attachmentModel->find('all')
-                    ->where(['model' => $this->source()])
+                    ->where(['model' => $this->getSource()])
                     ->where(['model_id' => $this->id])
                     ->where(['field_name' => $match[1]])
                     ->first()
