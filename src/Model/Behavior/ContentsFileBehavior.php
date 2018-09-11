@@ -144,6 +144,10 @@ class ContentsFileBehavior extends Behavior {
      */
     public function fileValidationWhen($context, $field)
     {
+        // 初期遷移時などでdataがそもそもいない場合はチェックしない
+        if ( empty($context['data']) ) {
+            return false;
+        }
         // content_file_fileがいる場合はチェックしない
         if (!empty($context['data']['contents_file_' . $field])) {
             return false;
