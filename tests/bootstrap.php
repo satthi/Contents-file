@@ -76,7 +76,7 @@ $cache = [
     ]
 ];
 
-Cake\Cache\Cache::config($cache);
+Cake\Cache\Cache::setConfig($cache);
 
 // Ensure default test connection is defined
 
@@ -87,13 +87,13 @@ if (!getenv('TESTDB') || getenv('TESTDB') == 'postgresql'){
         putenv('db_dsn=sqlite::memory:');
     }
 
-    Cake\Datasource\ConnectionManager::config('test', [
+    Cake\Datasource\ConnectionManager::setConfig('test', [
         'className' => 'Cake\Database\Connection',
         'driver' => 'Cake\Database\Driver\Postgres',
         //'dsn' => getenv('db_dsn'),
         'database' => 'cake_test_db',
         'username' => 'postgres',
-        'password' => '',
+        'password' => 'postgres',
         'timezone' => 'UTC'
     ]);
 } else {
@@ -102,7 +102,7 @@ if (!getenv('TESTDB') || getenv('TESTDB') == 'postgresql'){
         putenv('db_dsn=sqlite::memory:');
     }
 
-    Cake\Datasource\ConnectionManager::config('test', [
+    Cake\Datasource\ConnectionManager::setConfig('test', [
         'className' => 'Cake\Database\Connection',
         'driver' => 'Cake\Database\Driver\Mysql',
         //'dsn' => getenv('db_dsn'),

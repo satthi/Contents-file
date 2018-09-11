@@ -15,8 +15,8 @@ class AttachmentsTable extends Table
     {
         parent::initialize($config);
 
-        $this->table('attachments');
+        $this->setTable('attachments');
         $this->addBehavior('Timestamp');
-        $this->primaryKey('id');
+        $this->setPrimaryKey('id');
     }
 }

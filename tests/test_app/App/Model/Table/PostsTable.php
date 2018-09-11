@@ -20,9 +20,9 @@ class PostsTable extends Table
      */
     public function initialize(array $config)
     {
-        $this->table('posts');
-        $this->displayField('name');
-        $this->primaryKey('id');
+        $this->setTable('posts');
+        $this->setDisplayField('name');
+        $this->setPrimaryKey('id');
         $this->addBehavior('Timestamp');
         
         $this->addBehavior('ContentsFile.ContentsFile');
