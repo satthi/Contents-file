@@ -126,7 +126,7 @@ class ContentsFileController extends AppController
             'wav' => 'audio/wav',
             'mp4' => 'video/mp4',
             'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            'docs' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ];
         $sContentType = 'application/octet-stream';
@@ -165,7 +165,7 @@ class ContentsFileController extends AppController
             'wav' => 'audio/wav',
             'mp4' => 'video/mp4',
             'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            'docs' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ];
         $sContentType = 'application/octet-stream';
