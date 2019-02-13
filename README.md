@@ -19,10 +19,10 @@ composer.json
 `composer install`
 
 ## 使い方
-###(初期設定・ローカルファイル保存の場合)
-① bootstrap.phpなど
+###(初期設定・ローカルファイル保存の場合)  
+① 設定を記述  
+bootstrap.phpなど
 ```php
-Plugin::load('ContentsFile', ['routes' => true]);
 Configure::write('ContentsFile.Setting', [
     'type' => 'normal',
     // trueでファイル名がランダム文字列に
@@ -36,12 +36,30 @@ Configure::write('ContentsFile.Setting', [
 ]);
 ```
 
-② tmpDir及びfileDirを権限777で準備
+### CakePHP <= 3.4
 
-###(初期設定・S3保存の場合)
-① bootstrap.phpなど
+bootstrap.phpなど  
 ```php
 Plugin::load('ContentsFile', ['routes' => true]);
+```
+
+### CakePHP > 3.4
+Application.php  
+```php
+public function bootstrap()
+{
+    $this->addPlugin('Migrations');
+    // 追加
+    $this->addPlugin('ContentsFile', ['routes' => true]);
+}
+```
+
+② tmpDir及びfileDirを権限777で準備
+
+###(初期設定・S3保存の場合)  
+① 設定を記述  
+bootstrap.phpなど  
+```php
 Configure::write('ContentsFile.Setting', [
     'type' => 's3',
     // trueでファイル名がランダム文字列に
@@ -65,6 +83,24 @@ Configure::write('ContentsFile.Setting', [
     ]
 ]);
 ```
+### CakePHP <= 3.4
+
+bootstrap.phpなど  
+```php
+Plugin::load('ContentsFile', ['routes' => true]);
+```
+
+### CakePHP > 3.4
+Application.php  
+```php
+public function bootstrap()
+{
+    $this->addPlugin('Migrations');
+    // 追加
+    $this->addPlugin('ContentsFile', ['routes' => true]);
+}
+```
+
 ② workingDirを権限777で準備
 
 ③ S3のｊバケットを準備し、IAMの権限について以下を設定
