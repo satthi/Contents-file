@@ -77,6 +77,6 @@ class AttachmentsAdd extends AbstractMigration
 
     public function down()
     {
-        $this->dropTable('attachments');
+        $this->table('attachments')->drop()->update();
     }
 }
