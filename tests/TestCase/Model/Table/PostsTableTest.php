@@ -23,8 +23,8 @@ class PostsTableTest extends TestCase
      * @var array
      */
     public $fixtures = [
-        'plugin.contents_file.posts',
-        'plugin.contents_file.attachments',
+        'plugin.ContentsFile.Posts',
+        'plugin.ContentsFile.Attachments',
     ];
 
     /**
