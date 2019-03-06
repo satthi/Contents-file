@@ -51,35 +51,35 @@ class ContentsFileController extends AppController
 
         // 必要なパラメータがない場合はエラー
         if (
-            empty($this->request->query['model']) ||
-            empty($this->request->query['field_name'])
+            empty($this->request->getQuery('model')) ||
+            empty($this->request->getQuery('field_name'))
         ) {
             throw new NotFoundException('404 error');
         }
 
         //Entityに接続して設定値を取得
-        $this->baseModel = TableRegistry::get($this->request->query['model']);
+        $this->baseModel = TableRegistry::get($this->request->getQuery('model'));
 
         // このレベルで切り出す
-        $fieldName = $this->request->query['field_name'];
+        $fieldName = $this->request->getQuery('field_name');
         $filename = '';
-        if (!empty($this->request->query['tmp_file_name'])) {
-            $filename = $this->request->query['tmp_file_name'];
+        if (!empty($this->request->getQuery('tmp_file_name'))) {
+            $filename = $this->request->getQuery('tmp_file_name');
             $filepath = $this->{Configure::read('ContentsFile.Setting.type') . 'TmpFilePath'}($filename);
             Configure::read('ContentsFile.Setting.Normal.tmpDir') . $filename;
-        } elseif (!empty($this->request->query['model_id'])) {
+        } elseif (!empty($this->request->getQuery('model_id'))) {
             //表示条件をチェックする
             $checkMethodName = 'contentsFileCheck' . Inflector::camelize($fieldName);
             if (method_exists($this->baseModel, $checkMethodName)) {
                 //エラーなどの処理はTableに任せる
-                $this->baseModel->{$checkMethodName}($this->request->query['model_id']);
+                $this->baseModel->{$checkMethodName}($this->request->getQuery('model_id'));
             }
             //attachementからデータを取得
             $attachmentModel = TableRegistry::get('Attachments');
             $attachmentData = $attachmentModel->find('all')
-                ->where(['model' => $this->request->query['model']])
-                ->where(['model_id' => $this->request->query['model_id']])
-                ->where(['field_name' => $this->request->query['field_name']])
+                ->where(['model' => $this->request->getQuery('model')])
+                ->where(['model_id' => $this->request->getQuery('model_id')])
+                ->where(['field_name' => $this->request->getQuery('field_name')])
                 ->first()
             ;
             if (empty($attachmentData)) {
@@ -89,8 +89,8 @@ class ContentsFileController extends AppController
             $filepath = $this->{Configure::read('ContentsFile.Setting.type') . 'FilePath'}($attachmentData);
 
             //通常のセットの時のみresize設定があれば見る
-            if (!empty($this->request->query['resize'])) {
-                $filepath = $this->{Configure::read('ContentsFile.Setting.type') . 'ResizeSet'}($filepath, $this->request->query['resize']);
+            if (!empty($this->request->getQuery('resize'))) {
+                $filepath = $this->{Configure::read('ContentsFile.Setting.type') . 'ResizeSet'}($filepath, $this->request->getQuery('resize'));
             }
         }
 
@@ -188,7 +188,7 @@ class ContentsFileController extends AppController
     private function fileDownloadHeader($filename)
     {
         // loaderよりダウンロードするかどうか
-        if (!empty($this->request->query['download']) && $this->request->query['download'] == true) {
+        if (!empty($this->request->getQuery('download')) && $this->request->getQuery('download') == true) {
             // IE/Edge対応
             if (strstr(env('HTTP_USER_AGENT'), 'MSIE') || strstr(env('HTTP_USER_AGENT'), 'Trident') || strstr(env('HTTP_USER_AGENT'), 'Edge')) {
                 $filename = mb_convert_encoding($filename, "SJIS", "UTF-8");

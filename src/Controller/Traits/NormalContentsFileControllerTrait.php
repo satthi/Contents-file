@@ -24,18 +24,18 @@ trait NormalContentsFileControllerTrait
             }
         }
 
-        $this->response->header('Content-Length', filesize($filepath));
+        $this->response->withHeader('Content-Length', filesize($filepath));
         if (!empty($fileExt)) {
             $fileContentType = $this->getFileType($fileExt);
         } else {
             $fileContentType = $this->getMimeType($filepath);
         }
-        $this->response->type($fileContentType);
+        $this->response->withType($fileContentType);
         @ob_end_clean(); // clean
         $fp = fopen($filepath, 'r');
         $body = fread($fp, filesize($filepath));
         fclose($fp);
-        $this->response->body($body);
+        $this->response->getBody()->write($body);
     }
 
     /**
