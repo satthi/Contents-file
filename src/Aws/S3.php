@@ -26,8 +26,6 @@ class S3
         $S3Setting = Configure::read('ContentsFile.Setting.S3');
         if (
             !is_array($S3Setting) ||
-            !array_key_exists('key', $S3Setting) ||
-            !array_key_exists('secret', $S3Setting) ||
             !array_key_exists('bucket', $S3Setting) ||
             !array_key_exists('tmpDir', $S3Setting) ||
             !array_key_exists('fileDir', $S3Setting)
@@ -35,16 +33,20 @@ class S3
             throw new InternalErrorException('contentsFileS3Config paramater shortage');
         }
         // S3に接続するためのクライアントを用意します。
-        $key    = Configure::read('ContentsFile.Setting.S3.key');
-        $secret = Configure::read('ContentsFile.Setting.S3.secret');
-        $sdk = new Sdk([
-            'credentials' => array(
-                'key'=> $key,
-                'secret' => $secret,
-            ),
+        $config = array(
             'version' => 'latest',
             'region'  => 'ap-northeast-1'
-        ]);
+        );
+        // key, secretが指定されている場合はcredentialsを設定する
+        $key    = Configure::read('ContentsFile.Setting.S3.key');
+        $secret = Configure::read('ContentsFile.Setting.S3.secret');
+        if (!empty($key) && !empty($secret)) {
+            $config['credentials'] = array(
+                'key'=> $key,
+                'secret' => $secret,
+            );
+        }
+        $sdk = new Sdk($config);
         $this->client = $sdk->createS3();
     }
 

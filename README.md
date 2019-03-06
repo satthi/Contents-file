@@ -68,8 +68,8 @@ Configure::write('ContentsFile.Setting', [
     'ext' => true,
     'S3' => [
         'key' => 'KEY',
-        'secret' => 'SECRET',
-        'bucket' => 'BUCKET_NAME',
+        'secret' => 'SECRET',      // IAM Roleを利用する場合、省略可能
+        'bucket' => 'BUCKET_NAME', // IAM Roleを利用する場合、省略可能
         'tmpDir' => 'tmp',
         'fileDir' => 'file',
         'workingDir' => TMP,

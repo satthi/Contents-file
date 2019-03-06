@@ -29,8 +29,6 @@ trait S3ContentsFileBehaviorTrait
         $s3Setting = Configure::read('ContentsFile.Setting.S3');
         if (
             !is_array($s3Setting) ||
-            !array_key_exists('key', $s3Setting) ||
-            !array_key_exists('secret', $s3Setting) ||
             !array_key_exists('bucket', $s3Setting) ||
             !array_key_exists('tmpDir', $s3Setting) ||
             !array_key_exists('fileDir', $s3Setting) ||
