@@ -174,7 +174,7 @@ class ContentsFileController extends AppController
             // 拡張子がある場合
             $ext = strtolower(substr($filename, $pos + 1));
             if (strlen($ext)) {
-                return $aContentTypes[$ext] ? $aContentTypes[$ext] : $sContentType;
+                return array_key_exists($ext, $aContentTypes) ? $aContentTypes[$ext] : $sContentType;
             }
         }
         return $sContentType;
