@@ -187,15 +187,14 @@ class ContentsFileController extends AppController
      */
     private function fileDownloadHeader($filename)
     {
+        $filename = rawurlencode($filename);
         // loaderよりダウンロードするかどうか
-        if (!empty($this->request->getQuery('download')) && $this->request->getQuery('download') == true) {
-            $this->response->header('Content-Disposition', 'attachment;filename="' . rawurlencode($filename) . '"');
-
+        if (!empty($this->request->query['download']) && $this->request->query['download'] == true) {
             // IE/Edge対応
             if (strstr(env('HTTP_USER_AGENT'), 'MSIE') || strstr(env('HTTP_USER_AGENT'), 'Trident') || strstr(env('HTTP_USER_AGENT'), 'Edge')) {
                 $filename = mb_convert_encoding($filename, "SJIS", "UTF-8");
             }
-            $this->response->header('Content-Disposition', 'attachment;filename="' . $filename . '"');
         }
+        $this->response->header('Content-Disposition', 'attachment;filename="' . $filename . '"');
     }
 }
