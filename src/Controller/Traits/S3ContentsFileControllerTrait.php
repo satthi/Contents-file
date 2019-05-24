@@ -26,14 +26,14 @@ trait S3ContentsFileControllerTrait
         fclose($fp);
 
         // ファイルの出力
-        $this->response->header('Content-Length', filesize($topath));
+        $this->response = $this->response->withHeader('Content-Length', filesize($topath));
         $fileContentType = $this->getMimeType($topath);
-        $this->response->type($fileContentType);
+        $this->response = $this->response->withType($fileContentType);
         @ob_end_clean(); // clean
         $fp = fopen($topath, 'r');
         $body = fread($fp, filesize($topath));
         fclose($fp);
-        $this->response->body($body);
+        $this->response->getBody()->write($body);
         // サーバー上にファイルを残しておく必要がないので削除する
         unlink($topath);
     }
