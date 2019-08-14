@@ -176,7 +176,7 @@ class ContentsFileBehavior extends ModelBehavior {
             'file_size' => $file_size
         );
         $this->ContentsFileAttachment->create();
-        if (!$this->ContentsFileAttachment->save($db_save)) {
+        if (!$this->ContentsFileAttachment->save($db_save, array('atomic' => false))) {
             return false;
         }
         //!DBデータの保存
