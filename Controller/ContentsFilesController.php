@@ -1,4 +1,5 @@
 <?php
+App::uses('Security', 'Utility');
 
 class ContentsFilesController extends ContentsFileAppController {
 
