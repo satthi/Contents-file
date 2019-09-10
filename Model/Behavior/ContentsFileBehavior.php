@@ -138,15 +138,15 @@ class ContentsFileBehavior extends ModelBehavior {
     private function _fileSave(Model $model, $field) {
         $model_name = $model->alias;
         $field_name = $field['column'];
-        if (!isset($model->data[$model->alias][$field_name])){
-            return;
-        }
         if (array_key_exists('delete_' . $field_name , $model->data[$model->alias]) && $model->data[$model->alias]['delete_' . $field_name] == true){
             //ファイル削除のほうへ
             if (!empty($model->data[$model->alias][$field_name]['cache_tmp_name'])){
                 @unlink($field['cacheTempDir'] . $model->data[$model_name][$field_name]['cache_tmp_name']);
             }
             $this->_fileDelete($model, $field);
+            return;
+        }
+        if (!isset($model->data[$model->alias][$field_name])){
             return;
         }
         if (!empty($model->data[$model->alias][$field['column']]['file_path'])) {
