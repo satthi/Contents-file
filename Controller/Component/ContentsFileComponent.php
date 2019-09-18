@@ -101,7 +101,13 @@ class ContentsFileComponent extends Component {
 
     function _tmpSet($hash,$modelName, $field) {
         //データがあった場合セッションに書き込んでおく。(次に表示するために
-        if (!empty($this->controller->request->data[$modelName][$field['column']])) {
+        if (
+            !empty($this->controller->request->data[$modelName][$field['column']]) &&
+            (
+                !array_key_exists('error', $this->controller->request->data[$modelName][$field['column']]) ||
+                $this->controller->request->data[$modelName][$field['column']]['error'] == UPLOAD_ERR_OK
+            )
+        ) {
             $data = $this->controller->request->data[$modelName][$field['column']];
             $this->Session->write('ContentsFile.' . $modelName . '__' . $field['column'] . '__' . $hash, $data);
         }
