@@ -191,7 +191,7 @@ class ContentsFileController extends AppController
         if (!empty($this->request->getQuery('download')) && $this->request->getQuery('download') == true) {
             // IE/Edge対応
             if (strstr(env('HTTP_USER_AGENT'), 'MSIE') || strstr(env('HTTP_USER_AGENT'), 'Trident') || strstr(env('HTTP_USER_AGENT'), 'Edge')) {
-                $filename = mb_convert_encoding($filename, "SJIS", "UTF-8");
+                $filename = rawurlencode($filename);
             }
             $this->response->header('Content-Disposition', 'attachment;filename="' . $filename . '"');
         }
