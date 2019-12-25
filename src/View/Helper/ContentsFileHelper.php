@@ -39,10 +39,15 @@ class ContentsFileHelper extends Helper {
             $options
         );
 
+        $urlOption = $options;
+        $linkOptions = $options;
+        // download属性がいるとEdgeでダウンロード属性が優先されてしまう
+        unset($linkOptions['download']);
+
         return $this->Html->link(
             $title,
-            $this->urlArray($fileInfo, $options),
-            $options
+            $this->urlArray($fileInfo, $urlOption),
+            $linkOptions
         );
     }
 
