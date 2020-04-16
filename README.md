@@ -3,8 +3,7 @@
 [![Build Status](https://travis-ci.org/satthi/Contents-file.svg?branch=master)](https://travis-ci.org/satthi/Contents-file)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/satthi/Contents-file/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/satthi/Contents-file/?branch=master)
 
-このプラグインはCakePHP用ファイルアップロードツールです。
-Ver 3.1 よりS3にも。対応しました。
+このプラグインはCakePHP4用ファイルアップロードツールです。
 
 ## インストール
 composer.json
@@ -19,8 +18,9 @@ composer.json
 `composer install`
 
 ## 使い方
-###(初期設定・ローカルファイル保存の場合)  
-① 設定を記述  
+### (初期設定・ローカルファイル保存の場合)
+
+① 設定を記述
 bootstrap.phpなど
 ```php
 Configure::write('ContentsFile.Setting', [
@@ -36,15 +36,8 @@ Configure::write('ContentsFile.Setting', [
 ]);
 ```
 
-### CakePHP <= 3.4
-
-bootstrap.phpなど  
-```php
-Plugin::load('ContentsFile', ['routes' => true]);
-```
-
-### CakePHP > 3.4
-Application.php  
+② プラグイン読込
+Application.php
 ```php
 public function bootstrap()
 {
@@ -54,11 +47,12 @@ public function bootstrap()
 }
 ```
 
-② tmpDir及びfileDirを権限777で準備
+③ tmpDir及びfileDirを権限777で準備
 
-###(初期設定・S3保存の場合)  
-① 設定を記述  
-bootstrap.phpなど  
+### (初期設定・S3保存の場合)
+
+① 設定を記述
+bootstrap.phpなど
 ```php
 Configure::write('ContentsFile.Setting', [
     'type' => 's3',
@@ -83,15 +77,8 @@ Configure::write('ContentsFile.Setting', [
     ]
 ]);
 ```
-### CakePHP <= 3.4
-
-bootstrap.phpなど  
-```php
-Plugin::load('ContentsFile', ['routes' => true]);
-```
-
-### CakePHP > 3.4
-Application.php  
+② プラグイン読込
+Application.php
 ```php
 public function bootstrap()
 {
@@ -101,9 +88,9 @@ public function bootstrap()
 }
 ```
 
-② workingDirを権限777で準備
+③ workingDirを権限777で準備
 
-③ S3のｊバケットを準備し、IAMの権限について以下を設定
+④ S3のｊバケットを準備し、IAMの権限について以下を設定
 ```
 {
     "Version": "2012-10-17",
@@ -126,7 +113,8 @@ public function bootstrap()
 ```
 ※ 作業するbucketについてs3:GetObject、s3:PutObject、s3:DeleteObject、s3:ListBucketの権限があれば良いです
 
-###各種基本設定(共通)
+### 各種基本設定(共通)
+
 マイグレーション実行
 
 `ContentsFile/config/Migrations/20161109095904_AttachmentsAdd`
@@ -256,7 +244,7 @@ class TopicsController extends AppController
 ```
 
 Template
-form.ctp
+form.php
 ```php
     <?= $this->Form->create($topic, ['type' => 'file']) ?>
     <fieldset>
@@ -282,7 +270,7 @@ form.ctp
     <?= $this->Form->end() ?>
 ```
 
-view.ctp
+view.php
 ```php
 <?php // linkでファイルのリンク作成?>
 <?= $this->ContentsFile->link($topic->contents_file_file);?>
@@ -294,7 +282,4 @@ view.ctp
 <?= $this->ContentsFile->link($topic->contents_file_file, ['static_s3' => true]);?>
 <?php // imgでimgタグ作成 リサイズお画像の指定はオプションで指定?>
 <?= $this->ContentsFile->image($topic->contents_file_img, ['resize' => ['width' => 300], 'static_s3' => true]);?>
-
 ```
-
-
