@@ -93,7 +93,7 @@ if (!getenv('TESTDB') || getenv('TESTDB') == 'postgresql'){
         //'dsn' => getenv('db_dsn'),
         'database' => 'cake_test_db',
         'username' => 'postgres',
-        'password' => 'postgres',
+        'password' => '',
         'timezone' => 'UTC'
     ]);
 } else {

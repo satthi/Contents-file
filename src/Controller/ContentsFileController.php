@@ -20,7 +20,7 @@ class ContentsFileController extends AppController
      * initialize
      * Configureの最後のスラッシュの設定
      */
-    public function initialize()
+    public function initialize(): void
     {
         parent::initialize();
         // /が最後についていない場合はつける

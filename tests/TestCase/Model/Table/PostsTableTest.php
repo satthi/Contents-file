@@ -32,7 +32,7 @@ class PostsTableTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -66,7 +66,7 @@ class PostsTableTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->Posts);
 
@@ -99,7 +99,7 @@ class PostsTableTest extends TestCase
             'tmp_file_name' => $rand
         ];
 
-        $entity = $this->Posts->newEntity();
+        $entity = $this->Posts->newEntity([]);
         $entity->name = 'test';
 
         $entity->contents_file_file = $fileinfo;
@@ -160,7 +160,7 @@ class PostsTableTest extends TestCase
             'tmp_file_name' => $rand
         ];
 
-        $entity = $this->Posts->newEntity();
+        $entity = $this->Posts->newEntity([]);
         $entity->name = 'test';
 
         $entity->contents_file_img = $fileinfo;
