@@ -253,14 +253,13 @@ trait ContentsFileTrait
 
             return true;
 
-// copy($tmpName, Configure::read('ContentsFile.Setting.Normal.tmpDir') . $tmpFileName);
         } elseif (Configure::read('ContentsFile.Setting.type') == 's3') {
-            // @Todo: 後調整
-            debug('ATO');
-            exit;
-            // $uploadFileName = Configure::read('ContentsFile.Setting.S3.tmpDir') . $tmpFileName;
-            // $S3 = new S3();
-            // return $S3->upload($tmpName, $uploadFileName);
+            $tmpName = Configure::read('ContentsFile.Setting.S3.workingDir') . $tmpFileName;
+            $fileInfo->moveTo($tmpName);
+            $uploadFileName = Configure::read('ContentsFile.Setting.S3.tmpDir') . $tmpFileName;
+
+            $S3 = new S3();
+            return $S3->upload($tmpName, $uploadFileName);
         } else {
             throw new InternalErrorException('contentsFileConfig type illegal');
         }
