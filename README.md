@@ -135,8 +135,8 @@ class TopicsTable extends Table
     {
         parent::initialize($config);
 
-        $this->table('topics');
-        $this->primaryKey('id');
+        $this->setTable('topics');
+        $this->setPrimaryKey('id');
         // 追加項目
         $this->addBehavior('ContentsFile.ContentsFile');
         $this->addBehavior('Timestamp');
@@ -145,7 +145,7 @@ class TopicsTable extends Table
     public function validationDefault(Validator $validator)
     {
         // providerを読み込み
-        $validator->provider('contents_file', 'ContentsFile\Validation\ContentsFileValidation');
+        $validator->setProvider('contents_file', 'ContentsFile\Validation\ContentsFileValidation');
         $validator
             ->notEmpty('img', 'ファイルを添付してください' , function ($context){
                 // fileValidationWhenメソッドを追加しました。
@@ -232,14 +232,16 @@ Controller(※ほとんど変更の必要なし)
 ```php
 <?php
 namespace App\Controller;
+use Cake\Event\EventInterface;
 
 use App\Controller\AppController;
 class TopicsController extends AppController
 {
-    // ヘルパー読み込み
-    public $helpers = [
-        'ContentsFile.ContentsFile',
-    ];
+    public function beforeFilter(EventInterface $event)
+    {
+        parent::beforeFilter($event);
+        $this->viewBuilder()->setHelpers(['ContentsFile.ContentsFile']);
+    }
 }
 ```
 
@@ -250,19 +252,19 @@ form.php
     <fieldset>
         <legend><?= __('Edit Topic') ?></legend>
         <?php
-            echo $this->Form->input('file', ['type' => 'file']);
+            echo $this->Form->control('file', ['type' => 'file']);
             // バリデーションに引っかかった際に、再度ファイルを登録しなくて済むための対応
             echo $this->ContentsFile->contentsFileHidden($topic->contents_file_file, 'contents_file_file');
             if (!empty($topic->contents_file_file)) {
                 echo $this->ContentsFile->link($topic->contents_file_file);
                 // 「delete_フィールド名」がtrueでファイルを削除
-                echo $this->Form->input('delete_file', ['type' => 'checkbox', 'label' => 'delete']);
+                echo $this->Form->control('delete_file', ['type' => 'checkbox', 'label' => 'delete']);
             }
-            echo $this->Form->input('img', ['type' => 'file']);
+            echo $this->Form->control('img', ['type' => 'file']);
             echo $this->ContentsFile->contentsFileHidden($topic->contents_file_img, 'contents_file_img');
             if (!empty($topic->contents_file_img)) {
                 echo $this->ContentsFile->image($topic->contents_file_img);
-                echo $this->Form->input('delete_img', ['type' => 'checkbox', 'label' => 'delete']);
+                echo $this->Form->control('delete_img', ['type' => 'checkbox', 'label' => 'delete']);
             }
         ?>
     </fieldset>
