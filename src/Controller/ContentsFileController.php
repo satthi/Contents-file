@@ -59,11 +59,12 @@ class ContentsFileController extends AppController
         }
 
         //Entityに接続して設定値を取得
-        $this->baseModel = TableRegistry::get($this->request->getQuery('model'));
+        $this->baseModel = TableRegistry::getTableLocator()->get($this->request->getQuery('model'));
 
         // このレベルで切り出す
         $fieldName = $this->request->getQuery('field_name');
         $filename = '';
+        $filepath = '';
         if (!empty($this->request->getQuery('tmp_file_name'))) {
             $filename = $this->request->getQuery('tmp_file_name');
             $filepath = $this->{Configure::read('ContentsFile.Setting.type') . 'TmpFilePath'}($filename);
@@ -76,7 +77,7 @@ class ContentsFileController extends AppController
                 $this->baseModel->{$checkMethodName}($this->request->getQuery('model_id'));
             }
             //attachementからデータを取得
-            $attachmentModel = TableRegistry::get('Attachments');
+            $attachmentModel = TableRegistry::getTableLocator()->get('Attachments');
             $attachmentData = $attachmentModel->find('all')
                 ->where(['model' => $this->request->getQuery('model')])
                 ->where(['model_id' => $this->request->getQuery('model_id')])
@@ -197,7 +198,7 @@ class ContentsFileController extends AppController
             if (strstr(env('HTTP_USER_AGENT'), 'MSIE') || strstr(env('HTTP_USER_AGENT'), 'Trident') || strstr(env('HTTP_USER_AGENT'), 'Edge')) {
                 $filename = rawurlencode($filename);
             }
-            $this->response->header('Content-Disposition', 'attachment;filename="' . $filename . '"');
+            $this->response->withDownload($filename);
         }
     }
 }

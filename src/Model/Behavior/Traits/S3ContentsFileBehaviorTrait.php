@@ -108,7 +108,7 @@ trait S3ContentsFileBehaviorTrait
     private function s3FileDelete(string $modelName, int $modelId, string $field): bool
     {
         //attachementからデータを取得
-        $attachmentModel = TableRegistry::get('Attachments');
+        $attachmentModel = TableRegistry::getTableLocator()->get('Attachments');
         $attachmentData = $attachmentModel->find('all')
             ->where(['model' => $modelName])
             ->where(['model_id' => $modelId])
