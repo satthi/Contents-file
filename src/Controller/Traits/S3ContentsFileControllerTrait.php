@@ -2,6 +2,7 @@
 namespace ContentsFile\Controller\Traits;
 
 use Cake\Core\Configure;
+use Cake\ORM\Entity;
 use ContentsFile\Aws\S3;
 
 /**
@@ -14,8 +15,11 @@ trait S3ContentsFileControllerTrait
      * s3Loader
      * S3用のファイルローダー
      * @author hagiwara
+     * @param string $filename
+     * @param string $filepath
+     * @return void
      */
-    private function s3Loader($filename, $filepath)
+    private function s3Loader(string $filename, string $filepath): void
     {
         // S3より該当ファイルを取得
         $S3 = new S3();
@@ -43,8 +47,9 @@ trait S3ContentsFileControllerTrait
      * S3のtmpのパス作成
      * @author hagiwara
      * @param string $filename
+     * @return string
      */
-    private function s3TmpFilePath($filename)
+    private function s3TmpFilePath($filename): string
     {
         return Configure::read('ContentsFile.Setting.S3.tmpDir') . $filename;
     }
@@ -54,8 +59,9 @@ trait S3ContentsFileControllerTrait
      * S3のファイルのパス作成
      * @author hagiwara
      * @param Entity $attachmentData
+     * @return string
      */
-    private function s3FilePath($attachmentData)
+    private function s3FilePath(Entity $attachmentData): string
     {
         $ext = '';
         if (Configure::read('ContentsFile.Setting.ext') === true) {
@@ -75,8 +81,9 @@ trait S3ContentsFileControllerTrait
      * @author hagiwara
      * @param string $filepath
      * @param array $resize
+     * @param string
      */
-    private function s3ResizeSet($filepath, $resize)
+    private function s3ResizeSet(string $filepath, array $resize): string
     {
         if (empty($resize['width'])) {
             $resize['width'] = 0;

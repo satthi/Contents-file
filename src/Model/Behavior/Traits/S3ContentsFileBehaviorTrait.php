@@ -22,8 +22,9 @@ trait S3ContentsFileBehaviorTrait
      * s3ParamCheck
      * 通常の設定値チェック
      * @author hagiwara
+     * @return void
      */
-    private function s3ParamCheck()
+    private function s3ParamCheck(): void
     {
         // S3に必要な設定がそろっているかチェックする
         $s3Setting = Configure::read('ContentsFile.Setting.S3');
@@ -57,8 +58,9 @@ trait S3ContentsFileBehaviorTrait
      * @param array $fileInfo
      * @param array $fieldSettings
      * @param array $attachmentSaveData
+     * @return bool
      */
-    private function s3FileSave($fileInfo, $fieldSettings, $attachmentSaveData)
+    private function s3FileSave(array $fileInfo, array $fieldSettings, array $attachmentSaveData): bool
     {
         $S3 = new S3();
         $newFiledir = Configure::read('ContentsFile.Setting.S3.fileDir') . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
@@ -101,8 +103,9 @@ trait S3ContentsFileBehaviorTrait
      * @param string $modelName
      * @param integer $modelId
      * @param string $field
+     * @return bool
      */
-    private function s3FileDelete($modelName, $modelId, $field)
+    private function s3FileDelete(string $modelName, int $modelId, string $field): bool
     {
         //attachementからデータを取得
         $attachmentModel = TableRegistry::get('Attachments');
@@ -147,8 +150,9 @@ trait S3ContentsFileBehaviorTrait
      * @author hagiwara
      * @param string $filepath
      * @param array $resize
+     * @return string
      */
-    public function s3ImageResize($filepath, $resize)
+    public function s3ImageResize(string $filepath, array $resize): string
     {
         $imagepathinfo = $this->getPathinfo($filepath, $resize);
         $S3 = new S3();

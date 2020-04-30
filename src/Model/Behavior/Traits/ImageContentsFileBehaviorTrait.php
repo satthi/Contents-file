@@ -18,9 +18,10 @@ trait ImageContentsFileBehaviorTrait
      * @author hagiwara
      * @param string $imagePath
      * @param array $baseSize
+     * @return bool
      */
-    public function imageResize($imagePath, $baseSize) {
-
+    public function imageResize(string $imagePath, array $baseSize): bool
+    {
         $imageInfo = $this->getImageInfo($imagePath);
         $image = $imageInfo['image'];
         $imagetype = $imageInfo['imagetype'];
@@ -39,8 +40,9 @@ trait ImageContentsFileBehaviorTrait
      * 画像情報の取得
      * @author hagiwara
      * @param string $imagePath
+     * @return bool|array
      */
-    private function getImageInfo($imagePath)
+    private function getImageInfo(string $imagePath)
     {
         if (file_exists($imagePath) === false) {
             return false;
@@ -77,8 +79,9 @@ trait ImageContentsFileBehaviorTrait
      * @author hagiwara
      * @param resource $image
      * @param array $baseSize
+     * @return array
      */
-    private function imageSizeInfo($image, $baseSize)
+    private function imageSizeInfo($image, array $baseSize): array
     {
         // 画像の縦横サイズを取得
         $sizeX = ImageSX($image);
@@ -136,12 +139,12 @@ trait ImageContentsFileBehaviorTrait
      * 画像リサイズ情報の取得
      * @author hagiwara
      * @param resource $image
-     * @param integer $imagetype
+     * @param int $imagetype
      * @param string $imagePath
      * @param array $baseSize
      * @param array $imageSizeInfo
      */
-    private function imageResizeMake($image, $imagetype, $imagePath, $baseSize, $imageSizeInfo)
+    private function imageResizeMake($image, int $imagetype, string $imagePath, array $baseSize, array $imageSizeInfo): bool
     {
         // サイズ変更後の画像データを生成
         $campusX = $imageSizeInfo['reSizeX'];
@@ -226,8 +229,10 @@ trait ImageContentsFileBehaviorTrait
      * @author hagiwara
      * @param string $imagePath
      * @param array $resize
+     * @return array
      */
-    public function getPathInfo($imagePath, $resize = []) {
+    public function getPathInfo(string $imagePath, array $resize = []): array
+    {
         $pathinfo = pathinfo($imagePath);
         $pathinfo['resize_dir'] = $pathinfo['dirname'] . '/contents_file_resize_' . $pathinfo['filename'];
         //一旦ベースのパスを通しておく

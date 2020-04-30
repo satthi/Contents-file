@@ -3,6 +3,7 @@
 namespace ContentsFile\View\Helper;
 
 use Cake\Core\Configure;
+use Cake\ORM\Entity;
 use Cake\View\Helper;
 
 class ContentsFileHelper extends Helper {
@@ -17,11 +18,12 @@ class ContentsFileHelper extends Helper {
     /**
      * link
      * @author hagiwara
-     * @param array $fileInfo
+     * @param array|null $fileInfo
      * @param array $options
      * @param string $title
+     * @return string|null
      */
-    public function link($fileInfo, $options = [], $title = null)
+    public function link($fileInfo, array $options = [], string $title = null): string
     {
         if (empty($fileInfo)) {
             return '';
@@ -54,10 +56,11 @@ class ContentsFileHelper extends Helper {
     /**
      * image
      * @author hagiwara
-     * @param array $fileInfo
+     * @param array|null $fileInfo
      * @param array $options
+     * @return string
      */
-    public function image($fileInfo, $options = [])
+    public function image($fileInfo, array $options = []): string
     {
         if (empty($fileInfo)) {
             return '';
@@ -79,11 +82,12 @@ class ContentsFileHelper extends Helper {
     /**
      * url
      * @author hagiwara
-     * @param array $fileInfo
+     * @param array|null $fileInfo
      * @param boolean $full
      * @param array $options
+     * @return string
      */
-    public function url($fileInfo, $full = false, $options = [])
+    public function url($fileInfo, bool $full = false, array $options = []): string
     {
         if (empty($fileInfo)) {
             return [];
@@ -106,9 +110,10 @@ class ContentsFileHelper extends Helper {
      *
      * @author hagiwara
      * @param array|null $contentFileData
-     * @param text $field
+     * @param string $field
+     * @return string
      */
-    public function contentsFileHidden($contentFileData, $field)
+    public function contentsFileHidden($contentFileData, string $field): string
     {
         $hiddenInput = '';
         if (!empty($contentFileData)) {
@@ -122,9 +127,11 @@ class ContentsFileHelper extends Helper {
     /**
      * urlArray
      * @author hagiwara
-     * @param array $fileInfo
+     * @param array|null $fileInfo
+     * @param array $options
+     * @return array
      */
-    private function urlArray($fileInfo, $options)
+    private function urlArray($fileInfo, array $options): array
     {
         if (!empty($fileInfo['tmp_file_name'])) {
             return [
@@ -178,8 +185,9 @@ class ContentsFileHelper extends Helper {
      * 静的ホスティング用のURL作成
      * @author hagiwara
      * @param array $fileInfo
+     * @return string
      */
-    private function makeStaticS3Url($fileInfo)
+    private function makeStaticS3Url(array $fileInfo): string
     {
         $staticS3Url = Configure::read('ContentsFile.Setting.S3.static_domain') . '/' . Configure::read('ContentsFile.Setting.S3.fileDir') . $fileInfo['model'] . '/' . $fileInfo['model_id'] . '/';
         if ($fileInfo['resize'] == false) {
@@ -215,7 +223,15 @@ class ContentsFileHelper extends Helper {
     }
 
     /* ここからはDD専用のHelper */
-    public function displayFilename($entity, $field)
+    /**
+     * displayFilename
+     * 静的ホスティング用のURL作成
+     * @author hagiwara
+     * @param Entity $entity
+     * @param array $field
+     * @return string
+     */
+    public function displayFilename(Entity $entity, string $field): string
     {
         if (!is_null($entity->{'contents_file_' . $field . '_filename'})) {
             return $entity->{'contents_file_' . $field . '_filename'};

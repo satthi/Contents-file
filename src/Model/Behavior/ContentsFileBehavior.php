@@ -45,8 +45,9 @@ class ContentsFileBehavior extends Behavior {
      * @param Event $event
      * @param EntityInterface $entity
      * @param ArrayObject $options
+     * @return bool
      */
-    public function afterSave(Event $event, EntityInterface $entity, ArrayObject $options)
+    public function afterSave(Event $event, EntityInterface $entity, ArrayObject $options): bool
     {
         //設定値をentityから取得
         $contentsFileConfig = $entity->getContentsFileSettings();
@@ -113,8 +114,9 @@ class ContentsFileBehavior extends Behavior {
      * @author hagiwara
      * @param EntityInterface $entity
      * @param array $fields
+     * @return bool
      */
-    public function fileDelete(EntityInterface $entity, $fields = [])
+    public function fileDelete(EntityInterface $entity, array $fields = []): bool
     {
         // 新規作成データ時は何もしない
         if (empty($entity->id)) {
@@ -141,8 +143,9 @@ class ContentsFileBehavior extends Behavior {
      * @author hagiwara
      * @param array $context
      * @param string $field
+     * @return bool
      */
-    public function fileValidationWhen($context, $field)
+    public function fileValidationWhen(array $context, string $field): bool
     {
         // 初期遷移時などでdataがそもそもいない場合はチェックしない
         if ( empty($context['data']) ) {
@@ -171,10 +174,10 @@ class ContentsFileBehavior extends Behavior {
      * @param EntityInterface $entity
      * @param string $field
      */
-    private function fileDeleteParts($entity, $field)
+    private function fileDeleteParts(EntityInterface $entity, string $field): bool
     {
         $attachmentModel = TableRegistry::get('ContentsFile.Attachments');
-        $modelName = $entity->source();
+        $modelName = $entity->getSource();
         $modelId = $entity->id;
         // 添付ファイルデータの削除
         $deleteAttachmentData = $attachmentModel->find('all')
@@ -197,11 +200,11 @@ class ContentsFileBehavior extends Behavior {
      * mkdir
      * ディレクトリの作成(パーミッションの設定のため
      * @author hagiwara
-     * @param string $permission
-     * @param integer $path
+     * @param string $path
+     * @param integer $permission
      * @param boolean $recursive
      */
-    private function mkdir($path, $permission, $recursive)
+    private function mkdir(string $path, $permission, bool $recursive)
     {
         if (is_dir($path)) {
             return true;
@@ -215,8 +218,9 @@ class ContentsFileBehavior extends Behavior {
     /**
      * makeRandomKey
      * @author hagiwara
+     * @return string
      */
-    private function makeRandomPath()
+    private function makeRandomPath(): string
     {
         $hash = Security::hash(time() . rand());
         $attachmentModel = TableRegistry::get('ContentsFile.Attachments');

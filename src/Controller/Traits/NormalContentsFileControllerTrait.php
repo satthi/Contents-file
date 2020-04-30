@@ -3,6 +3,7 @@
 namespace ContentsFile\Controller\Traits;
 
 use Cake\Core\Configure;
+use Cake\ORM\Entity;
 
 /**
  * 通常のファイルローダー周り
@@ -13,9 +14,12 @@ trait NormalContentsFileControllerTrait
     /**
      * normalLoader
      * 通常のローダー
+     * @param string $filename
+     * @param string $filepath
+     * @return void
      * @author hagiwara
      */
-    private function normalLoader($filename, $filepath)
+    private function normalLoader(string $filename, string $filepath): void
     {
         $fileExt = null;
         if (preg_match('/\.([^\.]*)$/', $filename, $ext)) {
@@ -43,8 +47,9 @@ trait NormalContentsFileControllerTrait
      * 通常用のtmpのパス作成
      * @author hagiwara
      * @param string $filename
+     * @return string
      */
-    private function normalTmpFilePath($filename)
+    private function normalTmpFilePath(string $filename): string
     {
         return Configure::read('ContentsFile.Setting.Normal.tmpDir') . $filename;
     }
@@ -54,8 +59,9 @@ trait NormalContentsFileControllerTrait
      * 通常用のファイルのパス作成
      * @author hagiwara
      * @param Entity $attachmentData
+     * @return string
      */
-    private function normalFilePath($attachmentData)
+    private function normalFilePath(Entity $attachmentData): string
     {
         $ext = '';
         if (Configure::read('ContentsFile.Setting.ext') === true) {
@@ -74,8 +80,9 @@ trait NormalContentsFileControllerTrait
      * @author hagiwara
      * @param string $filepath
      * @param array $resize
+     * @return string
      */
-    private function normalResizeSet($filepath, $resize)
+    private function normalResizeSet(string $filepath, array $resize): string
     {
         if (empty($resize['width'])) {
             $resize['width'] = 0;

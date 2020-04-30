@@ -44,8 +44,9 @@ class ContentsFileController extends AppController
     /**
      * loader
      * @author hagiwara
+     * @return void
      */
-    public function loader()
+    public function loader(): void
     {
         $this->autoRender = false;
 
@@ -102,8 +103,9 @@ class ContentsFileController extends AppController
      * getFileType
      * @author hagiwara
      * @param string $ext
+     * @return string
      */
-    private function getFileType($ext)
+    private function getFileType($ext): string
     {
         $aContentTypes = [
             'txt'=>'text/plain',
@@ -141,8 +143,9 @@ class ContentsFileController extends AppController
      * getMimeType
      * @author hagiwara
      * @param string $filename
+     * @return string
      */
-    private function getMimeType($filename)
+    private function getMimeType(string $filename): string
     {
         $aContentTypes = [
             'txt'=>'text/plain',
@@ -184,8 +187,9 @@ class ContentsFileController extends AppController
      * fileDownloadHeader
      * @author hagiwara
      * @param string $filename
+     * @return void
      */
-    private function fileDownloadHeader($filename)
+    private function fileDownloadHeader(string $filename): void
     {
         // loaderよりダウンロードするかどうか
         if (!empty($this->request->getQuery('download')) && $this->request->getQuery('download') == true) {

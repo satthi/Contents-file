@@ -10,8 +10,12 @@ class ContentsFileValidation extends Validation
     /**
      * checkMaxSize
      *
+     * @param UploadedFile $value
+     * @param int|string $max
+     * @param mixed $context
+     * @return bool
      */
-    public static function checkMaxSize(UploadedFile $value, $max, $context)
+    public static function checkMaxSize(UploadedFile $value, $max, $context): bool
     {
         $maxValue = self::calcFileSizeUnit($max);
         return $maxValue >= $value->getSize();
@@ -20,8 +24,11 @@ class ContentsFileValidation extends Validation
     /**
      * uploadMaxSizeCheck
      *
+     * @param UploadedFile $value
+     * @param mixed $context
+     * @return bool
      */
-    public static function uploadMaxSizeCheck(UploadedFile $value, $context)
+    public static function uploadMaxSizeCheck(UploadedFile $value, $context): bool
     {
         return $value->getError() != UPLOAD_ERR_INI_SIZE;
     }
@@ -31,8 +38,8 @@ class ContentsFileValidation extends Validation
      *
      * e.g.) 100KB -> 1024000
      *
-     * @param $size mixed
-     * @return int file size
+     * @param int|string $size
+     * @return int|bool
      */
     private static function calcFileSizeUnit($size)
     {
@@ -51,10 +58,11 @@ class ContentsFileValidation extends Validation
      * checkExtension
      * 拡張子のチェック
      *
-     * @param $value mixed
+     * @param UploadedFile $value
+     * @param array $extensions
      * @return bool
      */
-    public static function checkExtension(UploadedFile $value, $extensions = ['gif', 'jpeg', 'png', 'jpg'])
+    public static function checkExtension(UploadedFile $value, array $extensions = ['gif', 'jpeg', 'png', 'jpg']): bool
     {
         $check = $value->getClientFilename();
         if (is_null($check)) {
@@ -76,10 +84,13 @@ class ContentsFileValidation extends Validation
      * extensionDd
      * 拡張子のチェック
      *
-     * @param $value mixed
+     * @param string $value
+     * @param array $extensions
+     * @param string $filenameField
+     * @param mixed $context
      * @return bool
      */
-    public static function extensionDd($value, $extensions, $filenameField, $context)
+    public static function extensionDd(string $value, array $extensions, string $filenameField, $context): bool
     {
         // チェックに必要なフィールドがない
         if (!array_key_exists($filenameField, $context['data'])) {

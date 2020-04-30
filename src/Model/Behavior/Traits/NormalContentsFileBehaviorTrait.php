@@ -19,8 +19,9 @@ trait NormalContentsFileBehaviorTrait
      * normalParamCheck
      * 通常の設定値チェック
      * @author hagiwara
+     * @return void
      */
-    private function normalParamCheck()
+    private function normalParamCheck(): void
     {
         // S3に必要な設定がそろっているかチェックする
         $normalSetting = Configure::read('ContentsFile.Setting.Normal');
@@ -47,8 +48,9 @@ trait NormalContentsFileBehaviorTrait
      * @param array $fileInfo
      * @param array $fieldSettings
      * @param array $attachmentSaveData
+     * @return bool
      */
-    private function normalFileSave($fileInfo, $fieldSettings, $attachmentSaveData)
+    private function normalFileSave(array $fileInfo, array $fieldSettings, array $attachmentSaveData): bool
     {
         $newFiledir = Configure::read('ContentsFile.Setting.Normal.fileDir') . $attachmentSaveData['model'] . '/' . $attachmentSaveData['model_id'] . '/';
         // ランダムパスの場合の分岐
@@ -91,8 +93,9 @@ trait NormalContentsFileBehaviorTrait
      * @param string $modelName
      * @param integer $modelId
      * @param string $field
+     * @return bool
      */
-    private function normalFileDelete($modelName, $modelId, $field)
+    private function normalFileDelete(string $modelName, int $modelId, string $field): bool
     {
         //attachementからデータを取得
         $attachmentModel = TableRegistry::get('Attachments');
@@ -139,8 +142,9 @@ trait NormalContentsFileBehaviorTrait
      * @author hagiwara
      * @param string $newFilepath
      * @param array $resizeSettings
+     * @return bool
      */
-    private function normalImageResize($newFilepath, $resizeSettings)
+    private function normalImageResize(string $newFilepath, array $resizeSettings): bool
     {
         return $this->imageResize($newFilepath, $resizeSettings);
     }

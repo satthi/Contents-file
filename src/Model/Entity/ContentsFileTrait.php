@@ -2,13 +2,14 @@
 
 namespace ContentsFile\Model\Entity;
 
-use Cake\Utility\Security;
-use Cake\ORM\TableRegistry;
-use Cake\I18n\Time;
-use ContentsFile\Aws\S3;
-use Cake\Http\Exception\InternalErrorException;
 use Cake\Core\Configure;
 use Cake\Filesystem\File;
+use Cake\Http\Exception\InternalErrorException;
+use Cake\I18n\Time;
+use Cake\ORM\TableRegistry;
+use Cake\Utility\Security;
+use ContentsFile\Aws\S3;
+use Laminas\Diactoros\UploadedFile;
 
 trait ContentsFileTrait
 {
@@ -19,8 +20,9 @@ trait ContentsFileTrait
      * 設定値のセッティング
      *
      * @author hagiwara
+     * @return void
      */
-    private function contentsFileSettings()
+    private function contentsFileSettings(): void
     {
         $default = [];
         //設定値はまとめる
@@ -33,8 +35,9 @@ trait ContentsFileTrait
      * 設定値のセッティングの取得
      *
      * @author hagiwara
+     * @return array
      */
-    public function getContentsFileSettings()
+    public function getContentsFileSettings(): array
     {
         if (empty($this->contentsFileSettings)) {
             $this->contentsFileSettings();
@@ -48,9 +51,10 @@ trait ContentsFileTrait
      *
      * @author hagiwara
      * @param string $property
-     * @param array $value
+     * @param mixed $value
+     * @return mixed
      */
-    public function getContentsFile($property, $value)
+    public function getContentsFile(string $property, $value)
     {
         $this->contentsFileSettings();
         if (
@@ -113,9 +117,12 @@ trait ContentsFileTrait
      * normalSetContentsFile
      * ファイルのsetterのセッティング
      *
+     * @param string $field
+     * @param array $fieldSetting
+     * @return void
      * @author hagiwara
      */
-    private function normalSetContentsFile($field, $fieldSetting)
+    private function normalSetContentsFile(string $field, array $fieldSetting): void
     {
         $fileInfo = $this->{$field};
         if (
@@ -162,9 +169,12 @@ trait ContentsFileTrait
      * ddSetContentsFile
      * ファイルのsetterのセッティング
      *
+     * @param string $field
+     * @param array $fieldSetting
+     * @return void
      * @author hagiwara
      */
-    private function ddSetContentsFile($field, $fieldSetting)
+    private function ddSetContentsFile(string $field, array $fieldSetting): void
     {
 
         $fileInfo = $this->{$field};
@@ -221,8 +231,9 @@ trait ContentsFileTrait
      *
      * @author hagiwara
      * @param string $file
+     * @return string|null
      */
-    private function getExt($file)
+    private function getExt(string $file): ?string
     {
         $fileExplode = explode('.', $file);
         //この場合拡張子なし
@@ -240,8 +251,9 @@ trait ContentsFileTrait
      * @param \Laminas\Diactoros\UploadedFile $fileInfo
      * @param array $fieldSetting
      * @param string $tmpFileName
+     * @return mixed
      */
-    private function tmpUpload($fileInfo, $fieldSetting, $tmpFileName)
+    private function tmpUpload(UploadedFile $fileInfo, array $fieldSetting, string $tmpFileName)
     {
         // すでにtraitのため、ここはif文での分岐処理
         if (Configure::read('ContentsFile.Setting.type') == 'normal') {
@@ -271,9 +283,13 @@ trait ContentsFileTrait
      * 画像の方向を正す
      * 向きだけロジックが逆そうなので調整
      *
+     * @param string $input
+     * @param string $output
+     * @return void
      * @author hagiwara
      */
-    private function orientationFixedImage($input, $output){
+    private function orientationFixedImage(string $input, string $output): void
+    {
         $imagetype = exif_imagetype($input);
         // 何も取れない場合何もしない
         if ($imagetype === false) {
@@ -358,6 +374,8 @@ trait ContentsFileTrait
      * http://www.glic.co.jp/blog/archives/88 よりコピペ
      * 画像の左右反転
      *
+     * @param resource $image
+     * @return resource
      * @author hagiwara
      */
     private function imageFlop($image)
@@ -384,6 +402,7 @@ trait ContentsFileTrait
      * http://www.glic.co.jp/blog/archives/88 よりコピペ
      * 上下反転
      * @param resource $image
+     * @return resource
      *
      * @author hagiwara
      */
@@ -411,12 +430,14 @@ trait ContentsFileTrait
      * imageRotate
      * http://www.glic.co.jp/blog/archives/88 よりコピペ
      * 画像を回転
+     * @param resouce $image
      * @param integer $angle
      * @param integer $bgd_color
+     * @return resource
      *
      * @author hagiwara
      */
-    private function imageRotate($image, $angle, $bgd_color)
+    private function imageRotate($image, int $angle, int $bgd_color)
     {
         return imagerotate($image, $angle, $bgd_color, 0);
     }
