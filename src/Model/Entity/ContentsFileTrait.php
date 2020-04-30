@@ -6,7 +6,7 @@ use Cake\Utility\Security;
 use Cake\ORM\TableRegistry;
 use Cake\I18n\Time;
 use ContentsFile\Aws\S3;
-use Cake\Network\Exception\InternalErrorException;
+use Cake\Http\Exception\InternalErrorException;
 use Cake\Core\Configure;
 use Cake\Filesystem\File;
 
@@ -61,7 +61,7 @@ trait ContentsFileTrait
             array_key_exists($match[1], $this->contentsFileSettings['fields'])
         ) {
             //何もセットされていないとき
-            if (empty($this->_properties[$property])) {
+            if (empty($this->_fields[$property])) {
                 //attachmentからデータを探しに行く
                 $attachmentModel = TableRegistry::get('Attachments');
                 $attachmentData = $attachmentModel->find('all')
@@ -83,7 +83,7 @@ trait ContentsFileTrait
                 }
             } else {
                 //それ以外はpropertiesの値を取得(setterで値を編集している場合はそれを反映するために必要)
-                $value = $this->_properties[$property];
+                $value = $this->_fields[$property];
             }
         }
         return $value;
@@ -117,45 +117,45 @@ trait ContentsFileTrait
      */
     private function normalSetContentsFile($field, $fieldSetting)
     {
-            $fileInfo = $this->{$field};
-            if (
-                //ファイルの情報がある
-                !empty($fileInfo) &&
-                //エラーのフィールドがある=ファイルをアップロード中
-                array_key_exists('error', $fileInfo) &&
-                //空アップロード時は通さない(もともとのデータを活かす)
-                $fileInfo['error'] != UPLOAD_ERR_NO_FILE
-            ) {
-                $fileSet = [
-                    'model' => $this->getSource(),
-                    'model_id' => $this->id,
-                    'field_name' => $field,
-                    'file_name' => $fileInfo['name'],
-                    'file_content_type' => Configure::read('ContentsFile.Setting.type'),
-                    'file_size' => $fileInfo['size'],
-                    'file_error' => $fileInfo['error'],
-                ];
+        $fileInfo = $this->{$field};
+        if (
+            //ファイルの情報がある
+            is_object($fileInfo) &&
+            //空アップロード時は通さない(もともとのデータを活かす)
+            $fileInfo->getError() != UPLOAD_ERR_NO_FILE
+        ) {
+            $fileSet = [
+                'model' => $this->getSource(),
+                'model_id' => $this->id,
+                'field_name' => $field,
+                'file_name' => $fileInfo->getClientFilename(),
+                'file_content_type' => Configure::read('ContentsFile.Setting.type'),
+                'file_size' => $fileInfo->getSize(),
+                'file_error' => $fileInfo->getError(),
+            ];
 
-                //$fileInfoにtmp_nameがいるときはtmpディレクトリへのファイルのコピーを行う
-                if (!empty($fileInfo['tmp_name'])) {
-                    $tmpFileName = Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss') . $fileInfo['name']);
+            //$fileInfoにtmp_nameがいるときはtmpディレクトリへのファイルのコピーを行う
+            // if (!empty($fileInfo['tmp_name'])) {
+            $tmpFileName = Security::hash(rand() . Time::now()->i18nFormat('YYYY/MM/dd HH:ii:ss') . $fileInfo->getClientFilename());
 
-                    if ($this->getExt($fileInfo['name']) !== null) {
-                        $tmpFileName .= '.' . $this->getExt($fileInfo['name']);
-                    }
-
-                    // tmpディレクトリへのアップロードのエラー(パーミッションなど)
-                    if (!$this->tmpUpload($fileInfo['tmp_name'], $fieldSetting, $tmpFileName)) {
-                        throw new InternalErrorException('tmp upload error');
-                    }
-                    $fileSet['tmp_file_name'] = $tmpFileName;
-                }
-                //これを残して次に引き渡したくないので
-                unset($this->{$field});
-
-                $this->{'contents_file_' . $field} = $fileSet;
-                $this->{'contents_file_' . $field . '_filename'} = $fileInfo['name'];
+            if ($this->getExt($fileInfo->getClientFilename()) !== null) {
+                $tmpFileName .= '.' . $this->getExt($fileInfo->getClientFilename());
             }
+
+            // tmpディレクトリへのアップロードのエラー(パーミッションなど)
+            if (!$this->tmpUpload($fileInfo, $fieldSetting, $tmpFileName)) {
+                throw new InternalErrorException('tmp upload error');
+            }
+            $fileSet['tmp_file_name'] = $tmpFileName;
+            // }
+            //これを残して次に引き渡したくないので
+            unset($this->{$field});
+
+            $nowNew = $this->isNew();
+
+            $this->set('contents_file_' . $field, $fileSet);
+            $this->set('contents_file_' . $field . '_filename', $fileInfo->getClientFilename());
+        }
     }
 
     /**
@@ -237,23 +237,30 @@ trait ContentsFileTrait
      * tmpディレクトリへのアップロード
      *
      * @author hagiwara
-     * @param string $tmpFileName
+     * @param \Laminas\Diactoros\UploadedFile $fileInfo
      * @param array $fieldSetting
      * @param string $tmpFileName
      */
-    private function tmpUpload($tmpName, $fieldSetting, $tmpFileName)
+    private function tmpUpload($fileInfo, $fieldSetting, $tmpFileName)
     {
-        // 向きの調整をする場合
-        if (Configure::read('ContentsFile.Setting.exifRotate') == true) {
-            $this->orientationFixedImage($tmpName, $tmpName);
-        }
         // すでにtraitのため、ここはif文での分岐処理
         if (Configure::read('ContentsFile.Setting.type') == 'normal') {
-            return copy($tmpName, Configure::read('ContentsFile.Setting.Normal.tmpDir') . $tmpFileName);
+            $fileInfo->moveTo(Configure::read('ContentsFile.Setting.Normal.tmpDir') . $tmpFileName);
+            // 向きの調整をする場合
+            if (Configure::read('ContentsFile.Setting.exifRotate') == true) {
+                $this->orientationFixedImage($tmpFileName, $tmpFileName);
+            }
+
+            return true;
+
+// copy($tmpName, Configure::read('ContentsFile.Setting.Normal.tmpDir') . $tmpFileName);
         } elseif (Configure::read('ContentsFile.Setting.type') == 's3') {
-            $uploadFileName = Configure::read('ContentsFile.Setting.S3.tmpDir') . $tmpFileName;
-            $S3 = new S3();
-            return $S3->upload($tmpName, $uploadFileName);
+            // @Todo: 後調整
+            debug('ATO');
+            exit;
+            // $uploadFileName = Configure::read('ContentsFile.Setting.S3.tmpDir') . $tmpFileName;
+            // $S3 = new S3();
+            // return $S3->upload($tmpName, $uploadFileName);
         } else {
             throw new InternalErrorException('contentsFileConfig type illegal');
         }

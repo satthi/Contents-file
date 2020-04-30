@@ -3,6 +3,7 @@
 namespace ContentsFile\Validation;
 
 use Cake\Validation\Validation;
+use Laminas\Diactoros\UploadedFile;
 
 class ContentsFileValidation extends Validation
 {
@@ -10,19 +11,19 @@ class ContentsFileValidation extends Validation
      * checkMaxSize
      *
      */
-    public static function checkMaxSize($value, $max, $context)
+    public static function checkMaxSize(UploadedFile $value, $max, $context)
     {
         $maxValue = self::calcFileSizeUnit($max);
-        return $maxValue >= $value['size'];
+        return $maxValue >= $value->getSize();
     }
 
     /**
      * uploadMaxSizeCheck
      *
      */
-    public static function uploadMaxSizeCheck($value, $context)
+    public static function uploadMaxSizeCheck(UploadedFile $value, $context)
     {
-        return $value['error'] != UPLOAD_ERR_INI_SIZE;
+        return $value->getError() != UPLOAD_ERR_INI_SIZE;
     }
 
     /**
@@ -53,17 +54,16 @@ class ContentsFileValidation extends Validation
      * @param $value mixed
      * @return bool
      */
-    public static function checkExtension($value, $extensions = ['gif', 'jpeg', 'png', 'jpg'])
+    public static function checkExtension(UploadedFile $value, $extensions = ['gif', 'jpeg', 'png', 'jpg'])
     {
-        // データがない場合はチェックしない
-        if (!is_array($value) || !array_key_exists('name', $value)) {
+        $check = $value->getClientFilename();
+        if (is_null($check)) {
             return true;
         }
-        $check = $value['name'];
 
-        $extension = strtolower(pathinfo($check, PATHINFO_EXTENSION));
-        foreach ($extensions as $value) {
-            if ($extension === strtolower($value)) {
+        $checkExtension = strtolower(pathinfo($check, PATHINFO_EXTENSION));
+        foreach ($extensions as $extension) {
+            if ($checkExtension === strtolower($extension)) {
                 return true;
             }
         }
@@ -71,7 +71,7 @@ class ContentsFileValidation extends Validation
         return false;
     }
 
-    /* ドラッグアンドドロップアップロード専用 */
+    /* ドラッグアンドドロップアップロード専用  @Todo: 後*/
     /**
      * extensionDd
      * 拡張子のチェック

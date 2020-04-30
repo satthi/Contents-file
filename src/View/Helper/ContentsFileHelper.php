@@ -131,12 +131,14 @@ class ContentsFileHelper extends Helper {
                 'controller' => 'contents_file',
                 'action' => 'loader',
                 'plugin' => 'ContentsFile',
-                'model' => $fileInfo['model'],
-                'field_name' => $fileInfo['field_name'],
-                'tmp_file_name' => $fileInfo['tmp_file_name'],
                 // prefixは無視する
                 'prefix' => false,
-                'download' => $options['download'],
+                '?' => [
+                    'model' => $fileInfo['model'],
+                    'field_name' => $fileInfo['field_name'],
+                    'tmp_file_name' => $fileInfo['tmp_file_name'],
+                    'download' => $options['download'],
+                ]
             ];
         } else {
             if (!isset($fileInfo['resize'])) {
@@ -157,13 +159,15 @@ class ContentsFileHelper extends Helper {
                     'controller' => 'contents_file',
                     'action' => 'loader',
                     'plugin' => 'ContentsFile',
-                    'model' => $fileInfo['model'],
-                    'field_name' => $fileInfo['field_name'],
-                    'model_id' => $fileInfo['model_id'],
-                    'resize' => $fileInfo['resize'],
                     // prefixは無視する
                     'prefix' => false,
-                    'download' => $options['download'],
+                    '?' => [
+                        'model' => $fileInfo['model'],
+                        'field_name' => $fileInfo['field_name'],
+                        'model_id' => $fileInfo['model_id'],
+                        'resize' => $fileInfo['resize'],
+                        'download' => $options['download'],
+                    ]
                 ];
             }
         }
