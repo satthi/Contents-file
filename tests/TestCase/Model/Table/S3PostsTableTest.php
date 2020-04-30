@@ -23,8 +23,8 @@ class S3PostsTableTest extends TestCase
      * @var array
      */
     public $fixtures = [
-        'plugin.contents_file.posts',
-        'plugin.contents_file.attachments',
+        'plugin.ContentsFile.Posts',
+        'plugin.ContentsFile.Attachments',
     ];
 
 
@@ -33,7 +33,7 @@ class S3PostsTableTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->tmpDir = dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/tmp/';
@@ -74,7 +74,7 @@ class S3PostsTableTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->Posts);
 
@@ -105,7 +105,7 @@ class S3PostsTableTest extends TestCase
             'size' => filesize($demo_filepath)
         ];
 
-        $entity = $this->Posts->newEntity();
+        $entity = $this->Posts->newEntity([]);
         $data = [
             'name' => 'text',
             'file' => $fileinfo,
@@ -163,7 +163,7 @@ class S3PostsTableTest extends TestCase
             'size' => filesize($demo_filepath)
         ];
 
-        $entity = $this->Posts->newEntity();
+        $entity = $this->Posts->newEntity([]);
         $data = [
             'name' => 'text',
             'img' => $fileinfo,
