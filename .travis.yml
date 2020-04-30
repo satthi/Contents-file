@@ -13,7 +13,7 @@ addons:
 
 services:
   - mysql
-  - postgresql
+  - postgres
 
 env:
   global:
