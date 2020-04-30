@@ -2,13 +2,14 @@
 
 namespace ContentsFile\Model\Behavior\Traits;
 
-use ContentsFile\Aws\S3;
 use Cake\Core\Configure;
-use Cake\Filesystem\Folder;
 use Cake\I18n\Time;
 use Cake\Network\Exception\InternalErrorException;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Security;
+use ContentsFile\Aws\S3;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 
 /**
  * S3ContentsFileBehaviorTrait
@@ -169,16 +170,24 @@ trait S3ContentsFileBehaviorTrait
             unlink($tmpPath);
             return $filepath;
         }
+
         $resizeFileDir = Configure::read('ContentsFile.Setting.S3.workingDir') . 'contents_file_resize_' . $tmpFileName;
-        $resizeFolder = new Folder($resizeFileDir);
+
         // 一つのはず
-        $resizeImg = $resizeFolder->findRecursive()[0];
+        $resizeImg = '';
+        $finder = new Finder();
+        $finder->in([$resizeFileDir]);
+        foreach ($finder as $a) {
+            $resizeImg = $a->getRealPath();
+        }
 
         // リサイズ画像をアップロード
         $S3->upload($resizeImg, $imagepathinfo['resize_filepath']);
 
         // tmpディレクトリの不要なディレクトリ/ファイルを削除
-        $resizeFolder->delete();
+        $filesystem = new Filesystem();
+        $filesystem->remove($resizeFileDir);
+
         unlink($tmpPath);
         return $imagepathinfo['resize_filepath'];
     }

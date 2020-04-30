@@ -3,9 +3,9 @@
 namespace ContentsFile\Model\Behavior\Traits;
 
 use Cake\Core\Configure;
-use Cake\Filesystem\Folder;
 use Cake\Network\Exception\InternalErrorException;
 use Cake\ORM\TableRegistry;
+use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * NormalContentsFileBehaviorTrait
@@ -118,8 +118,8 @@ trait NormalContentsFileBehaviorTrait
         // リサイズのディレクトリ
         $resizeDir = Configure::read('ContentsFile.Setting.Normal.fileDir') . $modelName . '/' . $modelId . '/' . 'contents_file_resize_' . $deleteField . '/';
         if (is_dir($resizeDir)) {
-            $deleteFolder = new Folder($resizeDir);
-            if (!$deleteFolder->delete()) {
+            $filesystem = new Filesystem();
+            if (!$filesystem->remove($resizeDir)) {
                 return false;
             }
         }

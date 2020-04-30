@@ -17,7 +17,9 @@
     "require": {
         "cakephp/cakephp": "~4.0",
         "ext-gd": "*",
-        "aws/aws-sdk-php": "3.*"
+        "aws/aws-sdk-php": "3.*",
+        "symfony/filesystem": "5.*",
+        "symfony/finder": "5.*"
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "dev-master",
