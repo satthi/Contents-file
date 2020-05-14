@@ -161,7 +161,7 @@ class ContentsFileBehavior extends Behavior {
             return true;
         }
         $fileInfo = $this->_table->find('all')
-            ->where([$this->_table->alias() . '.id' => $context['data']['id']])
+            ->where([$this->_table->aliasField('id') => $context['data']['id']])
             ->first();
         // 編集時はfileがアップロードされていなければチェックする
         return empty($fileInfo->{'contents_file_' . $field});
