@@ -50,7 +50,7 @@ class ContentsFileBehavior extends Behavior {
     {
         //設定値をentityから取得
         $contentsFileConfig = $entity->getContentsFileSettings();
-        $attachmentModel = TableRegistry::get('ContentsFile.Attachments');
+        $attachmentModel = TableRegistry::getTableLocator()->get('ContentsFile.Attachments');
         foreach ($contentsFileConfig['fields'] as $field => $fieldSettings) {
             // ファイルの削除を最初に確認
             if ($entity->{'delete_' . $field} == true) {
@@ -158,7 +158,7 @@ class ContentsFileBehavior extends Behavior {
             return true;
         }
         $fileInfo = $this->_table->find('all')
-            ->where([$this->_table->alias() . '.id' => $context['data']['id']])
+            ->where([$this->_table->getAlias() . '.id' => $context['data']['id']])
             ->first();
         // 編集時はfileがアップロードされていなければチェックする
         return empty($fileInfo->{'contents_file_' . $field});
@@ -173,8 +173,8 @@ class ContentsFileBehavior extends Behavior {
      */
     private function fileDeleteParts($entity, $field)
     {
-        $attachmentModel = TableRegistry::get('ContentsFile.Attachments');
-        $modelName = $entity->source();
+        $attachmentModel = TableRegistry::getTableLocator()->get('ContentsFile.Attachments');
+        $modelName = $entity->getSoucre();
         $modelId = $entity->id;
         // 添付ファイルデータの削除
         $deleteAttachmentData = $attachmentModel->find('all')
@@ -219,7 +219,7 @@ class ContentsFileBehavior extends Behavior {
     private function makeRandomPath()
     {
         $hash = Security::hash(time() . rand());
-        $attachmentModel = TableRegistry::get('ContentsFile.Attachments');
+        $attachmentModel = TableRegistry::getTableLocator()->get('ContentsFile.Attachments');
         $check = $attachmentModel->find('all')
             ->where(['Attachments.file_random_path' => $hash])
             ->count();

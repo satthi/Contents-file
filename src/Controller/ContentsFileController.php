@@ -58,7 +58,7 @@ class ContentsFileController extends AppController
         }
 
         //Entityに接続して設定値を取得
-        $this->baseModel = TableRegistry::get($this->request->getQuery('model'));
+        $this->baseModel = TableRegistry::getTableLocator()->get($this->request->getQuery('model'));
 
         // このレベルで切り出す
         $fieldName = $this->request->getQuery('field_name');
@@ -75,7 +75,7 @@ class ContentsFileController extends AppController
                 $this->baseModel->{$checkMethodName}($this->request->getQuery('model_id'));
             }
             //attachementからデータを取得
-            $attachmentModel = TableRegistry::get('Attachments');
+            $attachmentModel = TableRegistry::getTableLocator()->get('Attachments');
             $attachmentData = $attachmentModel->find('all')
                 ->where(['model' => $this->request->getQuery('model')])
                 ->where(['model_id' => $this->request->getQuery('model_id')])

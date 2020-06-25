@@ -63,7 +63,7 @@ trait ContentsFileTrait
             //何もセットされていないとき
             if (empty($this->_properties[$property])) {
                 //attachmentからデータを探しに行く
-                $attachmentModel = TableRegistry::get('Attachments');
+                $attachmentModel = TableRegistry::getTableLocator()->get('Attachments');
                 $attachmentData = $attachmentModel->find('all')
                     ->where(['model' => $this->getSource()])
                     ->where(['model_id' => $this->id])
@@ -127,7 +127,7 @@ trait ContentsFileTrait
                 $fileInfo['error'] != UPLOAD_ERR_NO_FILE
             ) {
                 $fileSet = [
-                    'model' => $this->source(),
+                    'model' => $this->getSoucre(),
                     'model_id' => $this->id,
                     'field_name' => $field,
                     'file_name' => $fileInfo['name'],
@@ -196,7 +196,7 @@ trait ContentsFileTrait
             $fp->close();
 
             $fileSet = [
-                'model' => $this->source(),
+                'model' => $this->getSoucre(),
                 'model_id' => $this->id,
                 'field_name' => $field,
                 'file_name' => $filename,

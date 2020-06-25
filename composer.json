@@ -15,7 +15,7 @@
         "source": "https://github.com/satthi/Contents-file"
     },
     "require": {
-        "cakephp/cakephp": "~3.4",
+        "cakephp/cakephp": "~3.6",
         "ext-gd": "*",
         "aws/aws-sdk-php": "3.*"
     },
