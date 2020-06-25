@@ -193,7 +193,7 @@ class ContentsFileController extends AppController
             if (strstr(env('HTTP_USER_AGENT'), 'MSIE') || strstr(env('HTTP_USER_AGENT'), 'Trident') || strstr(env('HTTP_USER_AGENT'), 'Edge')) {
                 $filename = rawurlencode($filename);
             }
-            $this->response->header('Content-Disposition', 'attachment;filename="' . $filename . '"');
+            $this->response = $this->response->withDownload($filename);
         }
     }
 }
