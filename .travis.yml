@@ -10,6 +10,10 @@ addons:
   postgresql: "9.3"
   mysql: "7.3"
 
+services:
+  - mysql
+  - postgresql
+
 env:
   global:
     - DEFAULT=1
