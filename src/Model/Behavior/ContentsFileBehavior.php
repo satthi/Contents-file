@@ -174,7 +174,7 @@ class ContentsFileBehavior extends Behavior {
     private function fileDeleteParts($entity, $field)
     {
         $attachmentModel = TableRegistry::getTableLocator()->get('ContentsFile.Attachments');
-        $modelName = $entity->getSoucre();
+        $modelName = $entity->getSource();
         $modelId = $entity->id;
         // 添付ファイルデータの削除
         $deleteAttachmentData = $attachmentModel->find('all')
