@@ -127,7 +127,7 @@ trait ContentsFileTrait
                 $fileInfo['error'] != UPLOAD_ERR_NO_FILE
             ) {
                 $fileSet = [
-                    'model' => $this->getSoucre(),
+                    'model' => $this->getSource(),
                     'model_id' => $this->id,
                     'field_name' => $field,
                     'file_name' => $fileInfo['name'],
@@ -196,7 +196,7 @@ trait ContentsFileTrait
             $fp->close();
 
             $fileSet = [
-                'model' => $this->getSoucre(),
+                'model' => $this->getSource(),
                 'model_id' => $this->id,
                 'field_name' => $field,
                 'file_name' => $filename,
