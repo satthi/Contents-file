@@ -131,7 +131,7 @@ class ContentsFileHelper extends Helper {
      * @param array $options
      * @return array
      */
-    private function urlArray($fileInfo, array $options): array
+    private function urlArray($fileInfo, array $options)
     {
         if (!empty($fileInfo['tmp_file_name'])) {
             return [
@@ -219,6 +219,12 @@ class ContentsFileHelper extends Helper {
                 $staticS3Url .= 'contents_file_resize_' . $fileInfo['field_name'] . '/' . $resizeText;
             }
         }
+
+        // 拡張子設定をtrueにした場合S3にも拡張子付きとなるのでURLにも拡張子をつける
+        if (Configure::read('ContentsFile.Setting.ext') === true) {
+            $staticS3Url .= '.' . (new \SplFileInfo($fileInfo['file_name']))->getExtension();
+        }
+
         return $staticS3Url;
     }
 
