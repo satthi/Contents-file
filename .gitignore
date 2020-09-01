@@ -5,3 +5,14 @@
 /tests/test_app/App/tmp/*
 /tests/test_app/App/files/*
 /tmp
+
+# Tool specific files #
+#######################
+# Eclipse
+.settings/*
+# JetBrains, aka PHPStorm, IntelliJ IDEA
+.idea/*
+# NetBeans
+nbproject/*
+# Visual Studio Code
+.vscode
