@@ -46,6 +46,11 @@ class S3
                 'secret' => $secret,
             );
         }
+        // minio を使用する場合、endpoint を設定する
+        $endpoint = Configure::read('ContentsFile.Setting.S3.endpoint');
+        if (!empty($endpoint)) {
+            $config['endpoint'] = $endpoint;
+        }
         $sdk = new Sdk($config);
         $this->client = $sdk->createS3();
     }
