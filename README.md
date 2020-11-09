@@ -74,6 +74,8 @@ Configure::write('ContentsFile.Setting', [
         //指定の文字列.cloudfront.net でも使用したいものを設定
         */
         'static_domain' => '//s3-ap-northeast-1.amazonaws.com/BUCKET_NAME',
+        // minio 使用時にendpointを使用
+        //'endpoint' => 'http://{{ip_address}}:9000',
     ]
 ]);
 ```
