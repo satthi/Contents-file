@@ -118,7 +118,7 @@ class ContentsFileHelper extends Helper {
         $hiddenInput = '';
         if (!empty($contentFileData)) {
             foreach ($contentFileData as $fieldParts => $v) {
-                $hiddenInput .= $this->Form->input($field . '.' . $fieldParts, ['type' => 'hidden']);
+                $hiddenInput .= $this->Form->input($field . '.' . $fieldParts, ['type' => 'hidden', 'value' => $v]);
             }
         }
         return $hiddenInput;
