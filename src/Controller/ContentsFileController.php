@@ -131,6 +131,7 @@ class ContentsFileController extends AppController
             'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
             'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'css' => 'text/css',
         ];
         $sContentType = 'application/octet-stream';
 
@@ -171,6 +172,7 @@ class ContentsFileController extends AppController
             'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
             'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'css' => 'text/css',
     ];
         $sContentType = 'application/octet-stream';
 
