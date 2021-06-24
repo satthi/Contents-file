@@ -147,7 +147,8 @@ class ContentsFilesController extends ContentsFileAppController {
         'swf'=>'application/x-shockwave-flash',
         'lzh'=>'application/x-lha-compressed',
         'zip'=>'application/x-zip-compressed',
-        'sit'=>'application/x-stuffit'
+        'sit'=>'application/x-stuffit',
+        'css'=>'text/css',
     ); 
         $sContentType = 'application/octet-stream';
         
@@ -175,7 +176,8 @@ class ContentsFilesController extends ContentsFileAppController {
         'swf'=>'application/x-shockwave-flash',
         'lzh'=>'application/x-lha-compressed',
         'zip'=>'application/x-zip-compressed',
-        'sit'=>'application/x-stuffit'
+        'sit'=>'application/x-stuffit',
+        'css'=>'text/css',
     ); 
         $sContentType = 'application/octet-stream';
         
