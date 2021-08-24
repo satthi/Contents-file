@@ -77,7 +77,7 @@ class ContentsFileController extends AppController
                 $this->baseModel->{$checkMethodName}($this->request->getQuery('model_id'));
             }
             //attachementからデータを取得
-            $attachmentModel = TableRegistry::getTableLocator()->get('Attachments');
+            $attachmentModel = TableRegistry::getTableLocator()->get('ContentsFile.Attachments');
             $attachmentData = $attachmentModel->find('all')
                 ->where(['model' => $this->request->getQuery('model')])
                 ->where(['model_id' => $this->request->getQuery('model_id')])

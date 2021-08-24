@@ -67,7 +67,7 @@ trait ContentsFileTrait
             //何もセットされていないとき
             if (empty($this->_fields[$property])) {
                 //attachmentからデータを探しに行く
-                $attachmentModel = TableRegistry::getTableLocator()->get('Attachments');
+                $attachmentModel = TableRegistry::getTableLocator()->get('ContentsFile.Attachments');
                 $attachmentData = $attachmentModel->find('all')
                     ->where(['model' => $this->getSource()])
                     ->where(['model_id' => $this->id])
