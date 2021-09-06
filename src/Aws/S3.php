@@ -50,6 +50,7 @@ class S3
         $endpoint = Configure::read('ContentsFile.Setting.S3.endpoint');
         if (!empty($endpoint)) {
             $config['endpoint'] = $endpoint;
+            $config['use_path_style_endpoint'] = true;
         }
         $sdk = new Sdk($config);
         $this->client = $sdk->createS3();
