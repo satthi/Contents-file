@@ -5,7 +5,7 @@ namespace ContentsFile\Model\Behavior;
 use ArrayObject;
 use Cake\Core\Configure;
 use Cake\Event\Event;
-use Cake\Network\Exception\InternalErrorException;
+use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\Behavior;
 use Cake\Datasource\EntityInterface;
 use Cake\ORM\Table;
