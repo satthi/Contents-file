@@ -4,7 +4,7 @@ namespace ContentsFile\Model\Behavior\Traits;
 
 use Cake\Core\Configure;
 use Cake\I18n\Time;
-use Cake\Network\Exception\InternalErrorException;
+use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Security;
 use ContentsFile\Aws\S3;

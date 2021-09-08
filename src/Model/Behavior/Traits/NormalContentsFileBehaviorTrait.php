@@ -3,7 +3,7 @@
 namespace ContentsFile\Model\Behavior\Traits;
 
 use Cake\Core\Configure;
-use Cake\Network\Exception\InternalErrorException;
+use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\TableRegistry;
 use Symfony\Component\Filesystem\Filesystem;
 

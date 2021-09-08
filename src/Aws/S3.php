@@ -4,8 +4,8 @@ namespace ContentsFile\Aws;
 
 use Aws\Sdk;
 use Cake\Core\Configure;
-use Cake\Network\Exception\InternalErrorException;
-use Cake\Network\Exception\NotFoundException;
+use Cake\Http\Exception\InternalErrorException;
+use Cake\Http\Exception\NotFoundException;
 
 /**
  * S3
