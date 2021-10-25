@@ -100,7 +100,7 @@ class ContentsFileHelper extends Helper {
             $this->defaultOption,
             $options
         );
-        return $this->Url->build($this->urlArray($fileInfo, $options), $full);
+        return $this->Url->build($this->urlArray($fileInfo, $options), ['fullBase' => $full]);
     }
 
     /**
