@@ -22,7 +22,7 @@ class PostsTableTest extends TestCase
      *
      * @var array
      */
-    public $fixtures = [
+    protected $manualFixtures = [
         'plugin.ContentsFile.Posts',
         'plugin.ContentsFile.Attachments',
     ];
@@ -45,6 +45,7 @@ class PostsTableTest extends TestCase
                 'fileDir' => $this->fileDir,
             ],
         ]);
+        
         $this->connection = ConnectionManager::get('test');
         $this->Posts = new PostsTable([
             'alias' => 'Posts',
@@ -53,10 +54,13 @@ class PostsTableTest extends TestCase
         ]);
 
         //fixtureManagerを呼び出し、fixtureを実行する
-        $this->fixtureManager = new FixtureManager();
-        $this->fixtureManager->fixturize($this);
-        $this->fixtureManager->loadSingle('Posts');
-        $this->fixtureManager->loadSingle('Attachments');
+        // auto実行後に手動で実行
+        $this->fixtures = $this->manualFixtures;
+
+        self::$fixtureManager = new FixtureManager();
+        self::$fixtureManager->fixturize($this);
+        self::$fixtureManager->loadSingle('Posts');
+        self::$fixtureManager->loadSingle('Attachments');
 
         $this->demoFileDir = dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/demo/';
     }
