@@ -83,24 +83,32 @@ class ContentsFileHelper extends Helper {
      * url
      * @author hagiwara
      * @param array|null $fileInfo
-     * @param boolean $full
-     * @param array $options
+     * @param boolean|array $buildOptions
+     * @param array $urlArrayOptions
      * @return string
      */
-    public function url($fileInfo, bool $full = false, array $options = []): string
+    public function url($fileInfo, $buildOptions = [], array $urlArrayOptions = []): string
     {
         if (empty($fileInfo)) {
             return [];
         }
-        if (isset($options['resize'])) {
-            $fileInfo['resize'] = $options['resize'];
-            unset($options['resize']);
+
+        // 互換性保持のためにboolを許可する
+        if (is_bool($buildOptions)) {
+            $buildOptions = [
+                'fullBase' => $buildOptions
+            ];
         }
-        $options = array_merge(
+
+        if (isset($urlArrayOptions['resize'])) {
+            $fileInfo['resize'] = $urlArrayOptions['resize'];
+            unset($urlArrayOptions['resize']);
+        }
+        $urlArrayOptions = array_merge(
             $this->defaultOption,
-            $options
+            $urlArrayOptions
         );
-        return $this->Url->build($this->urlArray($fileInfo, $options), ['fullBase' => $full]);
+        return $this->Url->build($this->urlArray($fileInfo, $urlArrayOptions), $buildOptions);
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
+use Cake\Routing\RouteBuilder;
 use Cake\Routing\Router;
 
-Router::plugin('ContentsFile', function ($routes) {
+$routes->scope('/contents_file', ['plugin' => 'ContentsFile'], function (RouteBuilder $routes) {
     $routes->fallbacks('InflectedRoute');
 });
