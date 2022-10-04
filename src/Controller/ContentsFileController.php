@@ -24,19 +24,19 @@ class ContentsFileController extends AppController
     {
         parent::initialize();
         // /が最後についていない場合はつける
-        if (!preg_match('#/$#', Configure::read('ContentsFile.Setting.Normal.tmpDir'))) {
+        if (!preg_match('#/$#', Configure::read('ContentsFile.Setting.Normal.tmpDir') ?? '')) {
             Configure::write('ContentsFile.Setting.Normal.tmpDir', Configure::read('ContentsFile.Setting.Normal.tmpDir') . '/');
         }
-        if (!preg_match('#/$#', Configure::read('ContentsFile.Setting.Normal.fileDir'))) {
+        if (!preg_match('#/$#', Configure::read('ContentsFile.Setting.Normal.fileDir') ?? '')) {
             Configure::write('ContentsFile.Setting.Normal.fileDir', Configure::read('ContentsFile.Setting.Normal.fileDir') . '/');
         }
-        if (!preg_match('#/$#', Configure::read('ContentsFile.Setting.S3.tmpDir'))) {
+        if (!preg_match('#/$#', Configure::read('ContentsFile.Setting.S3.tmpDir') ?? '')) {
             Configure::write('ContentsFile.Setting.S3.tmpDir', Configure::read('ContentsFile.Setting.S3.tmpDir') . '/');
         }
-        if (!preg_match('#/$#', Configure::read('ContentsFile.Setting.S3.fileDir'))) {
+        if (!preg_match('#/$#', Configure::read('ContentsFile.Setting.S3.fileDir') ?? '')) {
             Configure::write('ContentsFile.Setting.S3.fileDir', Configure::read('ContentsFile.Setting.S3.fileDir') . '/');
         }
-        if (!preg_match('#/$#', Configure::read('ContentsFile.Setting.S3.workingDir'))) {
+        if (!preg_match('#/$#', Configure::read('ContentsFile.Setting.S3.workingDir') ?? '')) {
             Configure::write('ContentsFile.Setting.S3.workingDir', Configure::read('ContentsFile.Setting.S3.workingDir'). '/');
         }
     }
