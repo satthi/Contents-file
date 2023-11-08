@@ -1,9 +1,6 @@
 # Contents-file
 
-[![Build Status](https://app.travis-ci.com/satthi/Contents-file.svg?branch=master)](https://app.travis-ci.com/satthi/Contents-file)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/satthi/Contents-file/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/satthi/Contents-file/?branch=master)
-
-このプラグインはCakePHP4用ファイルアップロードツールです。
+このプラグインはCakePHP5用ファイルアップロードツールです。
 
 ## インストール
 composer.json
@@ -84,7 +81,6 @@ Application.php
 ```php
 public function bootstrap()
 {
-    $this->addPlugin('Migrations');
     // 追加
     $this->addPlugin('ContentsFile', ['routes' => true]);
 }
@@ -213,8 +209,20 @@ class Topic extends Entity
         ],
     ];
 
+    protected array $_accessible = [
+        'title' => true,
+        // 初期状態に追記
+        'file' => true,
+        'contents_file_file' => true,
+        'delete_file' => true,
+        'img' => true,
+        'contents_file_img' => true,
+        'delete_img' => true,
+    ];
+
+
     //&getメソッドをoverride
-    public function &get($property)
+    public function &get(string $property): mixed
     {
         $value = parent::get($property);
         $value = $this->getContentsFile($property, $value);
@@ -222,8 +230,8 @@ class Topic extends Entity
     }
 
     //setメソッドをoverride
-    public function set($property, $value = null, array $options = []){
-        parent::set($property, $value , $options);
+    public function set(array|string $field, mixed $value = null, array $options = []){
+        parent::set($field, $value , $options);
         $this->setContentsFile();
         return $this;
     }
