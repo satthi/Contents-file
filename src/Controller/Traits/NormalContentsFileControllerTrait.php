@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace ContentsFile\Controller\Traits;
 
 use Cake\Core\Configure;
 use Cake\ORM\Entity;
+use SplFileInfo;
 
 /**
  * 通常のファイルローダー周り
@@ -14,6 +16,7 @@ trait NormalContentsFileControllerTrait
     /**
      * normalLoader
      * 通常のローダー
+     *
      * @param string $filename
      * @param string $filepath
      * @return void
@@ -35,7 +38,7 @@ trait NormalContentsFileControllerTrait
             $fileContentType = $this->getMimeType($filepath);
         }
         $this->response = $this->response->withType($fileContentType);
-        @ob_end_clean(); // clean
+        ob_end_clean(); // clean
         $fp = fopen($filepath, 'r');
         $body = fread($fp, filesize($filepath));
         fclose($fp);
@@ -45,6 +48,7 @@ trait NormalContentsFileControllerTrait
     /**
      * normalTmpFilePath
      * 通常用のtmpのパス作成
+     *
      * @author hagiwara
      * @param string $filename
      * @return string
@@ -57,15 +61,16 @@ trait NormalContentsFileControllerTrait
     /**
      * normalFilePath
      * 通常用のファイルのパス作成
+     *
      * @author hagiwara
-     * @param Entity $attachmentData
+     * @param \Cake\ORM\Entity $attachmentData
      * @return string
      */
     private function normalFilePath(Entity $attachmentData): string
     {
         $ext = '';
         if (Configure::read('ContentsFile.Setting.ext') === true) {
-            $ext = '.' . (new \SplFileInfo($attachmentData->file_name))->getExtension();
+            $ext = '.' . (new SplFileInfo($attachmentData->file_name))->getExtension();
         }
         if (Configure::read('ContentsFile.Setting.randomFile') === true && $attachmentData->file_random_path != '') {
             return Configure::read('ContentsFile.Setting.Normal.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->file_random_path . $ext;
@@ -77,6 +82,7 @@ trait NormalContentsFileControllerTrait
     /**
      * normalResizeSet
      * 通常のリサイズ処理
+     *
      * @author hagiwara
      * @param string $filepath
      * @param array $resize
@@ -106,6 +112,7 @@ trait NormalContentsFileControllerTrait
             //失敗時はそのままのパスを返す(画像以外の可能性あり)
             return $filepath;
         }
+
         return $imagepathinfo['resize_filepath'];
     }
 }

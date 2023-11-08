@@ -5,7 +5,6 @@ use Cake\TestSuite\Fixture\TestFixture;
 
 /**
  * PostsFixture
- *
  */
 class PostsFixture extends TestFixture
 {
@@ -18,7 +17,7 @@ class PostsFixture extends TestFixture
         [
             'name' => 'test',
             'created' => 1430991176,
-            'modified' => 1430991176
+            'modified' => 1430991176,
         ],
     ];
 }

@@ -1,18 +1,18 @@
 <?php
+declare(strict_types=1);
+
 namespace ContentsFile\Test\TestCase\Model\Table;
 
-use ContentsFile\Test\App\Model\Table\PostsTable;
-use Cake\ORM\TableRegistry;
+use Cake\Core\Configure;
 use Cake\TestSuite\TestCase;
 use Cake\Utility\Security;
-use Cake\Core\Configure;
+use ContentsFile\Test\App\Model\Table\PostsTable;
 
 /**
  * App\Model\Table\PostsTable Test Case
  */
 class PostsTableTest extends TestCase
 {
-
     /**
      * Fixtures
      *
@@ -41,7 +41,7 @@ class PostsTableTest extends TestCase
                 'fileDir' => $this->fileDir,
             ],
         ]);
-        
+
         $this->Posts = new PostsTable();
 
         $this->demoFileDir = dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/demo/';
@@ -71,8 +71,8 @@ class PostsTableTest extends TestCase
     {
         //デモ画像をtmpディレクトリにコピーしておく
         $demo_filepath = $this->demoFileDir . 'demo1.png';
-        $rand = Security::hash(rand());
-        copy($demo_filepath , $this->tmpDir . $rand);
+        $rand = Security::hash((string)rand());
+        copy($demo_filepath, $this->tmpDir . $rand);
 
         $fileinfo = [
             'model' => 'Posts',
@@ -81,15 +81,15 @@ class PostsTableTest extends TestCase
             'file_name' => 'demo1.png',
             'file_content_type' => 'image/png',
             'file_size' => filesize($demo_filepath),
-            'file_error' => (int) 0,
-            'tmp_file_name' => $rand
+            'file_error' => (int)0,
+            'tmp_file_name' => $rand,
         ];
 
         $entity = $this->Posts->newEntity([]);
         $entity->name = 'test';
 
         $entity->contents_file_file = $fileinfo;
-        $this->assertTrue((bool) $this->Posts->save($entity));
+        $this->assertTrue((bool)$this->Posts->save($entity));
 
         //保存データのチェック
         $last_id = $entity->id;
@@ -98,11 +98,11 @@ class PostsTableTest extends TestCase
         //fileについてデータが正常に取得できているかどうか
         $assert_data = [
             'model' => 'Posts',
-            'model_id' =>  $last_id,
+            'model_id' => $last_id,
             'field_name' => 'file',
             'file_name' => 'demo1.png',
             'file_content_type' => 'image/png',
-            'file_size' => (string) filesize($demo_filepath),
+            'file_size' => (string)filesize($demo_filepath),
             'file_random_path' => null,
         ];
 
@@ -120,7 +120,7 @@ class PostsTableTest extends TestCase
         $upload_cont = fread($upload_fp, filesize($uploaded_filepath));
         fclose($upload_fp);
 
-        $this->assertEquals($origin_fp , $upload_fp);
+        $this->assertEquals($origin_cont, $upload_cont);
     }
 
     /**
@@ -132,8 +132,8 @@ class PostsTableTest extends TestCase
     {
         //デモ画像をtmpディレクトリにコピーしておく
         $demo_filepath = $this->demoFileDir . 'demo1.png';
-        $rand = Security::hash(rand());
-        copy($demo_filepath , $this->tmpDir . $rand);
+        $rand = Security::hash((string)rand());
+        copy($demo_filepath, $this->tmpDir . $rand);
 
         $fileinfo = [
             'model' => 'Posts',
@@ -142,15 +142,15 @@ class PostsTableTest extends TestCase
             'file_name' => 'demo1.png',
             'file_content_type' => 'image/png',
             'file_size' => filesize($demo_filepath),
-            'file_error' => (int) 0,
-            'tmp_file_name' => $rand
+            'file_error' => (int)0,
+            'tmp_file_name' => $rand,
         ];
 
         $entity = $this->Posts->newEntity([]);
         $entity->name = 'test';
 
         $entity->contents_file_img = $fileinfo;
-        $this->assertTrue((bool) $this->Posts->save($entity));
+        $this->assertTrue((bool)$this->Posts->save($entity));
 
         //保存データのチェック
         $last_id = $entity->id;
@@ -159,11 +159,11 @@ class PostsTableTest extends TestCase
         //fileについてデータが正常に取得できているかどうか
         $assert_data = [
             'model' => 'Posts',
-            'model_id' =>  $last_id,
+            'model_id' => $last_id,
             'field_name' => 'img',
             'file_name' => 'demo1.png',
             'file_content_type' => 'image/png',
-            'file_size' => (string) filesize($demo_filepath),
+            'file_size' => (string)filesize($demo_filepath),
             'file_random_path' => null,
         ];
 
@@ -181,7 +181,7 @@ class PostsTableTest extends TestCase
         $upload_cont = fread($upload_fp, filesize($uploaded_filepath));
         fclose($upload_fp);
 
-        $this->assertEquals($origin_fp , $upload_fp);
+        $this->assertEquals($origin_cont, $upload_cont);
 
         //リサイズ画像が上がっているか
         $resize_filepath1 = $this->fileDir . '/Posts/' . $last_id . '/contents_file_resize_img/300_0_normal';
@@ -192,7 +192,7 @@ class PostsTableTest extends TestCase
         $image1 = ImageCreateFromPNG($resize_filepath1);
         $image1_x = ImageSX($image1);
         //リサイズのチェック
-        $this->assertEquals($image1_x , 300);
+        $this->assertEquals($image1_x, 300);
         ImageDestroy($image1);
 
         $image2 = ImageCreateFromPNG($resize_filepath2);
@@ -204,26 +204,26 @@ class PostsTableTest extends TestCase
             ($image2_x <= 300 && $image2_y == 400)
         );
         ImageDestroy($image2);
-
     }
 
     /**
      * 再帰的にディレクトリを削除する。
+     *
      * @param string $dir ディレクトリ名（フルパス）
      *
      * http://blog3.logosware.com/archives/624
      */
-    private function removeDir( $dir ) {
-
+    private function removeDir($dir)
+    {
         $cnt = 0;
 
         $handle = opendir($dir);
         if (!$handle) {
-            return ;
+            return;
         }
 
-        while (false !== ($item = readdir($handle))) {
-            if ($item === "." || $item === "..") {
+        while (($item = readdir($handle)) !== false) {
+            if ($item === '.' || $item === '..') {
                 continue;
             }
 
@@ -232,8 +232,7 @@ class PostsTableTest extends TestCase
             if (is_dir($path)) {
                 // 再帰的に削除
                 $cnt = $cnt + $this->removeDir($path);
-            }
-            else {
+            } else {
                 // ファイルを削除
                 unlink($path);
             }
@@ -242,7 +241,7 @@ class PostsTableTest extends TestCase
 
         // ディレクトリを削除
         if (!rmdir($dir)) {
-            return ;
+            return;
         }
     }
 }

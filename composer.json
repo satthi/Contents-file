@@ -23,7 +23,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "*",
-        "cakephp/migrations": "*"
+        "cakephp/migrations": "*",
+        "cakephp/cakephp-codesniffer": "*"
     },
     "autoload": {
         "psr-4": {

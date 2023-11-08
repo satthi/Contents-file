@@ -1,9 +1,12 @@
 <?php
+declare(strict_types=1);
+
 namespace ContentsFile\Controller\Traits;
 
 use Cake\Core\Configure;
 use Cake\ORM\Entity;
 use ContentsFile\Aws\S3;
+use SplFileInfo;
 
 /**
  * S3のファイルローダー周り
@@ -14,6 +17,7 @@ trait S3ContentsFileControllerTrait
     /**
      * s3Loader
      * S3用のファイルローダー
+     *
      * @author hagiwara
      * @param string $filename
      * @param string $filepath
@@ -33,7 +37,7 @@ trait S3ContentsFileControllerTrait
         $this->response = $this->response->withHeader('Content-Length', filesize($topath));
         $fileContentType = $this->getMimeType($topath);
         $this->response = $this->response->withType($fileContentType);
-        @ob_end_clean(); // clean
+        ob_end_clean(); // clean
         $fp = fopen($topath, 'r');
         $body = fread($fp, filesize($topath));
         fclose($fp);
@@ -45,11 +49,12 @@ trait S3ContentsFileControllerTrait
     /**
      * s3TmpFilePath
      * S3のtmpのパス作成
+     *
      * @author hagiwara
      * @param string $filename
      * @return string
      */
-    private function s3TmpFilePath($filename): string
+    private function s3TmpFilePath(string $filename): string
     {
         return Configure::read('ContentsFile.Setting.S3.tmpDir') . $filename;
     }
@@ -57,15 +62,16 @@ trait S3ContentsFileControllerTrait
     /**
      * s3FilePath
      * S3のファイルのパス作成
+     *
      * @author hagiwara
-     * @param Entity $attachmentData
+     * @param \Cake\ORM\Entity $attachmentData
      * @return string
      */
     private function s3FilePath(Entity $attachmentData): string
     {
         $ext = '';
         if (Configure::read('ContentsFile.Setting.ext') === true) {
-            $ext = '.' . (new \SplFileInfo($attachmentData->file_name))->getExtension();
+            $ext = '.' . (new SplFileInfo($attachmentData->file_name))->getExtension();
         }
         if (Configure::read('ContentsFile.Setting.randomFile') === true && $attachmentData->file_random_path != '') {
             return Configure::read('ContentsFile.Setting.S3.fileDir') . $attachmentData->model . '/' . $attachmentData->model_id . '/' . $attachmentData->file_random_path . $ext;
@@ -74,10 +80,10 @@ trait S3ContentsFileControllerTrait
         }
     }
 
-
     /**
      * s3ResizeSet
      * S3のリサイズ処理
+     *
      * @author hagiwara
      * @param string $filepath
      * @param array $resize

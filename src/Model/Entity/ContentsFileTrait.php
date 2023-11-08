@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ContentsFile\Model\Entity;
 
@@ -13,7 +14,7 @@ use Laminas\Diactoros\UploadedFile;
 
 trait ContentsFileTrait
 {
-    private $contentsFileSettings = [];
+    private array $contentsFileSettings = [];
 
     /**
      * contentsFileSettings
@@ -42,6 +43,7 @@ trait ContentsFileTrait
         if (empty($this->contentsFileSettings)) {
             $this->contentsFileSettings();
         }
+
         return $this->contentsFileSettings;
     }
 
@@ -54,7 +56,7 @@ trait ContentsFileTrait
      * @param mixed $value
      * @return mixed
      */
-    public function getContentsFile(string $property, $value)
+    public function getContentsFile(string $property, mixed $value): mixed
     {
         $this->contentsFileSettings();
         if (
@@ -72,8 +74,7 @@ trait ContentsFileTrait
                     ->where(['model' => $this->getSource()])
                     ->where(['model_id' => $this->id])
                     ->where(['field_name' => $match[1]])
-                    ->first()
-                ;
+                    ->first();
                 if (!empty($attachmentData)) {
                     $value = [
                         'model' => $attachmentData->model,
@@ -90,6 +91,7 @@ trait ContentsFileTrait
                 $value = $this->_fields[$property];
             }
         }
+
         return $value;
     }
 
@@ -98,8 +100,9 @@ trait ContentsFileTrait
      * ファイルのsetterのセッティング
      *
      * @author hagiwara
+     * @return void
      */
-    public function setContentsFile()
+    public function setContentsFile(): void
     {
         $this->contentsFileSettings();
         foreach ($this->contentsFileSettings['fields'] as $field => $fieldSetting) {
@@ -110,7 +113,6 @@ trait ContentsFileTrait
                 $this->ddSetContentsFile($field, $fieldSetting);
             }
         }
-        return $this;
     }
 
     /**
@@ -158,8 +160,6 @@ trait ContentsFileTrait
             //これを残して次に引き渡したくないので
             unset($this->{$field});
 
-            $nowNew = $this->isNew();
-
             $this->set('contents_file_' . $field, $fileSet);
             $this->set('contents_file_' . $field . '_filename', $fileInfo->getClientFilename());
         }
@@ -176,7 +176,6 @@ trait ContentsFileTrait
      */
     private function ddSetContentsFile(string $field, array $fieldSetting): void
     {
-
         $fileInfo = $this->{$field};
         if (!empty($fileInfo)) {
             if (!preg_match('/^data:([^;]+);base64,(.+)$/', $fileInfo, $fileMatch)) {
@@ -240,7 +239,8 @@ trait ContentsFileTrait
         if (count($fileExplode) == 1) {
             return null;
         }
-        return $fileExplode[(count($fileExplode) - 1)];
+
+        return $fileExplode[count($fileExplode) - 1];
     }
 
     /**
@@ -253,7 +253,7 @@ trait ContentsFileTrait
      * @param string $tmpFileName
      * @return mixed
      */
-    private function tmpUpload(UploadedFile $fileInfo, array $fieldSetting, string $tmpFileName)
+    private function tmpUpload(UploadedFile $fileInfo, array $fieldSetting, string $tmpFileName): mixed
     {
         // すでにtraitのため、ここはif文での分岐処理
         if (Configure::read('ContentsFile.Setting.type') == 'normal') {
@@ -264,13 +264,13 @@ trait ContentsFileTrait
             }
 
             return true;
-
         } elseif (Configure::read('ContentsFile.Setting.type') == 's3') {
             $tmpName = Configure::read('ContentsFile.Setting.S3.workingDir') . $tmpFileName;
             $fileInfo->moveTo($tmpName);
             $uploadFileName = Configure::read('ContentsFile.Setting.S3.tmpDir') . $tmpFileName;
 
             $S3 = new S3();
+
             return $S3->upload($tmpName, $uploadFileName);
         } else {
             throw new InternalErrorException('contentsFileConfig type illegal');
@@ -305,7 +305,7 @@ trait ContentsFileTrait
             case IMAGETYPE_JPEG:
                 $image = ImageCreateFromJPEG($input);
                 // exif情報の取得(jpegのみ
-                $exif_datas = @exif_read_data($input);
+                $exif_datas = exif_read_data($input);
                 break;
             case IMAGETYPE_PNG:
                 $image = ImageCreateFromPNG($input);
@@ -320,49 +320,49 @@ trait ContentsFileTrait
         }
 
         // 向き補正
-        if(isset($exif_datas['Orientation'])){
+        if (isset($exif_datas['Orientation'])) {
             $orientation = $exif_datas['Orientation'];
-            if($image){
+            if ($image) {
                 // 未定義
-                if($orientation == 0) {
+                if ($orientation == 0) {
                     // 通常
-                }else if($orientation == 1) {
+                } elseif ($orientation == 1) {
                     // 左右反転
-                }else if($orientation == 2) {
+                } elseif ($orientation == 2) {
                     $image = $this->imageFlop($image);
                     // 180°回転
-                }else if($orientation == 3) {
-                    $image = $this->imageRotate($image,180, 0);
+                } elseif ($orientation == 3) {
+                    $image = $this->imageRotate($image, 180, 0);
                     // 上下反転
-                }else if($orientation == 4) {
+                } elseif ($orientation == 4) {
                     $image = $this->imageFlip($image);
                     // 反時計回りに90°回転 上下反転
-                }else if($orientation == 5) {
-                    $image = $this->imageRotate($image,90, 0);
+                } elseif ($orientation == 5) {
+                    $image = $this->imageRotate($image, 90, 0);
                     $image = $this->imageFlip($image);
                     // 時計回りに90°回転
-                }else if($orientation == 6) {
-                    $image = $this->imageRotate($image,-90, 0);
+                } elseif ($orientation == 6) {
+                    $image = $this->imageRotate($image, -90, 0);
                     // 時計回りに90°回転 上下反転
-                }else if($orientation == 7) {
-                    $image = $this->imageRotate($image,-90, 0);
+                } elseif ($orientation == 7) {
+                    $image = $this->imageRotate($image, -90, 0);
                     $image = $this->imageFlip($image);
                 // 反時計回りに90°回転
-                }else if($orientation == 8) {
-                    $image = $this->imageRotate($image,90, 0);
+                } elseif ($orientation == 8) {
+                    $image = $this->imageRotate($image, 90, 0);
                 }
             }
         }
 
         switch ($imagetype) {
             case IMAGETYPE_GIF:
-                ImageGIF($image ,$output);
+                ImageGIF($image, $output);
                 break;
             case IMAGETYPE_JPEG:
-                ImageJPEG($image ,$output, 100);
+                ImageJPEG($image, $output, 100);
                 break;
             case IMAGETYPE_PNG:
-                ImagePNG($image ,$output);
+                ImagePNG($image, $output);
                 break;
             default:
                 return;
@@ -385,15 +385,16 @@ trait ContentsFileTrait
         // 画像の高さを取得
         $h = imagesy($image);
         // 変換後の画像の生成（元の画像と同じサイズ）
-        $destImage = @imagecreatetruecolor($w,$h);
+        $destImage = imagecreatetruecolor($w, $h);
         // 逆側から色を取得
-        for($i=($w-1);$i>=0;$i--){
-            for($j=0;$j<$h;$j++){
-                $color_index = imagecolorat($image,$i,$j);
-                $colors = imagecolorsforindex($image,$color_index);
-                imagesetpixel($destImage,abs($i-$w+1),$j,imagecolorallocate($destImage,$colors["red"],$colors["green"],$colors["blue"]));
+        for ($i = $w - 1; $i >= 0; $i--) {
+            for ($j = 0; $j < $h; $j++) {
+                $color_index = imagecolorat($image, $i, $j);
+                $colors = imagecolorsforindex($image, $color_index);
+                imagesetpixel($destImage, abs($i - $w + 1), $j, imagecolorallocate($destImage, $colors['red'], $colors['green'], $colors['blue']));
             }
         }
+
         return $destImage;
     }
 
@@ -401,9 +402,9 @@ trait ContentsFileTrait
      * imageFlip
      * http://www.glic.co.jp/blog/archives/88 よりコピペ
      * 上下反転
+     *
      * @param resource $image
      * @return resource
-     *
      * @author hagiwara
      */
     private function imageFlip($image)
@@ -413,31 +414,31 @@ trait ContentsFileTrait
         // 画像の高さを取得
         $h = imagesy($image);
         // 変換後の画像の生成（元の画像と同じサイズ）
-        $destImage = @imagecreatetruecolor($w,$h);
+        $destImage = imagecreatetruecolor($w, $h);
         // 逆側から色を取得
-        for($i=0;$i<$w;$i++){
-            for($j=($h-1);$j>=0;$j--){
-                $color_index = imagecolorat($image,$i,$j);
-                $colors = imagecolorsforindex($image,$color_index);
-                imagesetpixel($destImage,$i,abs($j-$h+1),imagecolorallocate($destImage,$colors["red"],$colors["green"],$colors["blue"]));
+        for ($i = 0; $i < $w; $i++) {
+            for ($j = $h - 1; $j >= 0; $j--) {
+                $color_index = imagecolorat($image, $i, $j);
+                $colors = imagecolorsforindex($image, $color_index);
+                imagesetpixel($destImage, $i, abs($j - $h + 1), imagecolorallocate($destImage, $colors['red'], $colors['green'], $colors['blue']));
             }
         }
+
         return $destImage;
     }
-
 
     /**
      * imageRotate
      * http://www.glic.co.jp/blog/archives/88 よりコピペ
      * 画像を回転
-     * @param resouce $image
-     * @param integer $angle
-     * @param integer $bgd_color
-     * @return resource
      *
+     * @param \ContentsFile\Model\Entity\resouce $image
+     * @param int $angle
+     * @param int $bgd_color
+     * @return resource
      * @author hagiwara
      */
-    private function imageRotate($image, int $angle, int $bgd_color)
+    private function imageRotate(resouce $image, int $angle, int $bgd_color)
     {
         return imagerotate($image, $angle, $bgd_color, 0);
     }

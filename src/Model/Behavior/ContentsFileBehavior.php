@@ -1,30 +1,32 @@
 <?php
+declare(strict_types=1);
 
 namespace ContentsFile\Model\Behavior;
 
 use ArrayObject;
 use Cake\Core\Configure;
+use Cake\Datasource\EntityInterface;
 use Cake\Event\Event;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\Behavior;
-use Cake\Datasource\EntityInterface;
 use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
+use Cake\Utility\Security;
+use ContentsFile\Model\Behavior\Traits\ImageContentsFileBehaviorTrait;
 use ContentsFile\Model\Behavior\Traits\NormalContentsFileBehaviorTrait;
 use ContentsFile\Model\Behavior\Traits\S3ContentsFileBehaviorTrait;
-use ContentsFile\Model\Behavior\Traits\ImageContentsFileBehaviorTrait;
-use Cake\Utility\Security;
 
-class ContentsFileBehavior extends Behavior {
-
+class ContentsFileBehavior extends Behavior
+{
     use NormalContentsFileBehaviorTrait;
     use S3ContentsFileBehaviorTrait;
     use ImageContentsFileBehaviorTrait;
 
     /**
      * __construct
+     *
      * @author hagiwara
-     * @param Table $table
+     * @param \Cake\ORM\Table $table
      * @param array $config
      */
     public function __construct(Table $table, array $config = [])
@@ -36,15 +38,16 @@ class ContentsFileBehavior extends Behavior {
         }
         // Configureの設定不足をチェックする
         $this->{Configure::read('ContentsFile.Setting.type') . 'ParamCheck'}();
-}
+    }
 
     /**
      * afterSave
      * 画像をafterSaveで保存する
+     *
      * @author hagiwara
-     * @param Event $event
-     * @param EntityInterface $entity
-     * @param ArrayObject $options
+     * @param \Cake\Event\Event $event
+     * @param \Cake\Datasource\EntityInterface $entity
+     * @param \ArrayObject $options
      * @return bool
      */
     public function afterSave(Event $event, EntityInterface $entity, ArrayObject $options): bool
@@ -89,12 +92,12 @@ class ContentsFileBehavior extends Behavior {
                     ->where(['model_id' => $entity->id])
                     ->where(['field_name' => $fileInfo['field_name']])
                     ->first();
-    
+
                 // 通常とS3で画像保存方法の切り替え
                 if (!$this->{Configure::read('ContentsFile.Setting.type') . 'FileSave'}($fileInfo, $fieldSettings, $attachmentSaveData, $oldAttachmentData)) {
                     return false;
                 }
-    
+
                 //元のデータがあれば更新にする
                 if (!empty($oldAttachmentData)) {
                     $attachmentEntity->id = $oldAttachmentData->id;
@@ -106,14 +109,14 @@ class ContentsFileBehavior extends Behavior {
         }
 
         return true;
-
     }
 
     /**
      * fileDelete
      * ファイル削除
+     *
      * @author hagiwara
-     * @param EntityInterface $entity
+     * @param \Cake\Datasource\EntityInterface $entity
      * @param array $fields
      * @return bool
      */
@@ -135,12 +138,14 @@ class ContentsFileBehavior extends Behavior {
                 }
             }
         }
+
         return true;
     }
 
     /**
      * fileValidationWhen
      * ファイルのバリデーションのwhenに使用可能なメソッド
+     *
      * @author hagiwara
      * @param array $context
      * @param string $field
@@ -149,7 +154,7 @@ class ContentsFileBehavior extends Behavior {
     public function fileValidationWhen(array $context, string $field): bool
     {
         // 初期遷移時などでdataがそもそもいない場合はチェックしない
-        if ( empty($context['data']) ) {
+        if (empty($context['data'])) {
             return false;
         }
         // content_file_fileがいる場合はチェックしない
@@ -171,8 +176,9 @@ class ContentsFileBehavior extends Behavior {
     /**
      * fileDeleteParts
      * ファイル削除
+     *
      * @author hagiwara
-     * @param EntityInterface $entity
+     * @param \Cake\Datasource\EntityInterface $entity
      * @param string $field
      */
     private function fileDeleteParts(EntityInterface $entity, string $field): bool
@@ -194,18 +200,21 @@ class ContentsFileBehavior extends Behavior {
             }
             $attachmentModel->delete($deleteAttachmentData);
         }
+
         return true;
     }
 
     /**
      * mkdir
      * ディレクトリの作成(パーミッションの設定のため
+     *
      * @author hagiwara
      * @param string $path
-     * @param integer $permission
-     * @param boolean $recursive
+     * @param int $permission
+     * @param bool $recursive
+     * @return bool
      */
-    private function mkdir(string $path, $permission, bool $recursive)
+    private function mkdir(string $path, int $permission, bool $recursive): bool
     {
         if (is_dir($path)) {
             return true;
@@ -213,11 +222,13 @@ class ContentsFileBehavior extends Behavior {
         $oldumask = umask(0);
         $result = mkdir($path, $permission, $recursive);
         umask($oldumask);
+
         return $result;
     }
 
     /**
      * makeRandomKey
+     *
      * @author hagiwara
      * @return string
      */
@@ -232,6 +243,7 @@ class ContentsFileBehavior extends Behavior {
         if ($check > 0) {
             return $this->makeRandomPath();
         }
+
         return $hash;
     }
 }

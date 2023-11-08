@@ -1,7 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace ContentsFile\Aws;
 
+use Aws\Result;
+use Aws\S3\S3Client;
 use Aws\Sdk;
 use Cake\Core\Configure;
 use Cake\Http\Exception\InternalErrorException;
@@ -10,14 +13,16 @@ use Cake\Http\Exception\NotFoundException;
 /**
  * S3
  * AWS SDKのS3関係の処理
+ *
  * @author hagiwara
  */
 class S3
 {
-    private $client;
+    private S3Client $client;
 
     /**
      * __construct
+     *
      * @author hagiwara
      */
     public function __construct()
@@ -33,18 +38,18 @@ class S3
             throw new InternalErrorException('contentsFileS3Config paramater shortage');
         }
         // S3に接続するためのクライアントを用意します。
-        $config = array(
+        $config = [
             'version' => 'latest',
-            'region'  => 'ap-northeast-1'
-        );
+            'region' => 'ap-northeast-1',
+        ];
         // key, secretが指定されている場合はcredentialsを設定する
-        $key    = Configure::read('ContentsFile.Setting.S3.key');
+        $key = Configure::read('ContentsFile.Setting.S3.key');
         $secret = Configure::read('ContentsFile.Setting.S3.secret');
         if (!empty($key) && !empty($secret)) {
-            $config['credentials'] = array(
-                'key'=> $key,
+            $config['credentials'] = [
+                'key' => $key,
                 'secret' => $secret,
-            );
+            ];
         }
         // minio を使用する場合、endpoint を設定する
         $endpoint = Configure::read('ContentsFile.Setting.S3.endpoint');
@@ -59,9 +64,10 @@ class S3
     /**
      * getClient
      * clientを取得
+     *
      * @author hagiwara
      */
-    public function getClient()
+    public function getClient(): S3Client
     {
         return $this->client;
     }
@@ -69,9 +75,10 @@ class S3
     /**
      * upload
      * S3へのファイルアップロード
+     *
      * @author hagiwara
      */
-    public function upload($filepath, $filename)
+    public function upload(string $filepath, string $filename): Result
     {
         // アップロードするべきファイルがない場合
         if (!file_exists($filepath)) {
@@ -87,72 +94,79 @@ class S3
             'Bucket' => $bucketName,
             'Key' => $filename,
             'Body' => $data,
-            'ContentType' => $mimetype
+            'ContentType' => $mimetype,
         ]);
     }
 
     /**
      * upload
      * S3からのファイルダウンロード
+     *
      * @author hagiwara
      */
-    public function download($filename)
+    public function download(string $filename): Result
     {
         // ファイルが存在しない場合は404
         if (!$this->fileExists($filename)) {
             throw new NotFoundException('404 error');
         }
+
         return $this->client->getObject([
             'Bucket' => Configure::read('ContentsFile.Setting.S3.bucket'),
-            'Key' => $filename
+            'Key' => $filename,
         ]);
     }
 
     /**
      * copy
      * S3上でのファイルコピー
+     *
      * @author hagiwara
      */
-    public function copy($oldFilename, $newFilename)
+    public function copy(string $oldFilename, string $newFilename): bool
     {
         // ファイルが存在しない
         if (!$this->fileExists($oldFilename)) {
             return false;
         }
         // 権限不足のExceptionはそのまま出す
-        $this->client->copyObject(array(
+        $this->client->copyObject([
             'Bucket' => Configure::read('ContentsFile.Setting.S3.bucket'),
-            'Key'        => $newFilename,
+            'Key' => $newFilename,
             'CopySource' => Configure::read('ContentsFile.Setting.S3.bucket') . '/' . $oldFilename,
-        ));
+        ]);
+
         return true;
     }
 
     /**
      * delete
      * S3上でのファイル削除
+     *
      * @author hagiwara
      */
-    public function delete($filename)
+    public function delete(string $filename): bool
     {
         // 削除するファイルが存在しない
         if (!$this->fileExists($filename)) {
             return false;
         }
         // 権限不足のExceptionはそのまま出す
-        $this->client->deleteObject(array(
+        $this->client->deleteObject([
             'Bucket' => Configure::read('ContentsFile.Setting.S3.bucket'),
             'Key' => $filename,
-        ));
+        ]);
+
         return true;
     }
 
     /**
      * deleteRecursive
      * S3上でのファイル削除(再帰的)
+     *
      * @author hagiwara
      */
-    public function deleteRecursive($dirname)
+    public function deleteRecursive(string $dirname): bool
     {
         // $dirnameで消す単位は最低でもIDなので文字列内に数値のディレクトリがあることをチェックする
         if (!preg_match('#/[0-9]+/#', $dirname)) {
@@ -167,15 +181,17 @@ class S3
                 }
             }
         }
+
         return true;
     }
 
     /**
      * move
      * S3上でのファイル移動(コピー&削除)
+     *
      * @author hagiwara
      */
-    public function move($oldFilename, $newFilename)
+    public function move(string $oldFilename, string $newFilename): bool
     {
         // 移動するファイルが存在しない
         if (!$this->fileExists($oldFilename)) {
@@ -188,9 +204,10 @@ class S3
     /**
      * fileExists
      * S3上でのファイルの存在チェック(ディレクトリ存在チェックも兼)
+     *
      * @author hagiwara
      */
-    public function fileExists($filename)
+    public function fileExists(string $filename): bool
     {
         return !empty($this->getFileList($filename));
     }
@@ -198,13 +215,14 @@ class S3
     /**
      * getFileList
      * 特定ディレクトリ内のfileの一覧取得
+     *
      * @author hagiwara
      */
-    public function getFileList($dirname)
+    public function getFileList(string $dirname): array
     {
-        return $this->client->listObjects(array(
+        return $this->client->listObjects([
             'Bucket' => Configure::read('ContentsFile.Setting.S3.bucket'),
-            'Prefix' => $dirname
-        ))->get('Contents');
+            'Prefix' => $dirname,
+        ])->get('Contents');
     }
 }
