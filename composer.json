@@ -15,7 +15,7 @@
         "source": "https://github.com/satthi/Contents-file"
     },
     "require": {
-        "cakephp/cakephp": "~4.0",
+        "cakephp/cakephp": "~5.0",
         "ext-gd": "*",
         "aws/aws-sdk-php": "3.*",
         "symfony/filesystem": "5.*",
@@ -23,7 +23,7 @@
     },
     "require-dev": {
         "cakephp/cakephp-codesniffer": "dev-master",
-        "phpunit/phpunit": "<=7.4.1"
+        "phpunit/phpunit": "*"
     },
     "autoload": {
         "psr-4": {
