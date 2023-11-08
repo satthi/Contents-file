@@ -15,12 +15,12 @@ use ContentsFileTrait;
      *
      * @var array
      */
-    protected $_accessible = [
+    protected array $_accessible = [
         '*' => true,
         'id' => false
     ];
 
-    public $contentsFileConfig = [
+    public array $contentsFileConfig = [
         'fields' => [
             'file' => [
                 'resize' => false,
@@ -35,22 +35,17 @@ use ContentsFileTrait;
     ];
 
     //&getメソッドをoverride
-    public function &get($property)
+    public function &get(string $property): mixed
     {
         $value = parent::get($property);
-
         $value = $this->getContentsFile($property, $value);
-
         return $value;
     }
 
     //setメソッドをoverride
 
-    public function set($property, $value = null, array $options = [])
-    {
-
-        parent::set($property, $value , $options);
-
+    public function set(array|string $field, mixed $value = null, array $options = []){
+        parent::set($field, $value , $options);
         $this->setContentsFile();
         return $this;
     }

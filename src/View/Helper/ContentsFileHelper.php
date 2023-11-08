@@ -8,8 +8,8 @@ use Cake\View\Helper;
 
 class ContentsFileHelper extends Helper {
 
-    public $helpers = ['Html', 'Url', 'Form'];
-    private $defaultOption = [
+    public array $helpers = ['Html', 'Url', 'Form'];
+    private array $defaultOption = [
         'target' => '_blank',
         'escape' => false,
         'download' => false

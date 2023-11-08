@@ -6,10 +6,6 @@ use Cake\ORM\TableRegistry;
 use Cake\TestSuite\TestCase;
 use Cake\Utility\Security;
 use Cake\Core\Configure;
-use Cake\Datasource\ConnectionManager;
-use Cake\TestSuite\Fixture\FixtureManager;
-
-
 
 /**
  * App\Model\Table\PostsTable Test Case
@@ -22,7 +18,7 @@ class PostsTableTest extends TestCase
      *
      * @var array
      */
-    protected $manualFixtures = [
+    protected array $fixtures = [
         'plugin.ContentsFile.Posts',
         'plugin.ContentsFile.Attachments',
     ];
@@ -46,21 +42,7 @@ class PostsTableTest extends TestCase
             ],
         ]);
         
-        $this->connection = ConnectionManager::get('test');
-        $this->Posts = new PostsTable([
-            'alias' => 'Posts',
-            'table' => 'posts',
-            'connection' => $this->connection
-        ]);
-
-        //fixtureManagerを呼び出し、fixtureを実行する
-        // auto実行後に手動で実行
-        $this->fixtures = $this->manualFixtures;
-
-        self::$fixtureManager = new FixtureManager();
-        self::$fixtureManager->fixturize($this);
-        self::$fixtureManager->loadSingle('Posts');
-        self::$fixtureManager->loadSingle('Attachments');
+        $this->Posts = new PostsTable();
 
         $this->demoFileDir = dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/demo/';
     }
@@ -124,7 +106,7 @@ class PostsTableTest extends TestCase
             'file_random_path' => null,
         ];
 
-        $this->assertTrue($check_data->contents_file_file === $assert_data);
+        $this->assertEquals($check_data->contents_file_file, $assert_data);
 
         //ファイルが指定の個所にアップロードされており、同一ファイルか
         $uploaded_filepath = $this->fileDir . '/Posts/' . $last_id . '/file';
@@ -185,7 +167,7 @@ class PostsTableTest extends TestCase
             'file_random_path' => null,
         ];
 
-        $this->assertTrue($check_data->contents_file_img === $assert_data);
+        $this->assertEquals($check_data->contents_file_img, $assert_data);
 
         //ファイルが指定の個所にアップロードされており、同一ファイルか
         $uploaded_filepath = $this->fileDir . '/Posts/' . $last_id . '/img';

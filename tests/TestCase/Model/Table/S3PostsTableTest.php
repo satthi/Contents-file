@@ -7,8 +7,7 @@ use Cake\TestSuite\TestCase;
 use Cake\Utility\Security;
 use Cake\Core\Configure;
 use ContentsFile\Aws\S3;
-use Cake\Datasource\ConnectionManager;
-use Cake\TestSuite\Fixture\FixtureManager;
+use Laminas\Diactoros\UploadedFile;
 
 
 /**
@@ -22,7 +21,7 @@ class S3PostsTableTest extends TestCase
      *
      * @var array
      */
-    public $fixtures = [
+    public array $fixtures = [
         'plugin.ContentsFile.Posts',
         'plugin.ContentsFile.Attachments',
     ];
@@ -50,19 +49,7 @@ class S3PostsTableTest extends TestCase
             ]
         ]);
 
-        $this->connection = ConnectionManager::get('test');
-        $this->Posts = new PostsTable([
-            'alias' => 'Posts',
-            'table' => 'posts',
-            'connection' => $this->connection
-        ]);
-
-        //fixtureManagerを呼び出し、fixtureを実行する
-        $this->fixtureManager = new FixtureManager();
-        $this->fixtureManager->fixturize($this);
-        $this->fixtureManager->loadSingle('Posts');
-        $this->fixtureManager->loadSingle('Attachments');
-
+        $this->Posts = new PostsTable();
         $this->demoFileDir = dirname(dirname(dirname(dirname(__FILE__)))) . '/test_app/App/demo/';
 
         $this->S3 = new S3();
@@ -78,7 +65,7 @@ class S3PostsTableTest extends TestCase
     {
         unset($this->Posts);
 
-        //不要なディレクトリは削除する必要がある
+        // 不要なディレクトリは削除する必要がある
         $this->deleteRecursive('contents_file_test');
 
         unset($this->S3);
@@ -97,13 +84,13 @@ class S3PostsTableTest extends TestCase
         $rand = Security::hash(rand());
         copy($demo_filepath , $this->tmpDir . $rand);
 
-        $fileinfo = [
-            'name' => 'demo1.png',
-            'type' => 'image/png',
-            'tmp_name' => $this->tmpDir . $rand,
-            'error' => 0,
-            'size' => filesize($demo_filepath)
-        ];
+        $fileinfo = new UploadedFile(
+            $this->tmpDir . $rand,
+            filesize($demo_filepath),
+            0,
+            'demo1.png',
+            'image/png'
+        );
 
         $entity = $this->Posts->newEntity([]);
         $data = [
@@ -112,7 +99,6 @@ class S3PostsTableTest extends TestCase
         ];
 
         $entity =  $this->Posts->patchEntity($entity, $data);
-
         $this->assertTrue((bool) $this->Posts->save($entity));
 
         //保存データのチェック
@@ -127,9 +113,10 @@ class S3PostsTableTest extends TestCase
             'file_name' => 'demo1.png',
             'file_content_type' => 's3',
             'file_size' => (string) filesize($demo_filepath),
+            'file_random_path' => null,
         ];
 
-        $this->assertTrue($check_data->contents_file_file === $assert_data);
+        $this->assertEquals($check_data->contents_file_file, $assert_data);
 
         $s3_file = $this->S3->download('contents_file_test/file/Posts/' . $last_id . '/file');
         $s3_file_cont = $s3_file['Body']->getContents();
@@ -155,13 +142,13 @@ class S3PostsTableTest extends TestCase
         $rand = Security::hash(rand());
         copy($demo_filepath , $this->tmpDir . $rand);
 
-        $fileinfo = [
-            'name' => 'demo1.png',
-            'type' => 'image/png',
-            'tmp_name' => $this->tmpDir . $rand,
-            'error' => 0,
-            'size' => filesize($demo_filepath)
-        ];
+        $fileinfo = new UploadedFile(
+            $this->tmpDir . $rand,
+            filesize($demo_filepath),
+            0,
+            'demo1.png',
+            'image/png'
+        );
 
         $entity = $this->Posts->newEntity([]);
         $data = [
@@ -185,9 +172,10 @@ class S3PostsTableTest extends TestCase
             'file_name' => 'demo1.png',
             'file_content_type' => 's3',
             'file_size' => (string) filesize($demo_filepath),
+            'file_random_path' => null,
         ];
 
-        $this->assertTrue($check_data->contents_file_img === $assert_data);
+        $this->assertEquals($check_data->contents_file_img, $assert_data);
 
         $s3_file = $this->S3->download('contents_file_test/file/Posts/' . $last_id . '/img');
         $s3_file_cont = $s3_file['Body']->getContents();
@@ -205,8 +193,8 @@ class S3PostsTableTest extends TestCase
         $resize_filepath2 = $this->tmpDir . 'Posts_' . $last_id . '_300_400';
 
         // S3からファイルを落としてくる
-        $s3_resize_file1 = $this->S3->download('contents_file_test/file/Posts/' . $last_id . '/contents_file_resize_img/300_0');
-        $s3_resize_file2 = $this->S3->download('contents_file_test/file/Posts/' . $last_id . '/contents_file_resize_img/300_400');
+        $s3_resize_file1 = $this->S3->download('contents_file_test/file/Posts/' . $last_id . '/contents_file_resize_img/300_0_normal');
+        $s3_resize_file2 = $this->S3->download('contents_file_test/file/Posts/' . $last_id . '/contents_file_resize_img/300_400_normal');
 
         $s3_resize_file1_cont = $s3_resize_file1['Body']->getContents();
         $s3_resize_file2_cont = $s3_resize_file2['Body']->getContents();

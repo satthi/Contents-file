@@ -79,7 +79,6 @@ trait S3ContentsFileBehaviorTrait
         // 該当ファイルを消す
         // 失敗=ディレクトリが存在しないため、成功失敗判定は行わない。
         $this->s3FileDelete($attachmentSaveData['model'], $attachmentSaveData['model_id'], $fileInfo['field_name']);
-
         // tmpに挙がっているファイルを移
         if (!$S3->move($oldFilepath, $newFilepath)) {
             return false;

@@ -1,4 +1,5 @@
 <?php
+use Migrations\TestSuite\Migrator;
 
 function find_root() {
     $root = dirname(__DIR__);
@@ -50,11 +51,6 @@ require CORE_PATH . 'config/bootstrap.php';
 Cake\Core\Configure::write('App', ['namespace' => 'App']);
 Cake\Core\Configure::write('debug', 2);
 
-$Tmp = new \Cake\Filesystem\Folder(TMP);
-$Tmp->create(TMP . 'cache/models', 0777);
-$Tmp->create(TMP . 'cache/persistent', 0777);
-$Tmp->create(TMP . 'cache/views', 0777);
-
 $cache = [
     'default' => [
         'engine' => 'File',
@@ -96,6 +92,8 @@ if (!getenv('TESTDB') || getenv('TESTDB') == 'postgresql'){
         'password' => 'postgres',
         'timezone' => 'UTC'
     ]);
+    Cake\Datasource\ConnectionManager::alias('test', 'default');
+
 } else {
     if (!getenv('db_class')) {
         putenv('db_class=Cake\Database\Driver\Mysql');
@@ -111,5 +109,10 @@ if (!getenv('TESTDB') || getenv('TESTDB') == 'postgresql'){
         'password' => '',
         'timezone' => 'UTC'
     ]);
-
+    Cake\Datasource\ConnectionManager::alias('test', 'default');
 }
+
+// migration 実行
+$migrator = new Migrator();
+$migrator->run();
+

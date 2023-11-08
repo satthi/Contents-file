@@ -62,6 +62,7 @@ class ContentsFileBehavior extends Behavior {
                 // ファイルの削除に成功したら保存処理は飛ばす
                 continue;
             }
+
             //contents_file_の方に入ったentityをベースに処理する
             $fileInfo = $entity->{'contents_file_' . $field};
             if (
@@ -88,12 +89,12 @@ class ContentsFileBehavior extends Behavior {
                     ->where(['model_id' => $entity->id])
                     ->where(['field_name' => $fileInfo['field_name']])
                     ->first();
-
+    
                 // 通常とS3で画像保存方法の切り替え
                 if (!$this->{Configure::read('ContentsFile.Setting.type') . 'FileSave'}($fileInfo, $fieldSettings, $attachmentSaveData, $oldAttachmentData)) {
                     return false;
                 }
-
+    
                 //元のデータがあれば更新にする
                 if (!empty($oldAttachmentData)) {
                     $attachmentEntity->id = $oldAttachmentData->id;
