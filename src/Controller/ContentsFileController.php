@@ -1,12 +1,13 @@
 <?php
+declare(strict_types=1);
 
 namespace ContentsFile\Controller;
 
 use Cake\Core\Configure;
+use Cake\Http\Exception\NotFoundException;
+use Cake\ORM\Table;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Inflector;
-use Cake\Http\Exception\NotFoundException;
-use ContentsFile\Controller\AppController;
 use ContentsFile\Controller\Traits\NormalContentsFileControllerTrait;
 use ContentsFile\Controller\Traits\S3ContentsFileControllerTrait;
 
@@ -14,7 +15,8 @@ class ContentsFileController extends AppController
 {
     use S3ContentsFileControllerTrait;
     use NormalContentsFileControllerTrait;
-    private $baseModel;
+
+    private Table $baseModel;
 
     /**
      * initialize
@@ -37,12 +39,13 @@ class ContentsFileController extends AppController
             Configure::write('ContentsFile.Setting.S3.fileDir', Configure::read('ContentsFile.Setting.S3.fileDir') . '/');
         }
         if (!preg_match('#/$#', Configure::read('ContentsFile.Setting.S3.workingDir') ?? '')) {
-            Configure::write('ContentsFile.Setting.S3.workingDir', Configure::read('ContentsFile.Setting.S3.workingDir'). '/');
+            Configure::write('ContentsFile.Setting.S3.workingDir', Configure::read('ContentsFile.Setting.S3.workingDir') . '/');
         }
     }
 
     /**
      * loader
+     *
      * @author hagiwara
      * @return void
      */
@@ -82,8 +85,7 @@ class ContentsFileController extends AppController
                 ->where(['model' => $this->request->getQuery('model')])
                 ->where(['model_id' => $this->request->getQuery('model_id')])
                 ->where(['field_name' => $this->request->getQuery('field_name')])
-                ->first()
-            ;
+                ->first();
             if (empty($attachmentData)) {
                 throw new NotFoundException('404 error');
             }
@@ -102,29 +104,30 @@ class ContentsFileController extends AppController
 
     /**
      * getFileType
+     *
      * @author hagiwara
      * @param string $ext
      * @return string
      */
-    private function getFileType($ext): string
+    private function getFileType(string $ext): string
     {
         $aContentTypes = [
-            'txt'=>'text/plain',
-            'htm'=>'text/html',
-            'html'=>'text/html',
-            'jpg'=>'image/jpeg',
-            'jpeg'=>'image/jpeg',
-            'gif'=>'image/gif',
-            'png'=>'image/png',
-            'bmp'=>'image/x-bmp',
-            'ai'=>'application/postscript',
-            'psd'=>'image/x-photoshop',
-            'eps'=>'application/postscript',
-            'pdf'=>'application/pdf',
-            'swf'=>'application/x-shockwave-flash',
-            'lzh'=>'application/x-lha-compressed',
-            'zip'=>'application/x-zip-compressed',
-            'sit'=>'application/x-stuffit',
+            'txt' => 'text/plain',
+            'htm' => 'text/html',
+            'html' => 'text/html',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'png' => 'image/png',
+            'bmp' => 'image/x-bmp',
+            'ai' => 'application/postscript',
+            'psd' => 'image/x-photoshop',
+            'eps' => 'application/postscript',
+            'pdf' => 'application/pdf',
+            'swf' => 'application/x-shockwave-flash',
+            'lzh' => 'application/x-lha-compressed',
+            'zip' => 'application/x-zip-compressed',
+            'sit' => 'application/x-stuffit',
             'mp3' => 'audio/mpeg',
             'wav' => 'audio/wav',
             'mp4' => 'video/mp4',
@@ -138,11 +141,13 @@ class ContentsFileController extends AppController
         if (!empty($aContentTypes[$ext])) {
             $sContentType = $aContentTypes[$ext];
         }
+
         return $sContentType;
     }
 
     /**
      * getMimeType
+     *
      * @author hagiwara
      * @param string $filename
      * @return string
@@ -150,22 +155,22 @@ class ContentsFileController extends AppController
     private function getMimeType(string $filename): string
     {
         $aContentTypes = [
-            'txt'=>'text/plain',
-            'htm'=>'text/html',
-            'html'=>'text/html',
-            'jpg'=>'image/jpeg',
-            'jpeg'=>'image/jpeg',
-            'gif'=>'image/gif',
-            'png'=>'image/png',
-            'bmp'=>'image/x-bmp',
-            'ai'=>'application/postscript',
-            'psd'=>'image/x-photoshop',
-            'eps'=>'application/postscript',
-            'pdf'=>'application/pdf',
-            'swf'=>'application/x-shockwave-flash',
-            'lzh'=>'application/x-lha-compressed',
-            'zip'=>'application/x-zip-compressed',
-            'sit'=>'application/x-stuffit',
+            'txt' => 'text/plain',
+            'htm' => 'text/html',
+            'html' => 'text/html',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'png' => 'image/png',
+            'bmp' => 'image/x-bmp',
+            'ai' => 'application/postscript',
+            'psd' => 'image/x-photoshop',
+            'eps' => 'application/postscript',
+            'pdf' => 'application/pdf',
+            'swf' => 'application/x-shockwave-flash',
+            'lzh' => 'application/x-lha-compressed',
+            'zip' => 'application/x-zip-compressed',
+            'sit' => 'application/x-stuffit',
             'mp3' => 'audio/mpeg',
             'wav' => 'audio/wav',
             'mp4' => 'video/mp4',
@@ -173,21 +178,24 @@ class ContentsFileController extends AppController
             'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'css' => 'text/css',
-    ];
+        ];
         $sContentType = 'application/octet-stream';
 
-        if (($pos = strrpos($filename, ".")) !== false) {
+        $pos = strrpos($filename, '.');
+        if ($pos !== false) {
             // 拡張子がある場合
             $ext = strtolower(substr($filename, $pos + 1));
             if (strlen($ext)) {
                 return array_key_exists($ext, $aContentTypes) ? $aContentTypes[$ext] : $sContentType;
             }
         }
+
         return $sContentType;
     }
 
     /**
      * fileDownloadHeader
+     *
      * @author hagiwara
      * @param string $filename
      * @return void

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace ContentsFile\Validation;
 
@@ -10,25 +11,26 @@ class ContentsFileValidation extends Validation
     /**
      * checkMaxSize
      *
-     * @param UploadedFile $value
-     * @param int|string $max
+     * @param \Laminas\Diactoros\UploadedFile $value
+     * @param string|int $max
      * @param mixed $context
      * @return bool
      */
-    public static function checkMaxSize(UploadedFile $value, $max, $context): bool
+    public static function checkMaxSize(UploadedFile $value, int|string $max, mixed $context): bool
     {
         $maxValue = self::calcFileSizeUnit($max);
+
         return $maxValue >= $value->getSize();
     }
 
     /**
      * uploadMaxSizeCheck
      *
-     * @param UploadedFile $value
+     * @param \Laminas\Diactoros\UploadedFile $value
      * @param mixed $context
      * @return bool
      */
-    public static function uploadMaxSizeCheck(UploadedFile $value, $context): bool
+    public static function uploadMaxSizeCheck(UploadedFile $value, mixed $context): bool
     {
         return $value->getError() != UPLOAD_ERR_INI_SIZE;
     }
@@ -38,19 +40,20 @@ class ContentsFileValidation extends Validation
      *
      * e.g.) 100KB -> 1024000
      *
-     * @param int|string $size
+     * @param string|int $size
      * @return int|bool
      */
-    private static function calcFileSizeUnit($size)
+    private static function calcFileSizeUnit(int|string $size): int|bool
     {
         $units = ['K', 'M', 'G', 'T'];
         $byte = 1024;
 
         if (is_numeric($size) || is_int($size)) {
             return $size;
-        } else if (is_string($size) && preg_match('/^([0-9]+(?:\.[0-9]+)?)(' . implode('|', $units) . ')B?$/i', $size, $matches)) {
+        } elseif (is_string($size) && preg_match('/^([0-9]+(?:\.[0-9]+)?)(' . implode('|', $units) . ')B?$/i', $size, $matches)) {
             return $matches[1] * pow($byte, array_search($matches[2], $units) + 1);
         }
+
         return false;
     }
 
@@ -58,7 +61,7 @@ class ContentsFileValidation extends Validation
      * checkExtension
      * 拡張子のチェック
      *
-     * @param UploadedFile $value
+     * @param \Laminas\Diactoros\UploadedFile $value
      * @param array $extensions
      * @return bool
      */
@@ -90,7 +93,7 @@ class ContentsFileValidation extends Validation
      * @param mixed $context
      * @return bool
      */
-    public static function extensionDd(string $value, array $extensions, string $filenameField, $context): bool
+    public static function extensionDd(string $value, array $extensions, string $filenameField, mixed $context): bool
     {
         // チェックに必要なフィールドがない
         if (!array_key_exists($filenameField, $context['data'])) {
@@ -106,5 +109,4 @@ class ContentsFileValidation extends Validation
 
         return false;
     }
-
 }

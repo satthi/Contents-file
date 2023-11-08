@@ -1,13 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace ContentsFile\Model\Behavior\Traits;
 
 use Cake\Core\Configure;
-use Cake\I18n\Time;
 use Cake\Http\Exception\InternalErrorException;
+use Cake\I18n\Time;
 use Cake\ORM\TableRegistry;
 use Cake\Utility\Security;
 use ContentsFile\Aws\S3;
+use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
@@ -18,10 +20,10 @@ use Symfony\Component\Finder\Finder;
  */
 trait S3ContentsFileBehaviorTrait
 {
-
     /**
      * s3ParamCheck
      * 通常の設定値チェック
+     *
      * @author hagiwara
      * @return void
      */
@@ -35,7 +37,6 @@ trait S3ContentsFileBehaviorTrait
             !array_key_exists('tmpDir', $s3Setting) ||
             !array_key_exists('fileDir', $s3Setting) ||
             !array_key_exists('workingDir', $s3Setting)
-
         ) {
             throw new InternalErrorException('contentsFileS3Config paramater shortage');
         }
@@ -55,6 +56,7 @@ trait S3ContentsFileBehaviorTrait
     /**
      * s3FileSave
      * ファイルをS3に保存
+     *
      * @author hagiwara
      * @param array $fileInfo
      * @param array $fieldSettings
@@ -71,7 +73,7 @@ trait S3ContentsFileBehaviorTrait
             $newFilepath = $newFiledir . $fileInfo['field_name'];
         }
         if (Configure::read('ContentsFile.Setting.ext') === true) {
-            $ext = (new \SplFileInfo($attachmentSaveData['file_name']))->getExtension();
+            $ext = (new SplFileInfo($attachmentSaveData['file_name']))->getExtension();
             $newFilepath .= '.' . $ext;
         }
         $oldFilepath = Configure::read('ContentsFile.Setting.S3.tmpDir') . $fileInfo['tmp_file_name'];
@@ -79,12 +81,10 @@ trait S3ContentsFileBehaviorTrait
         // 該当ファイルを消す
         // 失敗=ディレクトリが存在しないため、成功失敗判定は行わない。
         $this->s3FileDelete($attachmentSaveData['model'], $attachmentSaveData['model_id'], $fileInfo['field_name']);
-
         // tmpに挙がっているファイルを移
         if (!$S3->move($oldFilepath, $newFilepath)) {
             return false;
         }
-
 
         //リサイズ画像作成
         if (!empty($fieldSettings['resize'])) {
@@ -94,15 +94,17 @@ trait S3ContentsFileBehaviorTrait
                 }
             }
         }
+
         return true;
     }
 
     /**
      * s3FileDelete
      * S3のファイル削除
+     *
      * @author hagiwara
      * @param string $modelName
-     * @param integer $modelId
+     * @param int $modelId
      * @param string $field
      * @return bool
      */
@@ -114,8 +116,7 @@ trait S3ContentsFileBehaviorTrait
             ->where(['model' => $modelName])
             ->where(['model_id' => $modelId])
             ->where(['field_name' => $field])
-            ->first()
-        ;
+            ->first();
         // 削除するべきファイルがない
         if (empty($attachmentData)) {
             return false;
@@ -126,7 +127,7 @@ trait S3ContentsFileBehaviorTrait
             $deleteField = $attachmentData->field_name;
         }
 
-       $S3 = new S3();
+        $S3 = new S3();
         // リサイズのディレクトリ
         $resizeDir = Configure::read('ContentsFile.Setting.S3.fileDir') . $modelName . '/' . $modelId . '/' . 'contents_file_resize_' . $deleteField . '/';
         if (!$S3->deleteRecursive($resizeDir)) {
@@ -136,18 +137,20 @@ trait S3ContentsFileBehaviorTrait
         // 大元のファイル
         $deleteFile = Configure::read('ContentsFile.Setting.S3.fileDir') . $modelName . '/' . $modelId . '/' . $deleteField;
         if (Configure::read('ContentsFile.Setting.ext') === true) {
-            $ext = (new \SplFileInfo($attachmentData->file_name))->getExtension();
+            $ext = (new SplFileInfo($attachmentData->file_name))->getExtension();
             $deleteFile .= '.' . $ext;
         }
         if (!$S3->delete($deleteFile)) {
             return false;
         }
+
         return true;
     }
 
     /**
      * s3ImageResize
      * 画像のリサイズ処理(S3用)
+     *
      * @author hagiwara
      * @param string $filepath
      * @param array $resize
@@ -163,11 +166,12 @@ trait S3ContentsFileBehaviorTrait
         // ベースのファイルを取得
         $baseObject = $S3->download($filepath);
         $fp = fopen($tmpPath, 'w');
-        fwrite($fp, $baseObject['Body']);
+        fwrite($fp, $baseObject['Body']->getContents());
         fclose($fp);
         if (!$this->imageResize($tmpPath, $resize)) {
             //失敗時はそのままのパスを返す(画像以外の可能性あり)
             unlink($tmpPath);
+
             return $filepath;
         }
 
@@ -189,7 +193,7 @@ trait S3ContentsFileBehaviorTrait
         $filesystem->remove($resizeFileDir);
 
         unlink($tmpPath);
+
         return $imagepathinfo['resize_filepath'];
     }
-
 }

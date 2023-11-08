@@ -1,8 +1,8 @@
 <?php
+declare(strict_types=1);
+
 namespace ContentsFile\Test\App\Model\Table;
 
-use Cake\ORM\Query;
-use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
 
@@ -11,7 +11,6 @@ use Cake\Validation\Validator;
  */
 class PostsTable extends Table
 {
-
     /**
      * Initialize method
      *

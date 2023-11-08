@@ -16,3 +16,6 @@
 nbproject/*
 # Visual Studio Code
 .vscode
+
+.phpunit.cache
+.phpunit.result.cache

@@ -1,29 +1,32 @@
 <?php
+declare(strict_types=1);
 
 namespace ContentsFile\View\Helper;
 
 use Cake\Core\Configure;
 use Cake\ORM\Entity;
 use Cake\View\Helper;
+use SplFileInfo;
 
-class ContentsFileHelper extends Helper {
-
-    public $helpers = ['Html', 'Url', 'Form'];
-    private $defaultOption = [
+class ContentsFileHelper extends Helper
+{
+    public array $helpers = ['Html', 'Url', 'Form'];
+    private array $defaultOption = [
         'target' => '_blank',
         'escape' => false,
-        'download' => false
+        'download' => false,
     ];
 
     /**
      * link
+     *
      * @author hagiwara
      * @param array|null $fileInfo
      * @param array $options
      * @param string $title
      * @return string|null
      */
-    public function link($fileInfo, array $options = [], string $title = null): string
+    public function link(?array $fileInfo, array $options = [], ?string $title = null): string
     {
         if (empty($fileInfo)) {
             return '';
@@ -55,12 +58,13 @@ class ContentsFileHelper extends Helper {
 
     /**
      * image
+     *
      * @author hagiwara
      * @param array|null $fileInfo
      * @param array $options
      * @return string
      */
-    public function image($fileInfo, array $options = []): string
+    public function image(?array $fileInfo, array $options = []): string
     {
         if (empty($fileInfo)) {
             return '';
@@ -74,20 +78,23 @@ class ContentsFileHelper extends Helper {
                 $fileInfo['resize'] = $options['resize'];
                 unset($options['resize']);
             }
+
             return $this->Html->image($this->urlArray($fileInfo, $options), $options);
         }
+
         return '';
     }
 
     /**
      * url
+     *
      * @author hagiwara
      * @param array|null $fileInfo
-     * @param boolean|array $buildOptions
+     * @param array|bool $buildOptions
      * @param array $urlArrayOptions
      * @return string
      */
-    public function url($fileInfo, $buildOptions = [], array $urlArrayOptions = []): string
+    public function url(?array $fileInfo, bool|array $buildOptions = [], array $urlArrayOptions = []): string
     {
         if (empty($fileInfo)) {
             return [];
@@ -96,7 +103,7 @@ class ContentsFileHelper extends Helper {
         // 互換性保持のためにboolを許可する
         if (is_bool($buildOptions)) {
             $buildOptions = [
-                'fullBase' => $buildOptions
+                'fullBase' => $buildOptions,
             ];
         }
 
@@ -108,6 +115,7 @@ class ContentsFileHelper extends Helper {
             $this->defaultOption,
             $urlArrayOptions
         );
+
         return $this->Url->build($this->urlArray($fileInfo, $urlArrayOptions), $buildOptions);
     }
 
@@ -121,7 +129,7 @@ class ContentsFileHelper extends Helper {
      * @param string $field
      * @return string
      */
-    public function contentsFileHidden($contentFileData, string $field): string
+    public function contentsFileHidden(?array $contentFileData, string $field): string
     {
         $hiddenInput = '';
         if (!empty($contentFileData)) {
@@ -129,17 +137,19 @@ class ContentsFileHelper extends Helper {
                 $hiddenInput .= $this->Form->input($field . '.' . $fieldParts, ['type' => 'hidden', 'value' => $v]);
             }
         }
+
         return $hiddenInput;
     }
 
     /**
      * urlArray
+     *
      * @author hagiwara
      * @param array|null $fileInfo
      * @param array $options
      * @return array
      */
-    private function urlArray($fileInfo, array $options)
+    private function urlArray(?array $fileInfo, array $options): array
     {
         if (!empty($fileInfo['tmp_file_name'])) {
             return [
@@ -153,7 +163,7 @@ class ContentsFileHelper extends Helper {
                     'field_name' => $fileInfo['field_name'],
                     'tmp_file_name' => $fileInfo['tmp_file_name'],
                     'download' => $options['download'],
-                ]
+                ],
             ];
         } else {
             if (!isset($fileInfo['resize'])) {
@@ -182,7 +192,7 @@ class ContentsFileHelper extends Helper {
                         'model_id' => $fileInfo['model_id'],
                         'resize' => $fileInfo['resize'],
                         'download' => $options['download'],
-                    ]
+                    ],
                 ];
             }
         }
@@ -191,6 +201,7 @@ class ContentsFileHelper extends Helper {
     /**
      * makeStaticS3Url
      * 静的ホスティング用のURL作成
+     *
      * @author hagiwara
      * @param array $fileInfo
      * @return string
@@ -230,7 +241,7 @@ class ContentsFileHelper extends Helper {
 
         // 拡張子設定をtrueにした場合S3にも拡張子付きとなるのでURLにも拡張子をつける
         if (Configure::read('ContentsFile.Setting.ext') === true) {
-            $staticS3Url .= '.' . (new \SplFileInfo($fileInfo['file_name']))->getExtension();
+            $staticS3Url .= '.' . (new SplFileInfo($fileInfo['file_name']))->getExtension();
         }
 
         return $staticS3Url;
@@ -240,8 +251,9 @@ class ContentsFileHelper extends Helper {
     /**
      * displayFilename
      * 静的ホスティング用のURL作成
+     *
      * @author hagiwara
-     * @param Entity $entity
+     * @param \Cake\ORM\Entity $entity
      * @param array $field
      * @return string
      */

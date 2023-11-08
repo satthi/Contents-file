@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ContentsFile\Test\App\Model\Entity;
 
 use Cake\ORM\Entity;
@@ -9,18 +11,19 @@ use ContentsFile\Model\Entity\ContentsFileTrait;
  */
 class Post extends Entity
 {
-use ContentsFileTrait;
+    use ContentsFileTrait;
+
     /**
      * Fields that can be mass assigned using newEntity() or patchEntity().
      *
      * @var array
      */
-    protected $_accessible = [
+    protected array $_accessible = [
         '*' => true,
-        'id' => false
+        'id' => false,
     ];
 
-    public $contentsFileConfig = [
+    public array $contentsFileConfig = [
         'fields' => [
             'file' => [
                 'resize' => false,
@@ -35,10 +38,10 @@ use ContentsFileTrait;
     ];
 
     //&getメソッドをoverride
-    public function &get($property)
+
+    public function &get(string $property): mixed
     {
         $value = parent::get($property);
-
         $value = $this->getContentsFile($property, $value);
 
         return $value;
@@ -46,13 +49,11 @@ use ContentsFileTrait;
 
     //setメソッドをoverride
 
-    public function set($property, $value = null, array $options = [])
+    public function set(array|string $field, mixed $value = null, array $options = [])
     {
-
-        parent::set($property, $value , $options);
-
+        parent::set($field, $value, $options);
         $this->setContentsFile();
+
         return $this;
     }
-
 }

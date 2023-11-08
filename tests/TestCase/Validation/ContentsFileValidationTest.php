@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace ContentsFile\Test\TestCase\Validation;
 
 use Cake\TestSuite\TestCase;
@@ -7,11 +9,9 @@ use Laminas\Diactoros\UploadedFile;
 
 /**
  * Test Case for Validation Class
- *
  */
 class ContentsFileValidationTest extends TestCase
 {
-
     /**
      * setUp method
      *
@@ -41,8 +41,8 @@ class ContentsFileValidationTest extends TestCase
     {
         $fp = new UploadedFile('dummy', 2000000, UPLOAD_ERR_OK);
         // $value['size'] = 2000000;
-        $this->assertTrue(ContentsFileValidation::checkMaxSize($fp,'2M',[]));
-        $this->assertFalse(ContentsFileValidation::checkMaxSize($fp,'1M',[]));
+        $this->assertTrue(ContentsFileValidation::checkMaxSize($fp, '2M', []));
+        $this->assertFalse(ContentsFileValidation::checkMaxSize($fp, '1M', []));
     }
 
     /**
@@ -53,27 +53,27 @@ class ContentsFileValidationTest extends TestCase
     public function test_uploadMaxSizeCheck()
     {
         $fp = new UploadedFile('dummy', 2000000, UPLOAD_ERR_INI_SIZE);
-        $this->assertFalse(ContentsFileValidation::uploadMaxSizeCheck($fp,[]));
+        $this->assertFalse(ContentsFileValidation::uploadMaxSizeCheck($fp, []));
 
         $fp = new UploadedFile('dummy', 2000000, UPLOAD_ERR_OK);
-        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp,[]));
+        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp, []));
 
         $fp = new UploadedFile('dummy', 2000000, UPLOAD_ERR_FORM_SIZE);
-        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp,[]));
+        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp, []));
 
         $fp = new UploadedFile('dummy', 2000000, UPLOAD_ERR_PARTIAL);
-        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp,[]));
+        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp, []));
 
         $fp = new UploadedFile('dummy', 2000000, UPLOAD_ERR_NO_FILE);
-        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp,[]));
+        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp, []));
 
         $fp = new UploadedFile('dummy', 2000000, UPLOAD_ERR_NO_TMP_DIR);
-        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp,[]));
+        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp, []));
 
         $fp = new UploadedFile('dummy', 2000000, UPLOAD_ERR_CANT_WRITE);
-        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp,[]));
+        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp, []));
 
         $fp = new UploadedFile('dummy', 2000000, UPLOAD_ERR_EXTENSION);
-        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp,[]));
+        $this->assertTrue(ContentsFileValidation::uploadMaxSizeCheck($fp, []));
     }
 }

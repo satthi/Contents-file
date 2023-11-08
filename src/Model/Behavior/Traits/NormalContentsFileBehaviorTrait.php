@@ -1,10 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace ContentsFile\Model\Behavior\Traits;
 
 use Cake\Core\Configure;
 use Cake\Http\Exception\InternalErrorException;
 use Cake\ORM\TableRegistry;
+use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -14,10 +16,10 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 trait NormalContentsFileBehaviorTrait
 {
-
     /**
      * normalParamCheck
      * 通常の設定値チェック
+     *
      * @author hagiwara
      * @return void
      */
@@ -44,6 +46,7 @@ trait NormalContentsFileBehaviorTrait
     /**
      * normalFileSave
      * ファイルを保存
+     *
      * @author hagiwara
      * @param array $fileInfo
      * @param array $fieldSettings
@@ -61,7 +64,7 @@ trait NormalContentsFileBehaviorTrait
         }
 
         if (Configure::read('ContentsFile.Setting.ext') === true) {
-            $ext = (new \SplFileInfo($attachmentSaveData['file_name']))->getExtension();
+            $ext = (new SplFileInfo($attachmentSaveData['file_name']))->getExtension();
             $newFilepath .= '.' . $ext;
         }
 
@@ -83,15 +86,17 @@ trait NormalContentsFileBehaviorTrait
                 }
             }
         }
+
         return true;
     }
 
     /**
      * normalFileDelete
      * 通常のファイル削除
+     *
      * @author hagiwara
      * @param string $modelName
-     * @param integer $modelId
+     * @param int $modelId
      * @param string $field
      * @return bool
      */
@@ -103,8 +108,7 @@ trait NormalContentsFileBehaviorTrait
             ->where(['model' => $modelName])
             ->where(['model_id' => $modelId])
             ->where(['field_name' => $field])
-            ->first()
-        ;
+            ->first();
         // 削除するべきファイルがない
         if (empty($attachmentData)) {
             return false;
@@ -127,18 +131,20 @@ trait NormalContentsFileBehaviorTrait
         // 大元のファイル
         $deleteFile = Configure::read('ContentsFile.Setting.Normal.fileDir') . $modelName . '/' . $modelId . '/' . $deleteField;
         if (Configure::read('ContentsFile.Setting.ext') === true) {
-            $ext = (new \SplFileInfo($attachmentData->file_name))->getExtension();
+            $ext = (new SplFileInfo($attachmentData->file_name))->getExtension();
             $deleteFile .= '.' . $ext;
         }
         if (file_exists($deleteFile) && !unlink($deleteFile)) {
             return false;
         }
+
         return true;
     }
 
     /**
      * normalImageResize
      * 通常のファイルのリサイズ
+     *
      * @author hagiwara
      * @param string $newFilepath
      * @param array $resizeSettings

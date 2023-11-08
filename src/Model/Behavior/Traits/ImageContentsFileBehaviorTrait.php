@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace ContentsFile\Model\Behavior\Traits;
 
 use Cake\Core\Configure;
+use SplFileInfo;
 
 /**
  * ImageContentsFileBehaviorTrait
@@ -10,11 +12,10 @@ use Cake\Core\Configure;
  */
 trait ImageContentsFileBehaviorTrait
 {
-    private $tp;
-
     /**
      * imageResize
      * 画像のリサイズ処理(外からでもたたけるようにpublicにする
+     *
      * @author hagiwara
      * @param string $imagePath
      * @param array $baseSize
@@ -38,11 +39,12 @@ trait ImageContentsFileBehaviorTrait
     /**
      * getImageInfo
      * 画像情報の取得
+     *
      * @author hagiwara
      * @param string $imagePath
-     * @return bool|array
+     * @return array|bool
      */
-    private function getImageInfo(string $imagePath)
+    private function getImageInfo(string $imagePath): bool|array
     {
         if (file_exists($imagePath) === false) {
             return false;
@@ -67,6 +69,7 @@ trait ImageContentsFileBehaviorTrait
             default:
                 $image = false;
         }
+
         return [
             'image' => $image,
             'imagetype' => $imagetype,
@@ -76,6 +79,7 @@ trait ImageContentsFileBehaviorTrait
     /**
      * imageSizeInfo
      * 画像リサイズ情報の取得
+     *
      * @author hagiwara
      * @param resource $image
      * @param array $baseSize
@@ -125,6 +129,7 @@ trait ImageContentsFileBehaviorTrait
                 $reSizeY = $sizeY * $mag;
             }
         }
+
         return [
             'sizeX' => $sizeX,
             'sizeY' => $sizeY,
@@ -137,6 +142,7 @@ trait ImageContentsFileBehaviorTrait
     /**
      * imageResizeMake
      * 画像リサイズ情報の取得
+     *
      * @author hagiwara
      * @param resource $image
      * @param int $imagetype
@@ -163,8 +169,8 @@ trait ImageContentsFileBehaviorTrait
         switch ($imagetype) {
             case IMAGETYPE_GIF:
                 //透過GIF対策
-                $alpha = imagecolortransparent($image);  // 元画像から透過色を取得する
-                imagefill($outImage, 0, 0, $alpha);       // その色でキャンバスを塗りつぶす
+                $alpha = imagecolortransparent($image); // 元画像から透過色を取得する
+                imagefill($outImage, 0, 0, $alpha); // その色でキャンバスを塗りつぶす
                 imagecolortransparent($outImage, $alpha); // 塗りつぶした色を透過色として指定する
                 //!透過GIF対策
                 break;
@@ -226,6 +232,7 @@ trait ImageContentsFileBehaviorTrait
     /**
      * getPathInfo
      * 通常のpathinfoに加えてContentsFile独自のpathも一緒に設定する
+     *
      * @author hagiwara
      * @param string $imagePath
      * @param array $resize
@@ -249,10 +256,11 @@ trait ImageContentsFileBehaviorTrait
             }
             $pathinfo['resize_filepath'] = $pathinfo['resize_dir'] . '/' . $resize['width'] . '_' . $resize['height'] . '_' . $resize['type'];
             if (Configure::read('ContentsFile.Setting.ext') === true) {
-                $ext = (new \SplFileInfo($imagePath))->getExtension();
+                $ext = (new SplFileInfo($imagePath))->getExtension();
                 $pathinfo['resize_filepath'] .= '.' . $ext;
             }
         }
+
         return $pathinfo;
     }
 }

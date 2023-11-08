@@ -1,38 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit
-    colors="true"
-    processIsolation="false"
-    stopOnFailure="false"
-    bootstrap="./tests/bootstrap.php"
-    >
-
-    <!-- Add any additional test suites you want to run here -->
-    <testsuites>
-        <testsuite name="All Tests">
-            <directory>./tests/TestCase/Model/Table/PostsTableTest.php</directory>
-            <directory>./tests/TestCase/Validation/ContentsFileValidationTest.php</directory>
-        </testsuite>
-        <!-- Add plugin test suites here. -->
-    </testsuites>
-
-    <!-- Setup a listener for fixtures -->
-    <!--
-    <listeners>
-        <listener
-        class="\Cake\TestSuite\Fixture\FixtureInjector"
-        file="./vendor/cakephp/cakephp/src/TestSuite/Fixture/FixtureInjector.php">
-            <arguments>
-                <object class="\Cake\TestSuite\Fixture\FixtureManager" />
-            </arguments>
-        </listener>
-    </listeners>
-    -->
-    <php>
-        <!-- Postgres
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" processIsolation="false" stopOnFailure="false" bootstrap="./tests/bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.4/phpunit.xsd" cacheDirectory=".phpunit.cache">
+  <!-- Add any additional test suites you want to run here -->
+  <testsuites>
+    <testsuite name="All Tests">
+      <file>./tests/TestCase/Model/Table/PostsTableTest.php</file>
+      <file>./tests/TestCase/Validation/ContentsFileValidationTest.php</file>
+    </testsuite>
+    <!-- Add plugin test suites here. -->
+  </testsuites>
+  <!-- Setup a listener for fixtures -->
+  <php>
+    <!-- Postgres
         <env name="db_dsn" value="postgres://root@localhost/cake_test_db"/>
         -->
-        <!-- Mysql
+    <!-- Mysql
         <env name="db_dsn" value="mysql://root@localhost/cake_test_db"/>
         -->
-    </php>
+  </php>
 </phpunit>

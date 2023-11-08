@@ -1,10 +1,12 @@
 <?php
+declare(strict_types=1);
+
 namespace ContentsFile\Model\Table;
 
 use Cake\ORM\Table;
+
 class AttachmentsTable extends Table
 {
-
     /**
      * Initialize method
      *
