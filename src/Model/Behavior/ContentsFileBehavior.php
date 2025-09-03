@@ -48,9 +48,9 @@ class ContentsFileBehavior extends Behavior
      * @param \Cake\Event\Event $event
      * @param \Cake\Datasource\EntityInterface $entity
      * @param \ArrayObject $options
-     * @return bool
+     * @return void
      */
-    public function afterSave(Event $event, EntityInterface $entity, ArrayObject $options): bool
+    public function afterSave(Event $event, EntityInterface $entity, ArrayObject $options): void
     {
         //設定値をentityから取得
         $contentsFileConfig = $entity->getContentsFileSettings();
@@ -60,7 +60,8 @@ class ContentsFileBehavior extends Behavior
             if ($entity->{'delete_' . $field} == true) {
                 // 該当フィールドを削除
                 if (!$this->fileDelete($entity, [$field])) {
-                    return false;
+                    $event->setResult(false);
+                    return;
                 }
                 // ファイルの削除に成功したら保存処理は飛ばす
                 continue;
@@ -95,7 +96,8 @@ class ContentsFileBehavior extends Behavior
 
                 // 通常とS3で画像保存方法の切り替え
                 if (!$this->{Configure::read('ContentsFile.Setting.type') . 'FileSave'}($fileInfo, $fieldSettings, $attachmentSaveData, $oldAttachmentData)) {
-                    return false;
+                    $event->setResult(false);
+                    return;
                 }
 
                 //元のデータがあれば更新にする
@@ -103,12 +105,13 @@ class ContentsFileBehavior extends Behavior
                     $attachmentEntity->id = $oldAttachmentData->id;
                 }
                 if (!$attachmentModel->save($attachmentEntity)) {
-                    return false;
+                    $event->setResult(false);
+                    return;
                 }
             }
         }
 
-        return true;
+        $event->setResult(true);
     }
 
     /**
