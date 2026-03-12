@@ -68,7 +68,7 @@ class ContentsFileBehavior extends Behavior
             }
 
             //contents_file_の方に入ったentityをベースに処理する
-            $fileInfo = $entity->{'contents_file_' . $field};
+            $fileInfo = $entity->getInfo($field);
             if (
                 !empty($fileInfo) &&
                 //tmp_file_nameがある=アップロードしたファイルがある

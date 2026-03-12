@@ -113,7 +113,7 @@ class S3PostsTableTest extends TestCase
             'file_random_path' => null,
         ];
 
-        $this->assertEquals($check_data->contents_file_file, $assert_data);
+        $this->assertEquals($check_data->get('file'), $assert_data);
 
         $s3_file = $this->S3->download('contents_file_test/file/Posts/' . $last_id . '/file');
         $s3_file_cont = $s3_file['Body']->getContents();
@@ -172,7 +172,7 @@ class S3PostsTableTest extends TestCase
             'file_random_path' => null,
         ];
 
-        $this->assertEquals($check_data->contents_file_img, $assert_data);
+        $this->assertEquals($check_data->getInfo('img'), $assert_data);
 
         $s3_file = $this->S3->download('contents_file_test/file/Posts/' . $last_id . '/img');
         $s3_file_cont = $s3_file['Body']->getContents();

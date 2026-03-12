@@ -37,7 +37,6 @@ trait S3ContentsFileControllerTrait
         $this->response = $this->response->withHeader('Content-Length', filesize($topath));
         $fileContentType = $this->getMimeType($topath);
         $this->response = $this->response->withType($fileContentType);
-        ob_end_clean(); // clean
         $fp = fopen($topath, 'r');
         $body = fread($fp, filesize($topath));
         fclose($fp);

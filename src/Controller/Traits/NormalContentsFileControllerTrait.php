@@ -38,7 +38,6 @@ trait NormalContentsFileControllerTrait
             $fileContentType = $this->getMimeType($filepath);
         }
         $this->response = $this->response->withType($fileContentType);
-        ob_end_clean(); // clean
         $fp = fopen($filepath, 'r');
         $body = fread($fp, filesize($filepath));
         fclose($fp);

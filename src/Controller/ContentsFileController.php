@@ -71,7 +71,6 @@ class ContentsFileController extends AppController
         if (!empty($this->request->getQuery('tmp_file_name'))) {
             $filename = $this->request->getQuery('tmp_file_name');
             $filepath = $this->{Configure::read('ContentsFile.Setting.type') . 'TmpFilePath'}($filename);
-            Configure::read('ContentsFile.Setting.Normal.tmpDir') . $filename;
         } elseif (!empty($this->request->getQuery('model_id'))) {
             //表示条件をチェックする
             $checkMethodName = 'contentsFileCheck' . Inflector::camelize($fieldName);
@@ -99,6 +98,7 @@ class ContentsFileController extends AppController
         }
 
         $this->fileDownloadHeader($filename);
+
         $this->{Configure::read('ContentsFile.Setting.type') . 'Loader'}($filename, $filepath);
     }
 
