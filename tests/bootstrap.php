@@ -94,7 +94,7 @@ if (!getenv('TESTDB') || getenv('TESTDB') == 'postgresql') {
         'className' => 'Cake\Database\Connection',
         'driver' => 'Cake\Database\Driver\Postgres',
         //'dsn' => getenv('db_dsn'),
-        'host' => 'db',
+        'host' => 'postgres',
         'database' => 'cake_test_db',
         'username' => 'postgres',
         'password' => 'postgres',

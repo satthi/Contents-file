@@ -13,6 +13,11 @@ use ContentsFile\Test\App\Model\Table\PostsTable;
  */
 class PostsTableTest extends TestCase
 {
+    private string $tmpDir;
+    private string $fileDir;
+    private string $demoFileDir;
+    private PostsTable $Posts;
+    
     /**
      * Fixtures
      *
@@ -106,7 +111,7 @@ class PostsTableTest extends TestCase
             'file_random_path' => null,
         ];
 
-        $this->assertEquals($check_data->contents_file_file, $assert_data);
+        $this->assertEquals($check_data->getInfo('file'), $assert_data);
 
         //ファイルが指定の個所にアップロードされており、同一ファイルか
         $uploaded_filepath = $this->fileDir . '/Posts/' . $last_id . '/file';
@@ -167,7 +172,7 @@ class PostsTableTest extends TestCase
             'file_random_path' => null,
         ];
 
-        $this->assertEquals($check_data->contents_file_img, $assert_data);
+        $this->assertEquals($check_data->getInfo('img'), $assert_data);
 
         //ファイルが指定の個所にアップロードされており、同一ファイルか
         $uploaded_filepath = $this->fileDir . '/Posts/' . $last_id . '/img';
@@ -193,7 +198,6 @@ class PostsTableTest extends TestCase
         $image1_x = ImageSX($image1);
         //リサイズのチェック
         $this->assertEquals($image1_x, 300);
-        ImageDestroy($image1);
 
         $image2 = ImageCreateFromPNG($resize_filepath2);
         $image2_x = ImageSX($image2);
@@ -203,7 +207,6 @@ class PostsTableTest extends TestCase
             ($image2_x == 300 && $image2_y <= 400) ||
             ($image2_x <= 300 && $image2_y == 400)
         );
-        ImageDestroy($image2);
     }
 
     /**

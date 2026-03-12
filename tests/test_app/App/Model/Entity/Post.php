@@ -37,21 +37,9 @@ class Post extends Entity
         ],
     ];
 
-    //&getメソッドをoverride
-
-    public function &get(string $property): mixed
+    public function patch(array $values, array $options = []): static
     {
-        $value = parent::get($property);
-        $value = $this->getContentsFile($property, $value);
-
-        return $value;
-    }
-
-    //setメソッドをoverride
-
-    public function set(array|string $field, mixed $value = null, array $options = [])
-    {
-        parent::set($field, $value, $options);
+        parent::patch($values, $options);
         $this->setContentsFile();
 
         return $this;

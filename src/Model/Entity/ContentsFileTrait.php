@@ -48,6 +48,18 @@ trait ContentsFileTrait
     }
 
     /**
+     * getInfo
+     * ファイル情報の取得。Entityで取得が難しくなったため
+     * @param string $field
+     * @return array
+     */
+    public function getInfo(string $field): array
+    {
+        return $this->getContentsFile('contents_file_' . $field, []);
+
+    }
+
+    /**
      * getContentsFile
      * ファイルのgetterのセッティング
      *

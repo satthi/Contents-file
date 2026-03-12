@@ -199,8 +199,6 @@ trait ImageContentsFileBehaviorTrait
             return false;
         }
 
-        ImageDestroy($image);
-
         // 画像保存
         $imagepathinfo = $this->getPathInfo($imagePath, $baseSize);
         //resizeファイルを格納するディレクトリを作成
@@ -223,8 +221,6 @@ trait ImageContentsFileBehaviorTrait
             default:
                 return false;
         }
-
-        ImageDestroy($outImage);
 
         return true;
     }

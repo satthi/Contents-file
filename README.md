@@ -220,19 +220,11 @@ class Topic extends Entity
         'delete_img' => true,
     ];
 
-
-    //&getメソッドをoverride
-    public function &get(string $property): mixed
+    public function patch(array $values, array $options = []): static
     {
-        $value = parent::get($property);
-        $value = $this->getContentsFile($property, $value);
-        return $value;
-    }
-
-    //setメソッドをoverride
-    public function set(array|string $field, mixed $value = null, array $options = []){
-        parent::set($field, $value , $options);
+        parent::patch($values, $options);
         $this->setContentsFile();
+
         return $this;
     }
 }
@@ -264,16 +256,16 @@ form.php
         <?php
             echo $this->Form->control('file', ['type' => 'file']);
             // バリデーションに引っかかった際に、再度ファイルを登録しなくて済むための対応
-            echo $this->ContentsFile->contentsFileHidden($topic->contents_file_file, 'contents_file_file');
-            if (!empty($topic->contents_file_file)) {
-                echo $this->ContentsFile->link($topic->contents_file_file);
+            echo $this->ContentsFile->contentsFileHidden($topic->getInfo('file'), 'contents_file_file');
+            if (!empty($topic->getInfo('file'))) {
+                echo $this->ContentsFile->link($topic->getInfo('file'));
                 // 「delete_フィールド名」がtrueでファイルを削除
                 echo $this->Form->control('delete_file', ['type' => 'checkbox', 'label' => 'delete']);
             }
             echo $this->Form->control('img', ['type' => 'file']);
-            echo $this->ContentsFile->contentsFileHidden($topic->contents_file_img, 'contents_file_img');
-            if (!empty($topic->contents_file_img)) {
-                echo $this->ContentsFile->image($topic->contents_file_img);
+            echo $this->ContentsFile->contentsFileHidden($topic->getInfo('img'), 'contents_file_img');
+            if (!empty($topic->getInfo('img'))) {
+                echo $this->ContentsFile->image($topic->getInfo('img'));
                 echo $this->Form->control('delete_img', ['type' => 'checkbox', 'label' => 'delete']);
             }
         ?>
@@ -285,13 +277,13 @@ form.php
 view.php
 ```php
 <?php // linkでファイルのリンク作成?>
-<?= $this->ContentsFile->link($topic->contents_file_file);?>
+<?= $this->ContentsFile->link($topic->getInfo('file'));?>
 <?php // imgでimgタグ作成 リサイズお画像の指定はオプションで指定?>
-<?= $this->ContentsFile->image($topic->contents_file_img, ['resize' => ['width' => 300, 'height' => 400, 'type' => 'scoop']]);?>
+<?= $this->ContentsFile->image($topic->getInfo('img'), ['resize' => ['width' => 300, 'height' => 400, 'type' => 'scoop']]);?>
 
 <?php // 静的ホスティングにアクセス?>
 <?php // linkでファイルのリンク作成?>
-<?= $this->ContentsFile->link($topic->contents_file_file, ['static_s3' => true]);?>
+<?= $this->ContentsFile->link($topic->getInfo('file'), ['static_s3' => true]);?>
 <?php // imgでimgタグ作成 リサイズお画像の指定はオプションで指定?>
-<?= $this->ContentsFile->image($topic->contents_file_img, ['resize' => ['width' => 300], 'static_s3' => true]);?>
+<?= $this->ContentsFile->image($topic->getInfo('img'), ['resize' => ['width' => 300], 'static_s3' => true]);?>
 ```
