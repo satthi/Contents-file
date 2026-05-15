@@ -160,7 +160,7 @@ trait ImageContentsFileBehaviorTrait
             $campusX = $baseSize['width'];
             $campusY = $baseSize['height'];
         }
-        $outImage = ImageCreateTrueColor($campusX, $campusY);
+        $outImage = ImageCreateTrueColor((int)$campusX, (int)$campusY);
         if (!$outImage) {
             // リサイズ後の画像作成失敗
             return false;
@@ -190,10 +190,10 @@ trait ImageContentsFileBehaviorTrait
         $diffY = 0;
         // くりぬきの場合(幅と高さが両方必要)
         if ($imageSizeInfo['type'] == 'scoop' && !empty($baseSize['width']) && !empty($baseSize['height'])) {
-            $diffX = ($imageSizeInfo['sizeX'] - ($baseSize['width'] * $imageSizeInfo['sizeX'] / $imageSizeInfo['reSizeX'])) / 2;
-            $diffY = ($imageSizeInfo['sizeY'] - ($baseSize['height'] * $imageSizeInfo['sizeY'] / $imageSizeInfo['reSizeY'])) / 2;
+            $diffX = (int)(($imageSizeInfo['sizeX'] - ($baseSize['width'] * $imageSizeInfo['sizeX'] / $imageSizeInfo['reSizeX'])) / 2);
+            $diffY = (int)(($imageSizeInfo['sizeY'] - ($baseSize['height'] * $imageSizeInfo['sizeY'] / $imageSizeInfo['reSizeY'])) / 2);
         }
-        $ret = imagecopyresampled($outImage, $image, 0, 0, $diffX, $diffY, $imageSizeInfo['reSizeX'], $imageSizeInfo['reSizeY'], $imageSizeInfo['sizeX'], $imageSizeInfo['sizeY']);
+        $ret = imagecopyresampled($outImage, $image, 0, 0, $diffX, $diffY, (int)$imageSizeInfo['reSizeX'], (int)$imageSizeInfo['reSizeY'], (int)$imageSizeInfo['sizeX'], (int)$imageSizeInfo['sizeY']);
         if ($ret === false) {
             // リサイズ失敗
             return false;
