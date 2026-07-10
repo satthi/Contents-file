@@ -28,9 +28,10 @@ trait S3ContentsFileControllerTrait
         // S3より該当ファイルを取得
         $S3 = new S3();
         $fileObject = $S3->download($filepath);
+        $fileBody = (string)$fileObject['Body'];
         $topath = Configure::read('ContentsFile.Setting.S3.workingDir') . $filename;
         $fp = fopen($topath, 'w');
-        fwrite($fp, $fileObject['Body']);
+        fwrite($fp, $fileBody);
         fclose($fp);
 
         // ファイルの出力
