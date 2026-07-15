@@ -220,9 +220,11 @@ class S3
      */
     public function getFileList(string $dirname): array
     {
-        return $this->client->listObjects([
+        $contents = $this->client->listObjects([
             'Bucket' => Configure::read('ContentsFile.Setting.S3.bucket'),
             'Prefix' => $dirname,
         ])->get('Contents');
+
+        return $contents ?? [];
     }
 }
